@@ -488,23 +488,16 @@
         </div>
       </div>
 
-      <div class="model-card dim">
+      <div class="model-card">
         <div class="model-head">
           <div>
             <div class="model-name">Modelo de Migración de Votos</div>
-            <div class="model-desc">Proyección de segunda vuelta por transferencia electoral</div>
+            <div class="model-desc">WLS simplicial + Estimador FPC por transferencia electoral</div>
           </div>
-          <span class="badge badge-off">En desarrollo</span>
+          <span class="badge badge-on">Activo</span>
         </div>
-        <div class="model-body">
-          <div class="placeholder">
-            <div class="ph-icon">🔬</div>
-            <div class="ph-title">Metodología en definición</div>
-            <div class="ph-text">
-              Estimará el resultado de la segunda vuelta modelando cómo migran los votos
-              de los candidatos eliminados hacia los dos finalistas.
-            </div>
-          </div>
+        <div class="model-body" id="migr-body">
+          <div class="loader"><div class="spinner"></div> Calculando migración…</div>
         </div>
       </div>
 
@@ -530,6 +523,7 @@
 const S = {
   data:        { primera: null, segunda: null },
   prop:        null,
+  migr:        null,
   activeRound: 'primera',
   ambito:      { primera: 'total', segunda: 'total' },
   showAll:     { primera: false, segunda: false },
@@ -638,6 +632,18 @@ async function fetchProp() {
     renderProp();
   } catch(e) {
     setHTML('prop-body', errBox(e));
+  }
+}
+
+async function fetchMigr() {
+  setHTML('migr-body', loader('Calculando migración…'));
+  try {
+    const r = await fetch('/api/model/migration');
+    const j = await r.json();
+    S.migr = j;
+    renderMigr();
+  } catch(e) {
+    setHTML('migr-body', errBox(e));
   }
 }
 
@@ -879,6 +885,75 @@ function renderProp() {
     </table>${note}`);
 }
 
+// ─── Migration model card ─────────────────────────────────────────────────────
+function renderMigr() {
+  const d = S.migr;
+  if (!d) return;
+
+  // Not-ready states
+  if (!d.ok && d.status === 'waiting') {
+    setHTML('migr-body', `
+      <div class="placeholder">
+        <div class="ph-icon">⏳</div>
+        <div class="ph-title">Esperando datos de segunda vuelta</div>
+        <div class="ph-text">El modelo se activará automáticamente cuando comiencen a llegar resultados del balotaje.</div>
+      </div>`);
+    return;
+  }
+  if (d.status === 'insufficient_data') {
+    setHTML('migr-body', `
+      <div class="placeholder">
+        <div class="ph-icon">📊</div>
+        <div class="ph-title">Datos insuficientes</div>
+        <div class="ph-text">${d.message}</div>
+      </div>`);
+    return;
+  }
+  if (!d.ok) {
+    setHTML('migr-body', errBox({message: d.error || 'Error desconocido'}));
+    return;
+  }
+
+  const finalists = d.finalists || [];
+  if (finalists.length === 0) {
+    setHTML('migr-body', `<div class="placeholder"><div class="ph-text">Sin datos de finalistas.</div></div>`);
+    return;
+  }
+
+  const totalObs = finalists.reduce((s, f) => s + f.observed_votes, 0);
+  const pct      = d.pct_coverage || 0;
+
+  const rows = finalists.map(f => {
+    const obs = totalObs > 0 ? (f.observed_votes / totalObs) * 100 : 0;
+    const validNote = f.valid_share != null
+      ? `<span class="ci" style="margin-left:4px">(${f2(f.valid_share)}% válidos)</span>` : '';
+    return `<tr class="adv">
+      <td>
+        <span class="pdot" style="background:${pColor(f.id)}"></span>
+        <strong>${trunc(f.name, 30)}</strong>
+      </td>
+      <td>${f2(obs)}%</td>
+      <td><strong>${f2(f.projected_share)}%</strong>${validNote}</td>
+      <td><span class="ci">[${f2(f.lower_bound)}, ${f2(f.upper_bound)}]</span></td>
+    </tr>`;
+  }).join('');
+
+  const covNote = pct >= 100
+    ? '<div class="info-note">✓ Escrutinio al 100% — la migración confirma los resultados definitivos.</div>'
+    : `<div class="info-note" style="background:var(--blue-light);color:#1E40AF">
+        Basado en <strong>${fN(d.n_districts_reported)}</strong> de <strong>${fN(d.n_districts_total)}</strong> distritos
+        (${f1(pct)}% de cobertura) — IC 95% con estimador FPC.
+      </div>`;
+
+  setHTML('migr-body', `
+    <table class="mtable">
+      <thead><tr>
+        <th>Candidato</th><th>Observado</th><th>Proyectado (F1 vs F2)</th><th>IC 95%</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>${covNote}`);
+}
+
 // ─── Department table ─────────────────────────────────────────────────────────
 function renderDeptTable(round, departamental, parties) {
   const pfx = round === 'primera' ? 'p1' : 'p2';
@@ -998,11 +1073,14 @@ async function refreshAll() {
     if (charts[r]) { charts[r].destroy(); charts[r] = null; }
   });
   S.prop = null;
+  S.migr = null;
   setHTML('p1-finalists', '');
   setHTML('prop-body', loader('Calculando proyección…'));
+  setHTML('migr-body', loader('Calculando migración…'));
 
   await Promise.all([fetchRound('primera'), fetchRound('segunda')]);
   fetchProp();
+  fetchMigr();
 
   btn.disabled = false; btn.textContent = '↻ Actualizar';
 }
@@ -1010,7 +1088,8 @@ async function refreshAll() {
 // ─── Init ──────────────────────────────────────────────────────────────────────
 (async () => {
   await Promise.all([fetchRound('primera'), fetchRound('segunda')]);
-  fetchProp();  // background, no await
+  fetchProp();   // background, no await
+  fetchMigr();   // background, no await
 })();
 </script>
 </body>

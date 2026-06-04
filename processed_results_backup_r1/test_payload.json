@@ -1,0 +1,254 @@
+[
+  {
+    "ubigeo": "010202",
+    "ambito": "1",
+    "departamento": "AMAZONAS",
+    "provincia": "BAGUA",
+    "distrito": "ARAMANGO",
+    "actas_total": 34,
+    "actas_contabilizadas": 12,
+    "pct_actas_contabilizadas": 35.29,
+    "pct_participacion": 61.995,
+    "votos_emitidos": 2053,
+    "votos_validos": 1509,
+    "votos_habiles": 9383,
+    "votos_partidos": {
+      "10": 703, "80": 386, "8": 283, "14": 174, "81": 158, "32": 66, "2": 38, "24": 32, "35": 30, "1": 28
+    }
+  },
+  {
+    "ubigeo": "010201",
+    "ambito": "1",
+    "departamento": "AMAZONAS",
+    "provincia": "BAGUA",
+    "distrito": "LA PECA",
+    "actas_total": 25,
+    "actas_contabilizadas": 19,
+    "pct_actas_contabilizadas": 76.0,
+    "pct_participacion": 66.397,
+    "votos_emitidos": 3374,
+    "votos_validos": 2572,
+    "votos_habiles": 6687,
+    "votos_partidos": {
+      "10": 893, "80": 582, "8": 528, "14": 316, "81": 220, "2": 116, "35": 109, "20": 99, "16": 65
+    }
+  },
+  {
+    "ubigeo": "010306",
+    "ambito": "1",
+    "departamento": "AMAZONAS",
+    "provincia": "BONGARÁ",
+    "distrito": "FLORIDA",
+    "actas_total": 17,
+    "actas_contabilizadas": 2,
+    "pct_actas_contabilizadas": 11.76,
+    "pct_participacion": 71.455,
+    "votos_emitidos": 413,
+    "votos_validos": 310,
+    "votos_habiles": 4908,
+    "votos_partidos": {
+      "10": 106, "8": 69, "80": 67, "14": 46, "81": 36, "2": 18, "16": 11, "35": 9
+    }
+  },
+  {
+    "ubigeo": "010309",
+    "ambito": "1",
+    "departamento": "AMAZONAS",
+    "provincia": "BONGARÁ",
+    "distrito": "SHIPASBAMBA",
+    "actas_total": 6,
+    "actas_contabilizadas": 0,
+    "pct_actas_contabilizadas": 0.0,
+    "pct_participacion": 0.0,
+    "votos_emitidos": 0,
+    "votos_validos": 0,
+    "votos_habiles": 1509,
+    "votos_partidos": {}
+  },
+  {
+    "ubigeo": "010101",
+    "ambito": "1",
+    "departamento": "AMAZONAS",
+    "provincia": "CHACHAPOYAS",
+    "distrito": "CHACHAPOYAS",
+    "actas_total": 76,
+    "actas_contabilizadas": 62,
+    "pct_actas_contabilizadas": 81.58,
+    "pct_participacion": 74.824,
+    "votos_emitidos": 13436,
+    "votos_validos": 10990,
+    "votos_habiles": 22013,
+    "votos_partidos": {
+      "8": 1954, "80": 1543, "2": 1428, "16": 1423, "14": 1138, "35": 931, "81": 904, "10": 866, "33": 707
+    }
+  },
+  {
+    "ubigeo": "010108",
+    "ambito": "1",
+    "departamento": "AMAZONAS",
+    "provincia": "CHACHAPOYAS",
+    "distrito": "HUANCAS",
+    "actas_total": 3,
+    "actas_contabilizadas": 1,
+    "pct_actas_contabilizadas": 33.33,
+    "pct_participacion": 80.168,
+    "votos_emitidos": 222,
+    "votos_validos": 174,
+    "votos_habiles": 832,
+    "votos_partidos": {
+      "8": 53, "80": 35, "10": 23, "14": 20, "81": 13, "2": 12
+    }
+  },
+  {
+    "ubigeo": "010601",
+    "ambito": "1",
+    "departamento": "AMAZONAS",
+    "provincia": "CONDORCANQUI",
+    "distrito": "NIEVA",
+    "actas_total": 86,
+    "actas_contabilizadas": 22,
+    "pct_actas_contabilizadas": 25.58,
+    "pct_participacion": 41.778,
+    "votos_emitidos": 2544,
+    "votos_validos": 1868,
+    "votos_habiles": 23807,
+    "votos_partidos": {
+      "10": 1272, "80": 506, "81": 171, "8": 115, "32": 85, "14": 71, "20": 57
+    }
+  },
+  {
+    "ubigeo": "010602",
+    "ambito": "1",
+    "departamento": "AMAZONAS",
+    "provincia": "CONDORCANQUI",
+    "distrito": "EL CENEPA",
+    "actas_total": 42,
+    "actas_contabilizadas": 3,
+    "pct_actas_contabilizadas": 7.14,
+    "pct_participacion": 38.502,
+    "votos_emitidos": 312,
+    "votos_validos": 220,
+    "votos_habiles": 11340,
+    "votos_partidos": {
+      "10": 140, "80": 52, "81": 18, "8": 10, "14": 0
+    }
+  },
+  {
+    "ubigeo": "010405",
+    "ambito": "1",
+    "departamento": "AMAZONAS",
+    "provincia": "LUYA",
+    "distrito": "CONILA",
+    "actas_total": 6,
+    "actas_contabilizadas": 4,
+    "pct_actas_contabilizadas": 66.67,
+    "pct_participacion": 70.699,
+    "votos_emitidos": 775,
+    "votos_validos": 609,
+    "votos_habiles": 1645,
+    "votos_partidos": {
+      "10": 247, "8": 123, "80": 111, "81": 55, "14": 54, "2": 54
+    }
+  },
+  {
+    "ubigeo": "010401",
+    "ambito": "1",
+    "departamento": "AMAZONAS",
+    "provincia": "LUYA",
+    "distrito": "LÁMUD",
+    "actas_total": 12,
+    "actas_contabilizadas": 10,
+    "pct_actas_contabilizadas": 83.33,
+    "pct_participacion": 76.112,
+    "votos_emitidos": 2104,
+    "votos_validos": 1840,
+    "votos_habiles": 3315,
+    "votos_partidos": {
+      "80": 710, "10": 520, "8": 310, "2": 180, "14": 120
+    }
+  },
+  {
+    "ubigeo": "010501",
+    "ambito": "1",
+    "departamento": "AMAZONAS",
+    "provincia": "RODRÍGUEZ DE MENDOZA",
+    "distrito": "SAN NICOLÁS",
+    "actas_total": 31,
+    "actas_contabilizadas": 15,
+    "pct_actas_contabilizadas": 48.38,
+    "pct_participacion": 69.450,
+    "votos_emitidos": 2980,
+    "votos_validos": 2410,
+    "votos_habiles": 8850,
+    "votos_partidos": {
+      "14": 920, "8": 610, "80": 450, "10": 310, "35": 120
+    }
+  },
+  {
+    "ubigeo": "010504",
+    "ambito": "1",
+    "departamento": "AMAZONAS",
+    "provincia": "RODRÍGUEZ DE MENDOZA",
+    "distrito": "CHIRIMOTO",
+    "actas_total": 5,
+    "actas_contabilizadas": 1,
+    "pct_actas_contabilizadas": 20.0,
+    "pct_participacion": 72.115,
+    "votos_emitidos": 150,
+    "votos_validos": 85,
+    "votos_habiles": 1040,
+    "votos_partidos": {
+      "14": 45, "8": 25, "80": 15
+    }
+  },
+  {
+    "ubigeo": "010512",
+    "ambito": "1",
+    "departamento": "AMAZONAS",
+    "provincia": "RODRÍGUEZ DE MENDOZA",
+    "distrito": "VISTA ALEGRE",
+    "actas_total": 4,
+    "actas_contabilizadas": 0,
+    "pct_actas_contabilizadas": 0.0,
+    "pct_participacion": 0.0,
+    "votos_emitidos": 0,
+    "votos_validos": 0,
+    "votos_habiles": 915,
+    "votos_partidos": {}
+  },
+  {
+    "ubigeo": "010701",
+    "ambito": "1",
+    "departamento": "AMAZONAS",
+    "provincia": "UTCUBAMBA",
+    "distrito": "BAGUA GRANDE",
+    "actas_total": 142,
+    "actas_contabilizadas": 115,
+    "pct_actas_contabilizadas": 80.99,
+    "pct_participacion": 72.441,
+    "votos_emitidos": 28450,
+    "votos_validos": 23110,
+    "votos_habiles": 48500,
+    "votos_partidos": {
+      "8": 8120, "80": 6450, "10": 4310, "14": 2100, "81": 1200, "2": 930
+    }
+  },
+  {
+    "ubigeo": "010703",
+    "ambito": "1",
+    "卫生": "1",
+    "departamento": "AMAZONAS",
+    "provincia": "UTCUBAMBA",
+    "distrito": "CUMBA",
+    "actas_total": 22,
+    "actas_contabilizadas": 8,
+    "pct_actas_contabilizadas": 36.36,
+    "pct_participacion": 65.118,
+    "votos_emitidos": 1430,
+    "votos_validos": 1120,
+    "votos_habiles": 6050,
+    "votos_partidos": {
+      "8": 450, "80": 310, "10": 210, "14": 150
+    }
+  }
+]

@@ -71,6 +71,20 @@ def api_model_propagation():
         return jsonify({"ok": False, "error": str(exc)}), 500
 
 
+@app.route("/api/model/migration")
+def api_model_migration():
+    now = time.time()
+    if "migr" in _cache and now - _cache["migr"]["ts"] < CACHE_TTL:
+        return jsonify(_cache["migr"]["data"])
+    try:
+        from migration_model import get_migration_data
+        data = get_migration_data()
+        _cache["migr"] = {"ts": now, "data": data}
+        return jsonify(data)
+    except Exception as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 500
+
+
 if __name__ == "__main__":
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 5000
     print(f"Dashboard → http://127.0.0.1:{port}")
