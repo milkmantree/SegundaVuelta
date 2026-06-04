@@ -1,149 +1,274 @@
+import json
+import os
 import numpy as np
 import pandas as pd
+import plotly.graph_objects as go
+import plotly.io as pio
 
 
-def run_stratified_projection(
-    df, stratum_col, candidate_cols, fallback_col=None, z_score=1.96
-):
-    """Executes an election projection using Stratified Random Sampling.
+def preprocess_electoral_data(json_filepath, party_mapping_filepath):
+    """Loads raw aggregated distrital JSON data, flattens the nested party votes,
 
-    Parameters:
-    -----------
-    df : pd.DataFrame
-        The input election dataset containing reporting data per unit.
-    stratum_col : str
-        The primary column used for stratification (e.g., 'distrito',
-        'provincia').
-    candidate_cols : list
-        List of strings representing candidate columns (valid votes only).
-    fallback_col : str, optional
-        The larger geographic tier to fall back on if N-1 requirement fails.
-    z_score : float
-        Z-score for Confidence Intervals (default 1.96 for 95%).
+    and isolates valid candidate columns by excluding blank and null codes.
     """
-    # 1. Base Aggregations at the Stratum Level
-    # Summing up key tracking metrics
-    strata_metrics = (
-        df.groupby(stratum_col)
-        .agg(
-            N_h=("actas_total", "sum"),
-            n_h=("actas_contabilizadas", "sum"),
-            voters_total=("votos_habiles", "sum"),
-            v_observed_valid=("votos_validos", "sum"),
-            v_emitted=("votos_emitidos", "sum"),
+    print("📥 Loading and flattening raw electoral data...")
+    df_raw = pd.read_json(json_filepath)
+
+    if "votos_partidos" in df_raw.columns:
+        df_parties = pd.json_normalize(df_raw["votos_partidos"])
+        df_flat = pd.concat(
+            [df_raw.drop(columns=["votos_partidos"]), df_parties], axis=1
         )
-        .reset_index()
+    else:
+        df_flat = df_raw.copy()
+
+    with open(party_mapping_filepath, "r") as f:
+        party_mapping = json.load(f)
+
+    candidate_cols = [
+        code for code in party_mapping.keys() if code not in ["80", "81"]
+    ]
+
+    for col in candidate_cols:
+        if col not in df_flat.columns:
+            df_flat[col] = 0
+        else:
+            df_flat[col] = df_flat[col].fillna(0).astype(int)
+
+    print(
+        f"✅ Preprocessing complete: Matrix has {df_flat.shape[0]} rows and {len(candidate_cols)} candidate IDs isolated.\n"
     )
+    return df_flat, candidate_cols, party_mapping
 
-    # 2. Check "N-1" Stability Requirements
-    # If a stratum has fewer than 2 reported tables, it can fail variance calculation.
-    failed_strata = strata_metrics[strata_metrics["n_h"] < 2][stratum_col]
 
-    if not failed_strata.empty and fallback_col:
-        print(
-            f"⚠️ Warning: Stratum tier '{stratum_col}' has regions with < 2 tables reporting."
-        )
-        print(
-            f"Falling back to higher regional tier: '{fallback_col}' for those areas."
-        )
-        # Shift stratification strategy dynamically to the higher tier
-        stratum_col = fallback_col
-        strata_metrics = (
-            df.groupby(stratum_col)
-            .agg(
-                N_h=("actas_total", "sum"),
-                n_h=("actas_contabilizadas", "sum"),
-                voters_total=("votos_habiles", "sum"),
-                v_observed_valid=("votos_validos", "sum"),
-                v_emitted=("votos_emitidos", "sum"),
-            )
-            .reset_index()
-        )
+def run_dynamic_stratified_projection(
+    df, candidate_cols, party_mapping, z_score=1.96
+):
+    """Executes an election projection evaluating stability DYNAMICALLY per district.
 
-    # Total tables across the selected geographical ecosystem
-    N_total = strata_metrics["N_h"].sum()
+    Falls back row-by-row to provincial or departmental trends if a district
+    has < 50% reporting AND < 14 tables counted.
+    """
+    print("⚡ Initiating Dynamic Per-District Stratification Engine...")
 
-    # 3. Core Stratum Ratios & Weights
-    # Weight of stratum (W_h = N_h / N)
-    strata_metrics["W_h"] = strata_metrics["N_h"] / N_total
-    # Finite Population Correction term (1 - f_h) where f_h = n_h / N_h
-    strata_metrics["f_h"] = strata_metrics["n_h"] / strata_metrics["N_h"]
-    strata_metrics["FPC"] = 1 - strata_metrics["f_h"]
+    # -----------------------------------------------------------------
+    # 1. Precalculate Macro-Tier Fallback Profiles (Trends)
+    # -----------------------------------------------------------------
+    # Provincial Trend Blends
+    prov_totals = df.groupby("provincia")[
+        ["votos_validos", "votos_emitidos"] + candidate_cols
+    ].sum()
+    prov_valid = prov_totals["votos_validos"].to_dict()
+    prov_emitted = prov_totals["votos_emitidos"].to_dict()
 
-    # Observed Turnout / Valid Vote Factor (R_valid,h)
-    # Handles division by zero gracefully if no tables are reported yet
-    strata_metrics["R_valid_h"] = np.where(
-        strata_metrics["n_h"] > 0,
-        strata_metrics["v_observed_valid"] / strata_metrics["v_emitted"],
-        0,
-    )
+    # Departmental Trend Blends (Absolute safe fallback)
+    dept_totals = df.groupby("departamento")[
+        ["votos_validos", "votos_emitidos"] + candidate_cols
+    ].sum()
+    dept_valid = dept_totals["votos_validos"].to_dict()
+    dept_emitted = dept_totals["votos_emitidos"].to_dict()
 
-    # Calculate remaining unseen eligible voters (E_pending,h)
-    # Assumes proportional breakdown of voters per table
-    strata_metrics["E_pending_h"] = strata_metrics["voters_total"] * (
-        1 - strata_metrics["f_h"]
-    )
+    # Total tables counted per macro-tier for pooled variance DoF
+    prov_tables = df.groupby("provincia")["actas_contabilizadas"].sum().to_dict()
+    dept_tables = df.groupby("departamento")["actas_contabilizadas"].sum().to_dict()
 
-    # Candidate Specific Imputations
+    # -----------------------------------------------------------------
+    # 2. Evaluate Stability and Map Fallbacks Row-by-Row
+    # -----------------------------------------------------------------
+    df["pct_reporting"] = df["actas_contabilizadas"] / df["actas_total"]
+    df["rule_1_passed"] = df["pct_reporting"] >= 0.50
+    df["rule_2_passed"] = df["actas_contabilizadas"] >= 14
+    df["is_stable"] = df["rule_1_passed"] | df["rule_2_passed"]
+
+    # Global weights and infrastructure metrics
+    N_total = df["actas_total"].sum()
+    df["W_h"] = df["actas_total"] / N_total
+    df["f_h"] = df["actas_contabilizadas"] / df["actas_total"]
+    df["FPC"] = 1 - df["f_h"]
+    df["E_pending_h"] = df["votos_habiles"] * (1 - df["f_h"])
+
+    # -----------------------------------------------------------------
+    # 3. Dynamic Mathematical Modeling Loop
+    # -----------------------------------------------------------------
+    total_projected_valid_votes = df["votos_validos"].sum()
     projections = {}
 
+    # Pre-calculate projected valid vectors dynamically per row
+    pending_valid_shares = []
+    for idx, row in df.iterrows():
+        if row["is_stable"] and row["votos_emitidos"] > 0:
+            r_valid = row["votos_validos"] / row["votos_emitidos"]
+        elif prov_emitted.get(row["provincia"], 0) > 0:
+            r_valid = (
+                prov_valid[row["provincia"]] / prov_emitted[row["provincia"]]
+            )
+        else:
+            r_valid = (
+                dept_valid[row["departamento"]]
+                / dept_emitted[row["departamento"]]
+                if dept_emitted.get(row["departamento"], 0) > 0
+                else 0
+            )
+
+        pending_valid_votes = row["E_pending_h"] * r_valid
+        pending_valid_shares.append(pending_valid_votes)
+        total_projected_valid_votes += pending_valid_votes
+
+    df["projected_pending_valid"] = pending_valid_shares
+
+    # Calculate Candidate Shares & Variance
     for candidate in candidate_cols:
-        # Sum total candidate votes observed in stratum so far
-        candidate_stratum_votes = df.groupby(stratum_col)[candidate].sum().values
-
-        # Current proportion of valid votes obtained by the party in stratum (P_party,h)
-        strata_metrics["P_party_h"] = np.where(
-            strata_metrics["v_observed_valid"] > 0,
-            candidate_stratum_votes / strata_metrics["v_observed_valid"],
-            0,
-        )
-
-        # Apply Imputation Formula: V_observed + Sum(E_pending_h * R_valid_h * P_party_h)
         observed_total_votes = df[candidate].sum()
-        estimated_pending_votes = (
-            strata_metrics["E_pending_h"]
-            * strata_metrics["R_valid_h"]
-            * strata_metrics["P_party_h"]
-        ).sum()
+        estimated_pending_votes = 0
+        national_variance = 0
+
+        # Track tier assignments for execution logging summary
+        tier_counts = {"district": 0, "provincia": 0, "departamento": 0}
+
+        for idx, row in df.iterrows():
+            # Determine dynamic share prior (p_h) and Sample Size (n_pooled)
+            if row["is_stable"] and row["votos_validos"] > 0:
+                p_h = row[candidate] / row["votos_validos"]
+                n_pooled = row["actas_contabilizadas"]
+                tier_counts["district"] += 1
+            else:
+                # Local baseline failed, look to Provincia trend
+                p_prov_denom = prov_valid.get(row["provincia"], 0)
+                if p_prov_denom > 0:
+                    p_h = prov_totals.loc[row["provincia"], candidate] / p_prov_denom
+                    n_pooled = prov_tables.get(row["provincia"], 0)
+                    tier_counts["provincia"] += 1
+                else:
+                    # Provincial baseline failed, look to Departamento trend
+                    p_dept_denom = dept_valid.get(row["departamento"], 0)
+                    p_h = (
+                        dept_totals.loc[row["departamento"], candidate]
+                        / p_dept_denom
+                        if p_dept_denom > 0
+                        else 0
+                    )
+                    n_pooled = dept_tables.get(row["departamento"], 0)
+                    tier_counts["departamento"] += 1
+
+            # Accumulate pending projected votes
+            estimated_pending_votes += row["projected_pending_valid"] * p_h
+
+            # Dynamic Variance Mitigation (Bessel's correction adjustment)
+            bessels_correction = n_pooled - 1
+            if bessels_correction > 0:
+                variance_term = (
+                    (row["W_h"] ** 2)
+                    * row["FPC"]
+                    * ((p_h * (1 - p_h)) / bessels_correction)
+                )
+                national_variance += variance_term
 
         projected_votes = observed_total_votes + estimated_pending_votes
-
-        # 4. Stratified Variance Calculation
-        # Var(p) = Sum( W_h^2 * (1 - f_h) * [p_h(1-p_h) / (n_h - 1)] )
-        p_h = strata_metrics["P_party_h"]
-        bessels_correction = strata_metrics["n_h"] - 1
-
-        # Check safety bounds for variance math (requires n_h > 1)
-        variance_terms = np.where(
-            bessels_correction > 0,
-            (strata_metrics["W_h"] ** 2)
-            * strata_metrics["FPC"]
-            * ((p_h * (1 - p_h)) / bessels_correction),
-            0,
-        )
-
-        national_variance = variance_terms.sum()
-
-        # 5. Calculate Margins of Error
         margin_of_error = z_score * np.sqrt(national_variance)
 
-        # Store calculations converts underlying variance back into comparable vote units
-        # for clean visual interpretations
-        total_projected_valid_votes = (
-            strata_metrics["v_observed_valid"].sum()
-            + (
-                strata_metrics["E_pending_h"] * strata_metrics["R_valid_h"]
-            ).sum()
+        projected_share = (
+            (projected_votes / total_projected_valid_votes) * 100
+            if total_projected_valid_votes > 0
+            else 0
         )
+        moe_share = margin_of_error * 100
+        party_name = party_mapping.get(candidate, f"PARTY {candidate}")
 
-        moe_in_votes = margin_of_error * total_projected_valid_votes
-
-        projections[candidate] = {
+        projections[party_name] = {
+            "ID": candidate,
             "Observed Votes": int(observed_total_votes),
             "Projected Votes": int(projected_votes),
-            "MOE (Votes)": int(moe_in_votes),
-            "Lower Bound (Votes)": max(0, int(projected_votes - moe_in_votes)),
-            "Upper Bound (Votes)": int(projected_votes + moe_in_votes),
+            "Projected Share (%)": round(projected_share, 2),
+            "MOE (%)": round(moe_share, 2),
+            "Lower Bound Share (%)": round(max(0, projected_share - moe_share), 2),
+            "Upper Bound Share (%)": round(projected_share + moe_share, 2),
         }
 
-    return pd.DataFrame(projections).T
+    print(
+        f"✅ Dynamic calculations completed. Resolution footprint summary: {tier_counts}"
+    )
+
+    results_df = pd.DataFrame(projections).T
+    results_df.index.name = "Political Organization"
+
+    create_interactive_dashboard(results_df, "Dynamic Per-District Stratum")
+    return results_df.sort_values(by="Projected Share (%)", ascending=False)
+
+
+def create_interactive_dashboard(results_df, resolved_tier):
+    """Generates an interactive Plotly HTML file containing the results chart."""
+    plot_df = results_df.sort_values(by="Projected Share (%)", ascending=True)
+
+    candidates = plot_df.index.tolist()
+    shares = plot_df["Projected Share (%)"].tolist()
+    moe = plot_df["MOE (%)"].tolist()
+
+    fig = go.Figure()
+    fig.add_trace(
+        go.Bar(
+            x=shares,
+            y=candidates,
+            orientation="h",
+            text=[f"{s}%" for s in shares],
+            textposition="auto",
+            error_x=dict(type="data", array=moe, visible=True, color="#EF553B"),
+            marker=dict(
+                color="#1F77B4", line=dict(color="rgba(0, 0, 0, 0.3)", width=1)
+            ),
+            hovertemplate="<b>Party:</b> %{y}<br>"
+            + "<b>Projected Share:</b> %{x}%<br>"
+            + "<b>Margin of Error:</b> ±%{error_x.array}%<extra></extra>",
+        )
+    )
+
+    fig.update_layout(
+        title={
+            "text": f"<b>Dynamic Stratified Election Projection</b><br><span style='font-size:12px;color:gray;'>Resolved Stratification Tier: <b>{resolved_tier.upper()}</b> | 95% Confidence Intervals</span>",
+            "y": 0.95,
+            "x": 0.5,
+            "xanchor": "center",
+            "yanchor": "top",
+        },
+        xaxis_title="Projected Vote Share (% of Valid Votes)",
+        yaxis_title="Candidates / Political Organizations",
+        template="plotly_white",
+        height=max(500, len(candidates) * 22),
+        margin=dict(l=300, r=50, t=100, b=50),
+        xaxis=dict(range=[0, min(100, max(shares) + max(moe) + 5)]),
+    )
+
+    filename = "election_projection_dashboard.html"
+    pio.write_html(fig, file=filename, auto_open=False)
+    print(f"🌐 Interactive dashboard exported successfully as '{filename}'")
+
+
+if __name__ == "__main__":
+    DATA_PATH = "processed_results/agg_distrital.json"
+    MAPPING_PATH = "processed_results/idx_codigo_nombre_partido.json"
+
+    if os.path.exists(DATA_PATH) and os.path.exists(MAPPING_PATH):
+        processed_results, candidate_columns, party_mapping_dict = (
+            preprocess_electoral_data(DATA_PATH, MAPPING_PATH)
+        )
+
+        projection_summary = run_dynamic_stratified_projection(
+            df=processed_results,
+            candidate_cols=candidate_columns,
+            party_mapping=party_mapping_dict,
+            z_score=1.96,
+        )
+
+        print("\n🏆 Final Election Projection Summary (Sorted by Share):")
+        print(
+            projection_summary[
+                [
+                    "ID",
+                    "Observed Votes",
+                    "Projected Votes",
+                    "Projected Share (%)",
+                    "MOE (%)",
+                ]
+            ].head(10)
+        )
+    else:
+        print("❌ Missing workspace data payloads. Check file paths.")

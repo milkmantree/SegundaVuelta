@@ -1,71 +1,93 @@
-# 🗳️ Statistical Methodology: Stratified Election Projection Engine
+# 🗳️ Advanced Statistical Methodology: Dynamic Stratum Fallback & Variance Pooling
 
 ## 1. Overview
-This model is designed to provide high-accuracy election forecasts using partial returns. Unlike simple running totals, this engine accounts for the **non-random nature** of election reporting (where urban areas often report faster than rural ones) by using a **Stratified Random Sampling** framework.
+This documentation outlines the localized, adaptive estimation architecture used to handle highly uneven, real-time election reporting across asymmetric geographic levels. 
 
-The electorate is partitioned into $L$ strata (Geographic levels: Department, Province, or District), ensuring that the final projection reflects the true weight of each region regardless of its reporting speed.
-
----
-
-## 2. The Estimation Model (Imputation)
-The total projected votes for a candidate ($\hat{V}_{total}$) is the sum of observed votes plus the estimated votes from pending (uncounted) tables.
-
-$$\hat{V}_{party} = V_{observed} + \sum_{h=1}^{L} \left( E_{pending, h} \times R_{valid, h} \times P_{party, h} \right)$$
-
-### Key Variables:
-*   **$E_{pending, h}$**: Total eligible voters in tables that have not yet reported in stratum $h$.
-*   **$R_{valid, h}$**: The observed ratio of valid votes to total voters within stratum $h$.
-*   **$P_{party, h}$**: The current proportion of valid votes obtained by the party in stratum $h$.
+In real-time tracking, a rigid global stratification tier introduces catastrophic failures if a handful of remote or slow-counting districts report zero or near-zero tables. Rather than dropping precision globally, this engine implements **Dynamic Per-District Stratification Fallback**. Each district ($h$) is evaluated individually on its data maturity. If a district is flagged as unstable, the engine dynamically adapts its mathematical model, borrowing estimation priors from its parent macro-tier (Province or Department) while retaining its distinct structural population weight ($W_h$).
 
 ---
 
-## 3. Confidence Interval Calculation
-The model calculates the **Margin of Error (MOE)** to define the range in which the final result will likely fall. This is based on the variance of a stratified population.
+## 2. Dynamic Stability Rules
+A district is evaluated row-by-row on election night to determine its structural stability. Let $n_h$ be the number of counted tables (acts) in district $h$, and $N_h$ be the total planned tables.
 
-### A. Stratified Variance Formula
-The national variance is the weighted sum of the variances of each individual stratum:
+A stratum is classified as **Stable** if it satisfies at least one of the two following threshold criteria:
 
-$$Var(\hat{p}) = \sum_{h=1}^{L} W_h^2 \left( 1 - f_h \right) \frac{\hat{p}_h(1 - \hat{p}_h)}{n_h - 1}$$
+$$\text{Stability Condition: } \left( \frac{n_h}{N_h} \geq 0.50 \right) \lor \left( n_h \geq 14 \right)$$
 
-*   **Stratum Weight ($W_h$):** Calculated as $N_h / N$, representing the stratum's share of the total national tables.
-*   **Finite Population Correction ($1 - f_h$):** Where $f_h = n_h / N_h$. This is critical; as a region reaches 100% reporting, its contribution to the national error drops to zero.
-*   **Bessel's Correction ($n_h - 1$):** Used to provide an unbiased estimate of the variance from the sample of tables.
+* **Rule 1 (Reporting Density):** The district has processed $\geq 50\%$ of its total expected tables.
+* **Rule 2 (Sample Adequacy):** The district has recorded a raw sample size of $\geq 14$ tables, satisfying asymptotic normal distribution properties regardless of percentage.
 
-### B. Margin of Error & Bounds
-The MOE is derived using a Z-score (standardized normal distribution):
-
-$$MOE = z \times \sqrt{Var(\hat{p})}$$
-
-*   **95% Confidence Level:** $z = 1.96$
-*   **Upper Bound:** $\text{Projection} + MOE$
-*   **Lower Bound:** $\text{Projection} - MOE$
+If a district fails **both** conditions, its localized trend data is rejected due to high volatility risk, and the engine initiates a localized structural fallback.
 
 ---
 
-## 4. Relevant Statistical Considerations
+## 3. Adaptive Prior Imputation
 
-### Geographic Bias (The "Reporting Gap")
-In many countries, such as Peru, geographic location is highly correlated with political preference.
-*   **Urban vs. Rural:** If urban centers report 90% while rural areas report 10%, a simple count would be heavily biased.
-*   **The Stratification Solution:** The model treats a 10% rural sample as an estimate for 100% of that specific region's total weight, "protecting" the rural vote in the national projection.
+### A. Resolution Footprint Hierarchy
+The fallback path cascades sequentially through geographic tiers to resolve the valid turnout ratio ($R_{\text{valid}, h}$) and candidate distribution shares ($P_{\text{party}, h}$):
 
-### The "N-1" Stability Requirement
-Mathematically, a stratum must have at least **two tables reported** ($n_h \geq 2$) to calculate variance. 
-*   **Initial Volatility:** In the very early stages of the count, the Confidence Intervals will be extremely wide (or undefined for certain regions) until the minimum sample size per stratum is met.
+```mermaid
+    graph TD
+    A[District Tier Evaluated] --> B{Passes Safety Check?}
+    B -- Yes --> C[Impute Localized District Trend]
+    B -- No --> D{Provincial Sample > 0?}
+    D -- Yes --> E[Impute Provincial Trend Prior]
+    D -- No --> F[Impute Departmental Macro-Prior Baseline]
+    
+    style C fill:#d4edda,stroke:#28a745,stroke-width:2px
+    style E fill:#fff3cd,stroke:#ffc107,stroke-width:2px
+    style F fill:#f8d7da,stroke:#dc3545,stroke-width:2px
+```
 
-### Filtering "Noise"
-To align with official electoral rules, the model dynamically filters:
-1.  **Votos en Blanco** (Blank)
-2.  **Votos Nulos** (Null/Void)
-3.  **Votos Impugnados** (Challenged)
+### B. Mathematical Adaptation Formula
+The total projected votes for a political candidate ($\hat{V}_{\text{party}}$) updates dynamically using conditional parameter selection:
 
-Proportions are calculated solely based on **Votos Válidos** to accurately reflect the percentage used to declare a winner.
+$$\hat{V}_{\text{party}} = V_{\text{observed}} + \sum_{h=1}^{L} \left( E_{\text{pending}, h} \times \tilde{R}_{\text{valid}, h} \times \tilde{P}_{\text{party}, h} \right)$$
 
-### Convergence
-As $n_h$ approaches $N_h$ (total tables), the term $(1 - f_h)$ approaches $0$. Consequently, the variance collapses, and the projected line "freezes" into the final official result.
+Where the pending valid share parameters $\tilde{R}_{\text{valid}, h}$ and $\tilde{P}_{\text{party}, h}$ switch contexts based on local stability metadata:
+
+$$\tilde{P}_{\text{party}, h} = 
+\begin{cases} 
+\frac{V_{\text{party}, h}}{V_{\text{valid}, h}}, & \text{if District } h \text{ is Stable and } V_{\text{valid}, h} > 0 \\ 
+\frac{\sum_{i \in \text{Prov}} V_{\text{party}, i}}{\sum_{i \in \text{Prov}} V_{\text{valid}, i}}, & \text{if District } h \text{ is Unstable and Province has counted votes} \\
+\frac{\sum_{j \in \text{Dept}} V_{\text{party}, j}}{\sum_{j \in \text{Dept}} V_{\text{valid}, j}}, & \text{if Province has no data}
+\end{cases}$$
+
+This structure guarantees that an uncounted district (e.g., $n_h = 0$) does not zero out pending projections. Instead, it securely extrapolates using its local eligible pending voter weight ($E_{\text{pending}, h}$) multiplied by the surrounding region's real-time political trend.
 
 ---
 
-## 5. Summary of Limitations
-*   **Intra-stratum bias:** If the first 5% of a district to report is not representative of the whole district, the local estimate will be skewed until more data arrives.
-*   **Homogeneity Assumption:** The model assumes that within a stratum (e.g., a specific District), the voting behavior is relatively consistent.
+## 4. Resilient Variance Pooling & Degrees of Freedom
+Mixing highly precise, stable districts with fallback macro-tiers inside a standard stratified variance equation introduces critical bugs. If a district has 0 or 1 tables reporting, Bessel's correction factor ($n_h - 1$) triggers a division-by-zero or produces negative variance terms. 
+
+To address this, the engine implements a **Dynamic Variance Pooling** mechanism that matches sample sizes ($n_{\text{pooled}}$) to the resolved trend context.
+
+### A. Modifying the Stratified Variance Equation
+The adjusted national variance equations adapts dynamically across every individual stratum term:
+
+$$Var(\hat{p}) = \sum_{h=1}^{L} W_h^2 \left( 1 - f_h \right) \frac{\tilde{p}_h(1 - \tilde{p}_h)}{n_{\text{pooled}, h} - 1}$$
+
+Where the pooled degrees of freedom ($n_{\text{pooled}, h}$) are defined as:
+
+$$n_{\text{pooled}, h} = 
+\begin{cases} 
+n_h, & \text{if District } h \text{ is Stable} \\
+\sum_{i \in \text{Prov}} n_i, & \text{if District } h \text{ is Unstable and defaults to Province} \\
+\sum_{j \in \text{Dept}} n_j, & \text{if District } h \text{ defaults to Department}
+\end{cases}$$
+
+### B. Statistical Implications of Pooling
+1. **Resolution of the Asymptotic Bottleneck:** By replacing $n_h$ with the macro-tier sample size $\sum n_i$ for unstable rows, the denominator $n_{\text{pooled}, h} - 1$ is always safely locked $> 0$. The model completely avoids mathematical undefined states in uncounted areas.
+2. **Finite Population Correction (FPC) Integrity:** The FPC term $\left(1 - f_h\right)$ continues to use the *district's* true reporting fraction ($n_h / N_h$). If an unstable district has 0 tables processed, its local FPC correctly equals $1$, allowing maximum uncertainty contribution. As tables are steadily counted, the local FPC shrinks normally, freezing the variance once execution hits $100\%$ precision.
+3. **Cluster Correlation Mitigation:** Treating an unstable district as an independent sample with $n_h = 1$ would severely underestimate uncertainty. Substituting the pooled sample size of the parent macro-tier scales down the denominator, expanding the local variance boundary to accurately reflect that the district is currently dependent on a borrowed generalized trend.
+
+---
+
+## 5. Architectural Implementation Summary
+The execution flow running within the processing matrix maps directly onto these updated statistical assumptions:
+
+| Stratum Reporting State | Imputation Trend Prior ($\tilde{p}_h$) | Degree of Freedom ($n_{\text{pooled}}$) | FPC Reality ($1 - f_h$) | Impact on Margin of Error (MOE) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Stable District** ($\geq 50\%$ or $\geq 14$ acts) | Hyper-local District Split | District count ($n_h$) | Shrinks dynamically | Margins contract tightly to match localized data certainty. |
+| **Early District** ($>0$ acts but fails rules) | Provincial Aggregation | Province Total Count | High Variance | Margins expand slightly to absorb macro-tier trend bias. |
+| **Zero-Data District** ($0$ acts counted) | Provincial / Dept Aggregation | Province / Dept Total Count | Maximum ($1.0$) | Variance is maximized, reflecting total historical/regional dependence. |
