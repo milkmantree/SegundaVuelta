@@ -42,7 +42,7 @@ def preprocess_electoral_data(json_filepath, party_mapping_filepath):
 
 
 def run_dynamic_stratified_projection(
-    df, candidate_cols, party_mapping, z_score=1.96
+    df, candidate_cols, party_mapping, z_score=1.96, generate_html=True
 ):
     """Executes an election projection evaluating stability DYNAMICALLY per district.
 
@@ -191,7 +191,8 @@ def run_dynamic_stratified_projection(
     results_df = pd.DataFrame(projections).T
     results_df.index.name = "Political Organization"
 
-    create_interactive_dashboard(results_df, "Dynamic Per-District Stratum")
+    if generate_html:
+        create_interactive_dashboard(results_df, "Dynamic Per-District Stratum")
     return results_df.sort_values(by="Projected Share (%)", ascending=False)
 
 
@@ -240,6 +241,42 @@ def create_interactive_dashboard(results_df, resolved_tier):
     filename = "election_projection_dashboard.html"
     pio.write_html(fig, file=filename, auto_open=False)
     print(f"🌐 Interactive dashboard exported successfully as '{filename}'")
+
+
+def get_projection_data(data_path=None, mapping_path=None, z_score=1.96):
+    """Returns projection results as a JSON-serializable dict for the web API."""
+    if data_path is None:
+        data_path = os.path.join("processed_results", "agg_distrital.json")
+    if mapping_path is None:
+        mapping_path = os.path.join("processed_results", "idx_codigo_nombre_partido.json")
+
+    if not os.path.exists(data_path) or not os.path.exists(mapping_path):
+        return {"error": "Data files not found", "parties": []}
+
+    df_flat, candidate_cols, party_mapping = preprocess_electoral_data(data_path, mapping_path)
+    results_df = run_dynamic_stratified_projection(
+        df_flat, candidate_cols, party_mapping, z_score, generate_html=False
+    )
+
+    parties_data = []
+    for name, row in results_df.iterrows():
+        parties_data.append({
+            "name": name,
+            "id": str(row["ID"]),
+            "observed_votes": int(row["Observed Votes"]),
+            "projected_votes": int(row["Projected Votes"]),
+            "projected_share": float(row["Projected Share (%)"]),
+            "moe": float(row["MOE (%)"]),
+            "lower_bound": float(row["Lower Bound Share (%)"]),
+            "upper_bound": float(row["Upper Bound Share (%)"]),
+        })
+
+    return {
+        "model": "dynamic_stratified_propagation",
+        "z_score": z_score,
+        "confidence_level": "95%",
+        "parties": sorted(parties_data, key=lambda x: x["projected_share"], reverse=True),
+    }
 
 
 if __name__ == "__main__":

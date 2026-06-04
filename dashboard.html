@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elecciones Generales 2026 · Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red:         #C0392B;
+      --red-light:   #FDECEA;
+      --blue:        #1A3A6B;
+      --blue-mid:    #2d5aa0;
+      --blue-light:  #EBF0FA;
+      --gold:        #B7950B;
+      --gold-bg:     #FEFCE8;
+      --gold-border: #D4AC0D;
+      --bg:          #F0F4F8;
+      --card:        #FFFFFF;
+      --text:        #1A202C;
+      --muted:       #64748B;
+      --border:      #E2E8F0;
+      --green:       #166534;
+      --green-bg:    #F0FDF4;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    .flag-stripe {
+      height: 6px;
+      background: linear-gradient(90deg, var(--red) 33.3%, #fff 33.3% 66.6%, var(--red) 66.6%);
+    }
+
+    header {
+      background: var(--blue);
+      color: #fff;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .h-title h1 { font-size: 1.05rem; font-weight: 700; letter-spacing: .02em; }
+    .h-title p  { font-size: .72rem; opacity: .65; margin-top: 2px; }
+
+    .h-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+    .live-dot {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.12); padding: 4px 10px;
+      border-radius: 999px; font-size: .72rem;
+    }
+    .pulse {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #4ADE80; animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+    .btn {
+      padding: 6px 14px; border-radius: 6px; cursor: pointer;
+      font-size: .78rem; font-weight: 600; border: none;
+      transition: opacity .15s;
+    }
+    .btn:disabled { opacity: .45; cursor: default; }
+    .btn-ghost {
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      color: #fff;
+    }
+    .btn-ghost:not(:disabled):hover { background: rgba(255,255,255,.25); }
+
+    /* ── Round switcher ──────────────────────────────────────── */
+    .round-bar {
+      background: var(--blue);
+      border-top: 1px solid rgba(255,255,255,.1);
+      padding: 0 24px;
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .round-tab {
+      padding: 10px 20px 12px;
+      border: none; background: transparent;
+      color: rgba(255,255,255,.55);
+      font-size: .82rem; font-weight: 600;
+      cursor: pointer; border-bottom: 3px solid transparent;
+      display: flex; align-items: center; gap: 8px;
+      transition: color .15s, border-color .15s;
+      white-space: nowrap;
+    }
+    .round-tab:hover { color: rgba(255,255,255,.85); }
+    .round-tab.active {
+      color: #fff;
+      border-bottom-color: #fff;
+    }
+
+    .rtag {
+      font-size: .62rem; font-weight: 700; padding: 2px 6px;
+      border-radius: 4px; letter-spacing: .04em;
+    }
+    .rtag-done { background: rgba(74,222,128,.2); color: #4ADE80; }
+    .rtag-live { background: rgba(251,191,36,.2);  color: #FBD24C; }
+    .rtag-wait { background: rgba(255,255,255,.1); color: rgba(255,255,255,.5); }
+
+    /* ── Layout ──────────────────────────────────────────────── */
+    main { max-width: 1280px; margin: 0 auto; padding: 20px 20px 56px; }
+
+    /* ── KPI grid ────────────────────────────────────────────── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 860px) { .kpi-grid { grid-template-columns: repeat(2,1fr); } }
+
+    .kpi {
+      background: var(--card); border-radius: 10px;
+      padding: 14px 18px; box-shadow: 0 1px 3px rgba(0,0,0,.08);
+      border-left: 4px solid var(--blue);
+    }
+    .kpi.red   { border-left-color: var(--red); }
+    .kpi.green { border-left-color: #16A34A; }
+    .kpi.gold  { border-left-color: var(--gold-border); }
+
+    .kpi-label {
+      font-size: .68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--muted); margin-bottom: 5px;
+    }
+    .kpi-value { font-size: 1.55rem; font-weight: 800; line-height: 1; }
+    .kpi-sub   { font-size: .72rem; color: var(--muted); margin-top: 4px; }
+
+    .prog-wrap {
+      background: var(--bg); border-radius: 999px;
+      height: 7px; margin-top: 8px; overflow: hidden;
+    }
+    .prog-fill {
+      height: 100%; border-radius: 999px; background: var(--blue);
+      transition: width 1s ease; width: 0%;
+    }
+
+    /* ── Finalists banner ────────────────────────────────────── */
+    .finalists-wrap {
+      background: linear-gradient(135deg, var(--blue) 0%, var(--blue-mid) 100%);
+      border-radius: 10px;
+      padding: 18px 20px 20px;
+      margin-bottom: 20px;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(26,58,107,.3);
+    }
+    .finalists-label {
+      font-size: .68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .1em; opacity: .65; text-align: center; margin-bottom: 14px;
+    }
+    .finalists-row {
+      display: flex; align-items: stretch; justify-content: center;
+      gap: 16px; flex-wrap: wrap;
+    }
+    .finalist-card {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 8px;
+      padding: 14px 22px;
+      text-align: center;
+      flex: 1; min-width: 160px; max-width: 260px;
+    }
+    .finalist-rank {
+      font-size: .68rem; font-weight: 700;
+      opacity: .6; margin-bottom: 6px; letter-spacing: .06em;
+    }
+    .finalist-name {
+      font-size: .88rem; font-weight: 800;
+      margin-bottom: 8px; line-height: 1.3;
+    }
+    .finalist-share {
+      font-size: 1.8rem; font-weight: 900; line-height: 1;
+    }
+    .finalist-votes { font-size: .7rem; opacity: .6; margin-top: 4px; }
+    .finalist-color-bar {
+      height: 3px; border-radius: 999px;
+      margin: 10px auto 0; width: 40px;
+    }
+    .finalists-vs {
+      display: flex; align-items: center;
+      font-size: 1rem; font-weight: 900;
+      opacity: .4; padding: 0 4px; flex-shrink: 0;
+    }
+
+    /* ── Card ────────────────────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border-radius: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .card-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 18px; border-bottom: 1px solid var(--border);
+      flex-wrap: wrap; gap: 10px;
+    }
+    .card-title {
+      font-size: .78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .card-body { padding: 18px; }
+
+    /* ── Definitivo badge ────────────────────────────────────── */
+    .badge-final {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--green-bg); color: var(--green);
+      border: 1px solid #BBF7D0; border-radius: 5px;
+      font-size: .7rem; font-weight: 700; padding: 3px 9px;
+    }
+
+    /* ── Tabs ────────────────────────────────────────────────── */
+    .tabs {
+      display: flex; gap: 3px;
+      background: var(--bg); padding: 3px; border-radius: 7px;
+    }
+    .tab {
+      padding: 4px 12px; border-radius: 5px; border: none;
+      background: transparent; cursor: pointer; font-size: .78rem;
+      font-weight: 500; color: var(--muted); transition: all .15s;
+    }
+    .tab.active {
+      background: #fff; color: var(--blue);
+      font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.1);
+    }
+
+    /* ── Chart ───────────────────────────────────────────────── */
+    .chart-wrap { position: relative; width: 100%; }
+    .chart-legend {
+      display: flex; align-items: center; gap: 6px; margin-top: 10px;
+      font-size: .72rem; color: #92400E;
+      padding: 6px 10px;
+      background: var(--gold-bg); border-radius: 6px;
+      border: 1px solid #FDE68A;
+    }
+    .legend-box {
+      width: 13px; height: 13px;
+      border: 2px solid var(--gold-border); border-radius: 3px; flex-shrink: 0;
+    }
+
+    .show-more-btn {
+      display: block; margin: 12px auto 0;
+      padding: 6px 18px; border: 1px solid var(--border);
+      background: #fff; border-radius: 6px; cursor: pointer;
+      font-size: .78rem; color: var(--muted); transition: border-color .15s;
+    }
+    .show-more-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+    /* ── Models grid ─────────────────────────────────────────── */
+    .models-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 780px) { .models-grid { grid-template-columns: 1fr; } }
+
+    .model-card {
+      background: var(--card); border-radius: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.08); overflow: hidden;
+    }
+    .model-card.dim { opacity: .55; }
+
+    .model-head {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: 13px 18px; border-bottom: 1px solid var(--border); gap: 10px;
+    }
+    .model-name { font-size: .82rem; font-weight: 700; }
+    .model-desc { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+    .model-body { padding: 14px 18px; }
+
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      font-size: .68rem; font-weight: 700; white-space: nowrap; flex-shrink: 0;
+    }
+    .badge-on  { background: var(--green-bg); color: var(--green); }
+    .badge-off { background: var(--bg); color: var(--muted); }
+    .badge-adv {
+      background: var(--gold-bg); color: #92400E;
+      border: 1px solid #FDE68A; font-size: .62rem;
+    }
+
+    /* ── Model table ─────────────────────────────────────────── */
+    .mtable { width: 100%; border-collapse: collapse; font-size: .78rem; }
+    .mtable th {
+      text-align: right; color: var(--muted); font-weight: 700;
+      font-size: .68rem; text-transform: uppercase; letter-spacing: .04em;
+      padding: 0 8px 8px;
+    }
+    .mtable th:first-child { text-align: left; }
+    .mtable td {
+      padding: 5px 8px; border-top: 1px solid var(--border); text-align: right;
+    }
+    .mtable td:first-child { text-align: left; }
+    .mtable tr:hover td   { background: #F8FAFC; }
+    .mtable tr.adv td     { background: var(--gold-bg); }
+    .mtable tr.adv:hover td { background: #FEF3C7; }
+
+    .pdot {
+      display: inline-block; width: 9px; height: 9px;
+      border-radius: 2px; vertical-align: middle; margin-right: 5px;
+    }
+    .ci { font-size: .7rem; color: var(--muted); }
+    .info-note {
+      margin-top: 12px; padding: 8px 12px; border-radius: 6px;
+      background: var(--blue-light); color: #1E40AF; font-size: .73rem;
+    }
+
+    /* ── Dept table ───────────────────────────────────────────── */
+    .dtable { width: 100%; border-collapse: collapse; font-size: .8rem; }
+    .dtable th {
+      text-align: left; padding: 8px 12px; background: var(--bg);
+      font-size: .7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .04em; color: var(--muted);
+      cursor: pointer; user-select: none; white-space: nowrap;
+    }
+    .dtable th:hover { background: #E4EAF2; }
+    .dtable th.sa { color: var(--blue); }
+    .dtable td { padding: 7px 12px; border-top: 1px solid var(--border); }
+    .dtable tr:hover td { background: #F8FAFC; }
+
+    .pill {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      font-size: .7rem; font-weight: 600; color: #fff; white-space: nowrap;
+    }
+    .mbar {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .mbar-t {
+      width: 60px; height: 6px; background: var(--bg);
+      border-radius: 999px; overflow: hidden; flex-shrink: 0;
+    }
+    .mbar-f { height: 100%; border-radius: 999px; background: var(--blue); }
+
+    /* ── Loaders / states ────────────────────────────────────── */
+    .loader {
+      display: flex; align-items: center; justify-content: center;
+      padding: 44px 16px; gap: 10px; color: var(--muted); font-size: .82rem;
+    }
+    .spinner {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid var(--border); border-top-color: var(--blue);
+      animation: spin .7s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .placeholder {
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+      padding: 36px 20px; color: var(--muted);
+    }
+    .ph-icon  { font-size: 1.8rem; margin-bottom: 8px; }
+    .ph-title { font-weight: 700; font-size: .82rem; color: var(--text); }
+    .ph-text  { font-size: .75rem; margin-top: 4px; max-width: 280px; }
+
+    .errbox {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px; border-radius: 7px; margin: 8px 0;
+      background: var(--red-light); color: #7F1D1D; font-size: .8rem;
+      border: 1px solid #FECACA;
+    }
+
+    .overflow-x { overflow-x: auto; }
+  </style>
+</head>
+<body>
+
+<div class="flag-stripe"></div>
+<header>
+  <div class="h-title">
+    <h1>🗳️ Elecciones Generales 2026</h1>
+    <p id="ts">Cargando datos…</p>
+  </div>
+  <div class="h-right">
+    <div class="live-dot"><span class="pulse"></span> En vivo</div>
+    <button id="btn-refresh" class="btn btn-ghost" onclick="refreshAll()">↻ Actualizar</button>
+  </div>
+</header>
+
+<!-- Round switcher -->
+<div class="round-bar">
+  <button class="round-tab active" id="tab-primera" onclick="switchRound('primera')">
+    Primera Vuelta
+    <span class="rtag rtag-done" id="rtag-primera">Definitivo</span>
+  </button>
+  <button class="round-tab" id="tab-segunda" onclick="switchRound('segunda')">
+    Segunda Vuelta
+    <span class="rtag rtag-wait" id="rtag-segunda">Esperando</span>
+  </button>
+</div>
+
+<main>
+
+  <!-- ═══ PRIMERA VUELTA ═══════════════════════════════════════ -->
+  <div id="section-primera">
+
+    <!-- KPIs -->
+    <div id="p1-kpi">
+      <div class="loader"><div class="spinner"></div> Cargando primera vuelta…</div>
+    </div>
+
+    <!-- Finalists banner -->
+    <div id="p1-finalists"></div>
+
+    <!-- Observed chart -->
+    <div class="card">
+      <div class="card-head">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="card-title">Resultados — Primera Vuelta</span>
+          <span class="badge-final">✓ Resultados definitivos</span>
+        </div>
+        <div class="tabs" id="p1-ambito-tabs">
+          <button class="tab active" onclick="switchAmbito('primera','total',this)">Nacional</button>
+          <button class="tab" onclick="switchAmbito('primera','1',this)">Perú</button>
+          <button class="tab" onclick="switchAmbito('primera','2',this)">Exterior</button>
+        </div>
+      </div>
+      <div class="card-body" id="p1-chart">
+        <div class="loader"><div class="spinner"></div> Cargando…</div>
+      </div>
+    </div>
+
+    <!-- Dept table -->
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">Resultados por Departamento — Primera Vuelta</span>
+        <span style="font-size:.72rem;color:var(--muted)">Haz clic en columna para ordenar</span>
+      </div>
+      <div id="p1-dept">
+        <div class="loader"><div class="spinner"></div> Cargando…</div>
+      </div>
+    </div>
+
+  </div><!-- /section-primera -->
+
+
+  <!-- ═══ SEGUNDA VUELTA ════════════════════════════════════════ -->
+  <div id="section-segunda" style="display:none">
+
+    <!-- KPIs -->
+    <div id="p2-kpi">
+      <div class="loader"><div class="spinner"></div> Cargando segunda vuelta…</div>
+    </div>
+
+    <!-- Live chart -->
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">Resultados en Curso — Segunda Vuelta</span>
+        <div class="tabs" id="p2-ambito-tabs">
+          <button class="tab active" onclick="switchAmbito('segunda','total',this)">Nacional</button>
+          <button class="tab" onclick="switchAmbito('segunda','1',this)">Perú</button>
+          <button class="tab" onclick="switchAmbito('segunda','2',this)">Exterior</button>
+        </div>
+      </div>
+      <div class="card-body" id="p2-chart">
+        <div class="loader"><div class="spinner"></div> Cargando…</div>
+      </div>
+    </div>
+
+    <!-- Models -->
+    <div class="models-grid">
+
+      <div class="model-card">
+        <div class="model-head">
+          <div>
+            <div class="model-name">Modelo de Propagación Dinámica</div>
+            <div class="model-desc">Estratificación adaptativa por distrito con IC 95%</div>
+          </div>
+          <span class="badge badge-on">Activo</span>
+        </div>
+        <div class="model-body" id="prop-body">
+          <div class="loader"><div class="spinner"></div> Calculando proyección…</div>
+        </div>
+      </div>
+
+      <div class="model-card dim">
+        <div class="model-head">
+          <div>
+            <div class="model-name">Modelo de Migración de Votos</div>
+            <div class="model-desc">Proyección de segunda vuelta por transferencia electoral</div>
+          </div>
+          <span class="badge badge-off">En desarrollo</span>
+        </div>
+        <div class="model-body">
+          <div class="placeholder">
+            <div class="ph-icon">🔬</div>
+            <div class="ph-title">Metodología en definición</div>
+            <div class="ph-text">
+              Estimará el resultado de la segunda vuelta modelando cómo migran los votos
+              de los candidatos eliminados hacia los dos finalistas.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /models-grid -->
+
+    <!-- Dept table -->
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">Resultados por Departamento — Segunda Vuelta</span>
+        <span style="font-size:.72rem;color:var(--muted)">Haz clic en columna para ordenar</span>
+      </div>
+      <div id="p2-dept">
+        <div class="loader"><div class="spinner"></div> Cargando…</div>
+      </div>
+    </div>
+
+  </div><!-- /section-segunda -->
+
+</main>
+
+<script>
+// ─── State ────────────────────────────────────────────────────────────────────
+const S = {
+  data:        { primera: null, segunda: null },
+  prop:        null,
+  activeRound: 'primera',
+  ambito:      { primera: 'total', segunda: 'total' },
+  showAll:     { primera: false, segunda: false },
+  dept:        {
+    primera: { key: 'first_share', asc: false },
+    segunda: { key: 'first_share', asc: false },
+  },
+};
+
+const charts = { primera: null, segunda: null };
+
+// ─── Colors ───────────────────────────────────────────────────────────────────
+const FIXED = {
+  '8':  '#E67E22', '10': '#C0392B', '35': '#2980B9',
+  '16': '#27AE60', '14': '#8E44AD', '23': '#17A589',
+  '2':  '#F39C12', '33': '#7F8C8D', '31': '#D35400',
+  '21': '#2C3E50', '32': '#1ABC9C', '27': '#E91E63',
+  '12': '#FF7043', '25': '#0288D1', '29': '#558B2F',
+  '22': '#AD1457', '1':  '#1565C0', '20': '#00838F',
+};
+const PAL = [
+  '#4E79A7','#F28E2B','#E15759','#76B7B2','#59A14F',
+  '#EDC948','#B07AA1','#FF9DA7','#9C755F','#BAB0AC',
+];
+const colorMap = {}; let palIdx = 0;
+function pColor(id) {
+  if (FIXED[id]) return FIXED[id];
+  if (colorMap[id]) return colorMap[id];
+  return (colorMap[id] = PAL[palIdx++ % PAL.length]);
+}
+
+// ─── Formatters ───────────────────────────────────────────────────────────────
+const f2  = n => n.toFixed(2);
+const f1  = n => n.toFixed(1);
+const fM  = n => n >= 1e6 ? (n/1e6).toFixed(2)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : String(n);
+const fN  = n => n.toLocaleString('es-PE');
+const fTs = ts => new Date(ts*1000).toLocaleString('es-PE',{
+  day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'
+});
+const trunc = (s, n) => s.length > n ? s.slice(0, n-1) + '…' : s;
+
+const BN = ['80', '81'];
+
+// ─── Data helpers ──────────────────────────────────────────────────────────────
+function mergeAmbitos(arr) {
+  const m = JSON.parse(JSON.stringify(arr[0]));
+  for (let i = 1; i < arr.length; i++) {
+    const a = arr[i];
+    m.actas_total          += a.actas_total;
+    m.actas_contabilizadas += a.actas_contabilizadas;
+    m.votos_emitidos       += a.votos_emitidos;
+    m.votos_validos        += a.votos_validos;
+    m.votos_habiles        += a.votos_habiles;
+    for (const [id, v] of Object.entries(a.votos_partidos))
+      m.votos_partidos[id] = (m.votos_partidos[id] || 0) + v;
+  }
+  m.pct_actas_contabilizadas = m.actas_total > 0
+    ? (m.actas_contabilizadas / m.actas_total) * 100 : 0;
+  m.pct_participacion = m.votos_habiles > 0
+    ? (m.votos_emitidos / m.votos_habiles) * 100 : 0;
+  return m;
+}
+
+function getAmbito(d, key) {
+  if (key === 'total') return mergeAmbitos(d.ambito);
+  return d.ambito.find(a => a.ambito === key) || mergeAmbitos(d.ambito);
+}
+
+function sortedParties(votos, excludeBN = true) {
+  return Object.entries(votos)
+    .filter(([id]) => !excludeBN || !BN.includes(id))
+    .map(([id, votes]) => ({ id, votes }))
+    .sort((a, b) => b.votes - a.votes);
+}
+
+// ─── DOM helpers ──────────────────────────────────────────────────────────────
+const setHTML = (id, h) => { const el = document.getElementById(id); if (el) el.innerHTML = h; };
+const loader  = msg => `<div class="loader"><div class="spinner"></div>${msg}</div>`;
+const errBox  = e   => `<div class="errbox">⚠️ ${e.message || e}</div>`;
+
+// ─── Fetch ────────────────────────────────────────────────────────────────────
+async function fetchRound(round) {
+  const url = round === 'primera' ? '/api/round/first' : '/api/round/second';
+  try {
+    const r = await fetch(url);
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error);
+    S.data[round] = j.data;
+    renderRound(round);
+  } catch(e) {
+    const pfx = round === 'primera' ? 'p1' : 'p2';
+    setHTML(`${pfx}-kpi`,       errBox(e));
+    setHTML(`${pfx}-chart`,     errBox(e));
+    setHTML(`${pfx}-dept`,      errBox(e));
+    if (round === 'primera') setHTML('p1-finalists', '');
+  }
+}
+
+async function fetchProp() {
+  setHTML('prop-body', loader('Calculando proyección…'));
+  try {
+    const r = await fetch('/api/model/propagation');
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error);
+    S.prop = j.data;
+    renderProp();
+  } catch(e) {
+    setHTML('prop-body', errBox(e));
+  }
+}
+
+// ─── Render dispatcher ────────────────────────────────────────────────────────
+function renderRound(round) {
+  const d = S.data[round];
+  if (!d) return;
+  const ad = getAmbito(d, S.ambito[round]);
+  const pfx = round === 'primera' ? 'p1' : 'p2';
+
+  renderKPI(pfx, ad, d.is_final);
+  renderObsChart(round, ad, d.parties);
+  renderDeptTable(round, d.departamental, d.parties);
+  if (round === 'primera') renderFinalists(d);
+
+  // Update round tag
+  const tag  = document.getElementById('rtag-segunda');
+  const pct2 = S.data.segunda ? getAmbito(S.data.segunda, 'total').pct_actas_contabilizadas : null;
+  if (round === 'segunda' && pct2 !== null) {
+    if (pct2 >= 100) {
+      tag.textContent = 'Definitivo';
+      tag.className = 'rtag rtag-done';
+    } else if (pct2 > 0) {
+      tag.textContent = f1(pct2) + '%';
+      tag.className = 'rtag rtag-live';
+    }
+  }
+
+  document.getElementById('ts').textContent =
+    'Última actualización: ' + fTs(d.last_updated);
+}
+
+// ─── KPI cards ────────────────────────────────────────────────────────────────
+function renderKPI(pfx, ad, isFinal) {
+  const pct  = ad.pct_actas_contabilizadas;
+  const bn   = (ad.votos_partidos['80'] || 0) + (ad.votos_partidos['81'] || 0);
+  const progId = `${pfx}-prog`;
+
+  const progHTML = !isFinal
+    ? `<div class="prog-wrap"><div class="prog-fill" id="${progId}"></div></div>
+       <div style="font-size:.68rem;color:var(--muted);margin-top:4px">${fN(ad.actas_contabilizadas)} de ${fN(ad.actas_total)} actas</div>`
+    : `<div style="font-size:.72rem;color:var(--muted);margin-top:4px">${fN(ad.actas_contabilizadas)} actas · escrutinio completo</div>`;
+
+  setHTML(`${pfx}-kpi`, `
+    <div class="kpi-grid">
+      <div class="kpi ${isFinal ? 'green' : ''}">
+        <div class="kpi-label">Actas contabilizadas</div>
+        <div class="kpi-value">${f1(pct)}%</div>
+        ${progHTML}
+      </div>
+      <div class="kpi red">
+        <div class="kpi-label">Votos válidos</div>
+        <div class="kpi-value">${fM(ad.votos_validos)}</div>
+        <div class="kpi-sub">${f1((ad.votos_validos / ad.votos_emitidos) * 100)}% de emitidos</div>
+      </div>
+      <div class="kpi green">
+        <div class="kpi-label">Participación</div>
+        <div class="kpi-value">${f1(ad.pct_participacion)}%</div>
+        <div class="kpi-sub">Del padrón electoral</div>
+      </div>
+      <div class="kpi gold">
+        <div class="kpi-label">Blancos + Nulos</div>
+        <div class="kpi-value">${fM(bn)}</div>
+        <div class="kpi-sub">${f1((bn / ad.votos_emitidos) * 100)}% de emitidos</div>
+      </div>
+    </div>`);
+
+  if (!isFinal) {
+    setTimeout(() => {
+      const el = document.getElementById(progId);
+      if (el) el.style.width = pct + '%';
+    }, 60);
+  }
+}
+
+// ─── Finalists banner ─────────────────────────────────────────────────────────
+function renderFinalists(d) {
+  const ad = mergeAmbitos(d.ambito);
+  const sp = sortedParties(ad.votos_partidos);
+  const tot = sp.reduce((s, p) => s + p.votes, 0);
+  const [f1p, f2p] = sp.slice(0, 2);
+  if (!f1p || !f2p) return;
+
+  const card = (p, rank) => {
+    const name = d.parties[p.id] || `Partido ${p.id}`;
+    const share = (p.votes / tot) * 100;
+    const color = pColor(p.id);
+    return `
+      <div class="finalist-card">
+        <div class="finalist-rank">${rank === 1 ? '1° LUGAR' : '2° LUGAR'}</div>
+        <div class="finalist-name">${trunc(name, 28)}</div>
+        <div class="finalist-share">${f2(share)}%</div>
+        <div class="finalist-votes">${fN(p.votes)} votos válidos</div>
+        <div class="finalist-color-bar" style="background:${color}"></div>
+      </div>`;
+  };
+
+  setHTML('p1-finalists', `
+    <div class="finalists-wrap">
+      <div class="finalists-label">Avanzan a segunda vuelta</div>
+      <div class="finalists-row">
+        ${card(f1p, 1)}
+        <div class="finalists-vs">VS</div>
+        ${card(f2p, 2)}
+      </div>
+    </div>`);
+}
+
+// ─── Observed chart ───────────────────────────────────────────────────────────
+const TOP_N = 12;
+
+function renderObsChart(round, ad, parties) {
+  const pfx = round === 'primera' ? 'p1' : 'p2';
+  const sp  = sortedParties(ad.votos_partidos);
+  const tot = sp.reduce((s, p) => s + p.votes, 0);
+  const top2ids  = sp.slice(0, 2).map(p => p.id);
+  const visible  = S.showAll[round] ? sp : sp.slice(0, TOP_N);
+
+  const labels    = visible.map(p => trunc(parties[p.id] || `Partido ${p.id}`, 34));
+  const shares    = visible.map(p => (p.votes / tot) * 100);
+  const votes     = visible.map(p => p.votes);
+  const colors    = visible.map(p => pColor(p.id));
+  const advancing = visible.map(p => top2ids.includes(p.id));
+
+  const container = document.getElementById(`${pfx}-chart`);
+  container.innerHTML = '';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'chart-wrap';
+  wrap.style.height = Math.max(280, visible.length * 34) + 'px';
+  const canvas = document.createElement('canvas');
+  wrap.appendChild(canvas);
+  container.appendChild(wrap);
+
+  // Legend for primera vuelta
+  if (round === 'primera' && advancing.some(Boolean)) {
+    const leg = document.createElement('div');
+    leg.className = 'chart-legend';
+    leg.innerHTML = '<span class="legend-box"></span> Los dos primeros avanzan a segunda vuelta';
+    container.appendChild(leg);
+  }
+
+  // Show more / less button
+  if (sp.length > TOP_N) {
+    const btn = document.createElement('button');
+    btn.className = 'show-more-btn';
+    btn.textContent = S.showAll[round]
+      ? '▲ Mostrar menos'
+      : `▼ Ver todos los partidos (${sp.length})`;
+    btn.onclick = () => {
+      S.showAll[round] = !S.showAll[round];
+      renderObsChart(round, ad, parties);
+    };
+    container.appendChild(btn);
+  }
+
+  if (charts[round]) { charts[round].destroy(); charts[round] = null; }
+
+  charts[round] = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: shares,
+        backgroundColor: colors,
+        borderColor:  advancing.map(a => a ? '#D4AC0D' : 'rgba(0,0,0,0)'),
+        borderWidth:  advancing.map(a => a ? 2 : 0),
+        borderRadius: 4,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 500 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: ctx => (parties[sp[ctx[0].dataIndex]?.id] || ''),
+            label: ctx => {
+              const i = ctx.dataIndex;
+              return [
+                `  ${f2(shares[i])}% de votos válidos`,
+                `  ${fN(votes[i])} votos`,
+                advancing[i] ? '  → Avanza a segunda vuelta' : null,
+              ].filter(Boolean);
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: '% de votos válidos', font: { size: 11 } },
+          grid: { color: '#F0F4F8' },
+          ticks: { callback: v => v + '%' }
+        },
+        y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+// ─── Propagation model card ───────────────────────────────────────────────────
+function renderProp() {
+  if (!S.prop) return;
+  const valid   = S.prop.parties.filter(p => !BN.includes(p.id));
+  const totalOb = valid.reduce((s, p) => s + p.observed_votes, 0);
+  const top2ids = valid.slice(0, 2).map(p => p.id);
+
+  const rows = valid.slice(0, 12).map(p => {
+    const obs = (p.observed_votes / totalOb) * 100;
+    const adv = top2ids.includes(p.id);
+    return `<tr class="${adv ? 'adv' : ''}">
+      <td>
+        <span class="pdot" style="background:${pColor(p.id)}"></span>
+        <strong>${trunc(p.name, 30)}</strong>
+        ${adv ? '<span class="badge badge-adv" style="margin-left:4px">↗ 2da vuelta</span>' : ''}
+      </td>
+      <td>${f2(obs)}%</td>
+      <td><strong>${f2(p.projected_share)}%</strong></td>
+      <td><span class="ci">[${f2(p.lower_bound)}, ${f2(p.upper_bound)}]</span></td>
+    </tr>`;
+  }).join('');
+
+  const ad2  = S.data.segunda ? getAmbito(S.data.segunda, 'total') : null;
+  const pct  = ad2 ? ad2.pct_actas_contabilizadas : 0;
+  const note = pct >= 100
+    ? '<div class="info-note">✓ Escrutinio al 100% — la proyección confirma los resultados definitivos.</div>'
+    : '';
+
+  setHTML('prop-body', `
+    <table class="mtable">
+      <thead><tr>
+        <th>Partido</th><th>Observado</th><th>Proyectado</th><th>IC 95%</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>${note}`);
+}
+
+// ─── Department table ─────────────────────────────────────────────────────────
+function renderDeptTable(round, departamental, parties) {
+  const pfx = round === 'primera' ? 'p1' : 'p2';
+  const ds  = S.dept[round];
+
+  const rows = departamental
+    .filter(d => d.ambito === '1')
+    .map(d => {
+      const sp  = sortedParties(d.votos_partidos);
+      const tot = sp.reduce((s, p) => s + p.votes, 0);
+      const [f, s] = sp;
+      return {
+        dept:         d.departamento,
+        pct_actas:    d.pct_actas_contabilizadas,
+        pct_part:     d.pct_participacion,
+        first_id:     f ? f.id : '',
+        first_name:   f ? (parties[f.id] || `P${f.id}`) : '—',
+        first_share:  f ? (f.votes / tot) * 100 : 0,
+        second_id:    s ? s.id : '',
+        second_name:  s ? (parties[s.id] || `P${s.id}`) : '—',
+        second_share: s ? (s.votes / tot) * 100 : 0,
+      };
+    });
+
+  rows.sort((a, b) => {
+    const av = a[ds.key], bv = b[ds.key];
+    if (typeof av === 'string')
+      return ds.asc ? av.localeCompare(bv) : bv.localeCompare(av);
+    return ds.asc ? av - bv : bv - av;
+  });
+
+  const th = (label, key) => {
+    const active = ds.key === key;
+    const arrow  = active ? (ds.asc ? ' ▲' : ' ▼') : '';
+    return `<th class="${active ? 'sa' : ''}" onclick="sortDept('${round}','${key}')">${label}${arrow}</th>`;
+  };
+
+  const tbody = rows.map(r => `
+    <tr>
+      <td><strong>${r.dept}</strong></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="pill" style="background:${pColor(r.first_id)}">${trunc(r.first_name, 24)}</span>
+          <span style="font-weight:600">${f1(r.first_share)}%</span>
+        </div>
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="pill" style="background:${pColor(r.second_id)}">${trunc(r.second_name, 24)}</span>
+          <span>${f1(r.second_share)}%</span>
+        </div>
+      </td>
+      <td>
+        <div class="mbar">
+          <div class="mbar-t"><div class="mbar-f" style="width:${r.pct_actas}%"></div></div>
+          <span>${f1(r.pct_actas)}%</span>
+        </div>
+      </td>
+      <td>${f1(r.pct_part)}%</td>
+    </tr>`).join('');
+
+  setHTML(`${pfx}-dept`, `
+    <div class="overflow-x">
+      <table class="dtable">
+        <thead><tr>
+          ${th('Departamento', 'dept')}
+          ${th('1er lugar',   'first_share')}
+          ${th('2do lugar',   'second_share')}
+          ${th('Actas',       'pct_actas')}
+          ${th('Participación','pct_part')}
+        </tr></thead>
+        <tbody>${tbody}</tbody>
+      </table>
+    </div>`);
+}
+
+// ─── Events ───────────────────────────────────────────────────────────────────
+function switchRound(round) {
+  S.activeRound = round;
+  document.getElementById('section-primera').style.display = round === 'primera' ? '' : 'none';
+  document.getElementById('section-segunda').style.display = round === 'segunda' ? '' : 'none';
+  document.getElementById('tab-primera').classList.toggle('active', round === 'primera');
+  document.getElementById('tab-segunda').classList.toggle('active', round === 'segunda');
+}
+
+function switchAmbito(round, key, btn) {
+  S.ambito[round] = key;
+  const tabGroup = document.getElementById(
+    round === 'primera' ? 'p1-ambito-tabs' : 'p2-ambito-tabs'
+  );
+  tabGroup.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  if (S.data[round]) {
+    const ad = getAmbito(S.data[round], key);
+    renderKPI(round === 'primera' ? 'p1' : 'p2', ad, S.data[round].is_final);
+    renderObsChart(round, ad, S.data[round].parties);
+  }
+}
+
+function sortDept(round, key) {
+  const ds = S.dept[round];
+  ds.key === key ? (ds.asc = !ds.asc) : (ds.key = key, ds.asc = key === 'dept');
+  if (S.data[round]) renderDeptTable(round, S.data[round].departamental, S.data[round].parties);
+}
+
+async function refreshAll() {
+  const btn = document.getElementById('btn-refresh');
+  btn.disabled = true; btn.textContent = '↻ Actualizando…';
+
+  // Reset loaders
+  ['primera','segunda'].forEach(r => {
+    const p = r === 'primera' ? 'p1' : 'p2';
+    setHTML(`${p}-kpi`,   loader('Cargando…'));
+    setHTML(`${p}-chart`, loader('Cargando…'));
+    setHTML(`${p}-dept`,  loader('Cargando…'));
+    S.data[r] = null;
+    if (charts[r]) { charts[r].destroy(); charts[r] = null; }
+  });
+  S.prop = null;
+  setHTML('p1-finalists', '');
+  setHTML('prop-body', loader('Calculando proyección…'));
+
+  await Promise.all([fetchRound('primera'), fetchRound('segunda')]);
+  fetchProp();
+
+  btn.disabled = false; btn.textContent = '↻ Actualizar';
+}
+
+// ─── Init ──────────────────────────────────────────────────────────────────────
+(async () => {
+  await Promise.all([fetchRound('primera'), fetchRound('segunda')]);
+  fetchProp();  // background, no await
+})();
+</script>
+</body>
+</html>
