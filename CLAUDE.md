@@ -594,3 +594,126 @@ const scale = p.projected_share > 0 ? h2h / p.projected_share : 1;
 - **Clear the file before election night** with `rm -f prediction_history.jsonl`. Snapshots from simulation runs will corrupt the evolution chart.
 - **Do not change the 3-dataset ordering** (ub → lb → line) in `buildDatasets()`. Chart.js `fill: '+1'` resolves relative to dataset index — swapping breaks the CI shading.
 - **The recorder requires all 4 caches to be warm.** If you add a new model endpoint with its own cache key, update the guard in `_record_snapshot()` accordingly or the snapshot will never fire.
+
+---
+
+### Deployment Architecture (Objective 5 — Not Yet Implemented)
+
+The following section documents the decided architecture for public hosting. The code changes described here have **not been written yet** — this is the next immediate implementation objective.
+
+#### Chosen Stack
+
+**Cloudflare Tunnel + Cloudflare Access + gunicorn**
+
+```
+Internet → Cloudflare Access (email allowlist, ~20 users)
+         → Cloudflare Tunnel
+         → gunicorn (localhost:5000, 2 workers)
+         → app.py
+```
+
+- **Cloudflare Access** enforces authentication via Google/GitHub/email OTP before any request reaches the machine. Configured entirely in the Cloudflare dashboard — no auth code in the app. Free for up to 50 users.
+- **Cloudflare Tunnel** (`cloudflared`) exposes localhost to a stable public URL (either a `*.trycloudflare.com` random URL or a custom domain pointed at Cloudflare). No open inbound ports on the host machine.
+- **gunicorn** replaces the Flask dev server. 2 workers is sufficient for ~20 users on a read-heavy dashboard.
+
+The scraper pipeline continues to run on the same local machine. `processed_results/` is read directly by the server — no sync step needed since everything is local.
+
+#### Required Code Changes to `app.py`
+
+**1. Protect `/api/cache/clear` with an admin token**
+
+The cache-clear endpoint must not be callable by authenticated dashboard users — it triggers full model recomputation and is a DoS vector. Gate it with a secret token passed via environment variable:
+
+```python
+import os
+from flask import request
+
+ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "")
+
+@app.route("/api/cache/clear", methods=["POST"])
+def api_cache_clear():
+    token = request.headers.get("X-Admin-Token", "")
+    if not ADMIN_TOKEN or token != ADMIN_TOKEN:
+        return jsonify({"ok": False, "error": "unauthorized"}), 403
+    _cache.clear()
+    return jsonify({"ok": True})
+```
+
+Launch the server with:
+```bash
+ADMIN_TOKEN=your-secret gunicorn -w 2 --timeout 120 -b 127.0.0.1:5000 app:app
+```
+
+**2. Raise `CACHE_TTL` from 60s to 600s**
+
+```python
+CACHE_TTL = 600  # 10 minutes — matches pipeline cadence
+```
+
+With public users, 60s TTL means any visitor arriving on a cold cache triggers expensive model computation. Since the pipeline runs every 10–30 minutes, a 600s TTL is appropriate. Cache is explicitly invalidated after each pipeline run (see below) so the TTL is just a safety net, not the primary refresh mechanism.
+
+**3. Update the Actualizar button to send the admin token**
+
+The frontend `refreshAll()` call to `/api/cache/clear` must include the token header. This means the token must be embedded in the page or passed at serve time. Simplest approach: inject it as a JS variable via a Jinja2 template variable when serving `dashboard.html`, so it is never hardcoded in the file committed to git:
+
+```python
+# In app.py:
+@app.route("/")
+def index():
+    return render_template("dashboard.html", admin_token=ADMIN_TOKEN)
+```
+
+```js
+// In dashboard.html (injected by Flask):
+const ADMIN_TOKEN = "{{ admin_token }}";
+
+// In refreshAll():
+await fetch('/api/cache/clear', {
+  method: 'POST',
+  headers: { 'X-Admin-Token': ADMIN_TOKEN }
+});
+```
+
+This requires moving `dashboard.html` into a `templates/` subdirectory (Flask's default template folder) and changing `send_file` to `render_template`.
+
+#### Revised Election Night Pipeline (with public hosting)
+
+```bash
+# After each processData.py run, invalidate the server cache:
+curl -s -X POST -H "X-Admin-Token: your-secret" http://localhost:5000/api/cache/clear
+```
+
+The first visitor after invalidation triggers model recomputation; all subsequent visitors within 10 minutes get the cached result. This is the correct trigger pattern — cache invalidation is driven by new data arriving, not by TTL expiry.
+
+Full sequence:
+```
+python run_cluster.py --mode patch    # 1. scrape
+python merge_workers.py               # 2. merge
+python processData.py                 # 3. aggregate
+curl -X POST ... /api/cache/clear     # 4. invalidate → models recompute on next hit
+```
+
+#### Strict Rules for Deployment
+
+- **Never commit `ADMIN_TOKEN` to git.** It must come from an environment variable at runtime.
+- **Never expose gunicorn directly to the internet.** It must listen on `127.0.0.1` only. Cloudflare Tunnel is the only ingress.
+- **`dashboard.html` must move to `templates/`** before `render_template` will work. The `send_file("dashboard.html")` call in `app.py` must become `render_template("dashboard.html", admin_token=ADMIN_TOKEN)`. Do not use `send_file` after this change — it bypasses Jinja2 templating.
+- **Do not raise worker count above 2** without testing. Each worker holds its own `_cache` dict in memory — model results cached by worker A are not visible to worker B. With 2 workers this is acceptable (a cold-cache request hits one worker, warm-cache requests hit whichever worker responds). With more workers the cache efficiency degrades proportionally. A proper fix would require a shared cache (Redis), which is out of scope.
+- **Cloudflare Access must be configured before sharing the public URL.** If the tunnel is started without Access in front of it, the URL is publicly accessible to anyone. Set up the Access policy first, then share the URL.
+
+#### Current State (as of end of Objective 5 planning)
+
+**Decided, not yet implemented:**
+- gunicorn as the production server
+- `ADMIN_TOKEN` environment variable gating `/api/cache/clear`
+- `CACHE_TTL` raised to 600s
+- `dashboard.html` moved to `templates/` with Jinja2 token injection
+- `render_template` replacing `send_file` in the index route
+
+**Infrastructure (manual, Cloudflare dashboard — not code):**
+- Create Cloudflare Tunnel pointing to `http://127.0.0.1:5000`
+- Create Cloudflare Access policy with email allowlist of ~20 collaborators
+- Optionally: point a custom domain at the tunnel
+
+**Next immediate objective:**
+Implement the three `app.py` changes (ADMIN_TOKEN guard, CACHE_TTL=600, render_template), move `dashboard.html` to `templates/`, update the Actualizar button to send the token header, and validate end-to-end with gunicorn before election night.
