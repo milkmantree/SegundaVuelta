@@ -1109,8 +1109,11 @@ function renderProp() {
   const rows = valid.slice(0, 12).map(p => {
     const obs      = totalOb   > 0 ? (p.observed_votes  / totalOb)   * 100 : 0;
     const projHead = totalProj > 0 ? (p.projected_votes / totalProj) * 100 : 0;
+    // API lb/ub are in valid-vote space; scale to h2h space via projHead / projected_share
+    const scale    = p.projected_share > 0 ? projHead / p.projected_share : 1;
+    const lbH2h    = p.lower_bound * scale;
+    const ubH2h    = p.upper_bound * scale;
     const adv      = top2ids.includes(p.id);
-    // p.projected_share = share of all valid votes incl. blancos/nulos (server-computed)
     const validNote = `<span class="ci" style="margin-left:4px">(${f2(p.projected_share)}% válidos)</span>`;
     return `<tr class="${adv ? 'adv' : ''}">
       <td>
@@ -1119,7 +1122,7 @@ function renderProp() {
       </td>
       <td>${f2(obs)}%</td>
       <td><strong>${f2(projHead)}%</strong>${validNote}</td>
-      <td><span class="ci">[${f2(p.lower_bound)}, ${f2(p.upper_bound)}]</span></td>
+      <td><span class="ci">[${f2(lbH2h)}, ${f2(ubH2h)}]</span></td>
     </tr>`;
   }).join('');
 
@@ -1735,18 +1738,21 @@ function renderEvolucion() {
       const ubData  = toDataArr(pts, p => p.ub);
       const lbData  = toDataArr(pts, p => p.lb);
 
-      const ciColor  = color + '30'; // ~19% opacity hex
       const ciColor2 = color + '00';
 
-      // Upper CI band (fill toward lower)
+      // Upper CI band — fill to the _lb_ dataset immediately following it.
+      // Use the absolute dataset index (ubIdx + 1) instead of '+1' string,
+      // which is unreliable in Chart.js 4.x.
+      const ubIdx = datasets.length;
       datasets.push({
         label:        `_ub_${model}_${id}`,
         data:         ubData,
         borderColor:  ciColor2,
         borderWidth:  0,
         pointRadius:  0,
-        fill:         '+1',
+        fill:         ubIdx + 1,
         backgroundColor: color + '28',
+        spanGaps:     true,
         tension:      0.35,
       });
       // Lower CI band
@@ -1757,6 +1763,7 @@ function renderEvolucion() {
         borderWidth:  0,
         pointRadius:  0,
         fill:         false,
+        spanGaps:     true,
         tension:      0.35,
       });
       // Main line
