@@ -243,6 +243,96 @@ def create_interactive_dashboard(results_df, resolved_tier):
     print(f"🌐 Interactive dashboard exported successfully as '{filename}'")
 
 
+def get_projection_data_by_dept(data_path=None, mapping_path=None, z_score=1.96):
+    """Returns per-department projection results as a JSON-serializable dict."""
+    import io, contextlib
+
+    if data_path is None:
+        data_path = os.path.join("processed_results", "agg_distrital.json")
+    if mapping_path is None:
+        mapping_path = os.path.join("processed_results", "idx_codigo_nombre_partido.json")
+
+    if not os.path.exists(data_path) or not os.path.exists(mapping_path):
+        return {"error": "Data files not found", "departments": {}}
+
+    sink = io.StringIO()
+    with contextlib.redirect_stdout(sink):
+        df_flat, candidate_cols, party_mapping = preprocess_electoral_data(
+            data_path, mapping_path
+        )
+
+    departments = {}
+    for dept_name, dept_df in df_flat.groupby("departamento"):
+        dept_df    = dept_df.copy()
+        n_total    = len(dept_df)
+        n_reported = int((dept_df["actas_contabilizadas"] > 0).sum())
+        pct_cover  = round(n_reported / n_total * 100, 2) if n_total > 0 else 0.0
+
+        with contextlib.redirect_stdout(sink):
+            results_df = run_dynamic_stratified_projection(
+                dept_df, candidate_cols, party_mapping, z_score, generate_html=False
+            )
+
+        # Head-to-head projected shares (exclude blancos/nulos from denominator)
+        cand_rows = [
+            (name, row)
+            for name, row in results_df.iterrows()
+            if str(row["ID"]) not in ("80", "81")
+        ]
+        total_proj = sum(int(row["Projected Votes"]) for _, row in cand_rows) or 1
+
+        # Infer total projected valid votes from the first candidate to scale MOE
+        # projected_share (from model) = proj_votes / total_valid → total_valid = proj_votes / (share/100)
+        first_ps  = float(cand_rows[0][1]["Projected Share (%)"]) if cand_rows else 1.0
+        first_pv  = int(cand_rows[0][1]["Projected Votes"])       if cand_rows else 1
+        total_val = (first_pv / (first_ps / 100.0)) if first_ps > 0 else total_proj
+        h2h_scale = total_val / total_proj  # ~1.0 for 2-party, slightly >1 if blancos present
+
+        parties = []
+        for name, row in cand_rows:
+            pid        = str(row["ID"])
+            proj_votes = int(row["Projected Votes"])
+            proj_head  = round(proj_votes / total_proj * 100, 2)
+            valid_sh   = round(float(row["Projected Share (%)"]), 2)
+            moe        = round(float(row["MOE (%)"]) * h2h_scale, 2)
+            parties.append({
+                "id":             pid,
+                "name":           name,
+                "observed_votes": int(row["Observed Votes"]),
+                "projected_votes": proj_votes,
+                "projected_share": proj_head,
+                "valid_share":    valid_sh,
+                "moe":            moe,
+                "lower_bound":    round(max(0.0,   proj_head - moe), 2),
+                "upper_bound":    round(min(100.0, proj_head + moe), 2),
+            })
+
+        # Compute tier_counts: how many districts resolved at each fallback level
+        prov_valid_d = dept_df.groupby("provincia")["votos_validos"].sum()
+        has_prov = dept_df["provincia"].map(lambda p: float(prov_valid_d.get(p, 0.0)) > 0)
+        tier_district = int(dept_df["is_stable"].sum())
+        tier_prov     = int((~dept_df["is_stable"] & has_prov).sum())
+        tier_dept_n   = n_total - tier_district - tier_prov
+
+        departments[dept_name] = {
+            "n_reported":   n_reported,
+            "n_total":      n_total,
+            "pct_coverage": pct_cover,
+            "parties": sorted(parties, key=lambda x: x["projected_share"], reverse=True),
+            "tier_counts": {
+                "district":    tier_district,
+                "provincia":   tier_prov,
+                "departamento": tier_dept_n,
+            },
+        }
+
+    return {
+        "model":            "dynamic_stratified_propagation",
+        "confidence_level": "95%",
+        "departments":      departments,
+    }
+
+
 def get_projection_data(data_path=None, mapping_path=None, z_score=1.96):
     """Returns projection results as a JSON-serializable dict for the web API."""
     if data_path is None:

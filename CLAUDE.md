@@ -32,10 +32,11 @@ python propagation_model.py
 | `run_cluster.py` | Orchestrator — spawns 5 workers, renders live TUI dashboard |
 | `merge_workers.py` | Merges per-worker JSONL files into unified `onpe_combined_results.jsonl` |
 | `processData.py` | Builds district/province/department/ámbito aggregation tables |
-| `propagation_model.py` | Runs dynamic stratified projection; exposes `get_projection_data()` for API |
-| `migration_model.py` | Vote migration model (Hellinger clustering + share-space WLS + FPC); exposes `get_migration_data()` and `build_cluster_map()` |
+| `propagation_model.py` | Runs dynamic stratified projection; exposes `get_projection_data()` and `get_projection_data_by_dept()` for API |
+| `migration_model.py` | Vote migration model (Hellinger clustering + share-space WLS + FPC); exposes `get_migration_data()`, `get_migration_data_by_dept()`, and `build_cluster_map()` |
 | `app.py` | Flask server — serves dashboard and all API endpoints |
 | `dashboard.html` | Single-file frontend (Chart.js, inline CSS/JS) |
+| `generate_static_dashboard.py` | Generates a self-contained `dashboard_static.html` snapshot with all data embedded — no server required |
 | `simulate_segunda_vuelta.py` | Test utility — generates synthetic segunda vuelta data for end-to-end testing |
 | `inputs/onpe_ubigeo_map.json` | Master list of all districts with ubigeo codes |
 | `inputs/ubigeo_votos_habiles.json` | Pre-computed eligible voter counts per ubigeo (static baseline) |
@@ -160,41 +161,77 @@ python app.py 8080                                 # custom port
 | `GET /api/round/second` | `processed_results/` | none |
 | `GET /api/observed` | `processed_results/` | none (backward-compat alias) |
 | `GET /api/model/propagation` | `propagation_model.get_projection_data()` | 60s in-memory |
+| `GET /api/model/propagation/dept` | `propagation_model.get_projection_data_by_dept()` | 60s in-memory |
 | `GET /api/model/migration` | `migration_model.get_migration_data()` | 60s in-memory |
+| `GET /api/model/migration/dept` | `migration_model.get_migration_data_by_dept()` | 60s in-memory |
 
 Round endpoints return `{ "ok": true, "data": { ambito, departamental, parties, last_updated, is_final } }`. Model endpoints return their own payload shapes (see contracts below). All return `{ "ok": false, "error": "..." }` on failure.
 
-Both model results are **cached in memory for 60 seconds** (`CACHE_TTL` in `app.py`). Invalidate by restarting the server.
+All six model results are **cached in memory for 60 seconds** (`CACHE_TTL` in `app.py`). Cache keys: `"prop"`, `"prop_dept"`, `"migr"`, `"migr_dept"`. Invalidate by restarting the server.
 
 #### Dashboard Structure
 
 `dashboard.html` is a single self-contained HTML file (CSS + JS inline, Chart.js via CDN). Two top-level sections toggled by the round switcher tab bar:
 
 - **`#section-primera`** — loads `/api/round/first`, renders KPIs, finalists banner, Chart.js bar chart, department table. Shows "Resultados definitivos" badge.
-- **`#section-segunda`** — loads `/api/round/second`, renders KPIs with live progress bar, chart, **propagation model card** (`#prop-body`), **migration model card** (`#migr-body`), department table.
+- **`#section-segunda`** — loads `/api/round/second`. Contains a **sub-tab bar** (`[Resumen | Por Departamento]`) that controls two inner panels:
+  - **`#s2-tab-resumen`** — KPIs with live progress bar, chart, propagation model card (`#prop-body`), migration model card (`#migr-body`), raw department results table.
+  - **`#s2-tab-dept`** — department model comparison table (`#p2-dept-models`): 8-column table showing both models' valid-obs share, projected share ± MoE, and 95% CI per department. Peru's 25 departments shown first; the 5 exterior regions in a collapsible "🌐 EXTERIOR" toggle at the bottom. Clicking a department name opens a modal popup (`#dept-modal`).
 
-Both sections render on page load via `Promise.all([fetchRound('primera'), fetchRound('segunda')])`. Both models fetch in the background without blocking. The refresh button (`refreshAll()`) resets both model caches.
+Both round sections render on page load. All four model endpoints fetch in the background. The refresh button (`refreshAll()`) resets all caches and state.
 
 **Key JS state object:**
 ```js
 const S = {
-  data:    { primera: null, segunda: null },  // raw API payloads
-  prop:    null,                               // propagation model payload
-  migr:    null,                               // migration model payload
-  ambito:  { primera: 'total', segunda: 'total' },
-  showAll: { primera: false, segunda: false },
-  dept:    { primera: { key, asc }, segunda: { key, asc } },
+  data:        { primera: null, segunda: null },  // raw API payloads
+  prop:        null,                               // propagation national payload
+  migr:        null,                               // migration national payload
+  propDept:    null,                               // propagation dept payload
+  migrDept:    null,                               // migration dept payload
+  activeRound: 'primera',
+  activeS2Tab: 'resumen',                          // 'resumen' | 'dept'
+  modalDept:   null,                               // currently open dept name
+  ambito:      { primera: 'total', segunda: 'total' },
+  showAll:     { primera: false, segunda: false },
+  dept: {
+    primera:    { key: 'first_share', asc: false },
+    segunda:    { key: 'first_share', asc: false },
+    deptModels: { key: 'dept', asc: true },        // sort state for dept model table
+  },
 };
 const charts = { primera: null, segunda: null };
 ```
 
-**Rendering functions:** `renderProp()` writes into `#prop-body`. `renderMigr()` writes into `#migr-body`. Both handle three states: loading spinner → content → error box. `renderMigr()` also handles `status: "waiting"` (segunda vuelta data not yet available) and `status: "insufficient_data"` (< 4 districts reported).
+**Rendering functions:**
+- `renderProp()` → `#prop-body`. `renderMigr()` → `#migr-body`. Handle loading/error/active states.
+- `renderDeptModels()` → `#p2-dept-models`. Consumes both `S.propDept` and `S.migrDept`. Separates Peru vs exterior using `S.data.segunda.departamental[i].ambito`.
+- `openDeptModal(deptName)` → populates and opens `#dept-modal`. Shows tier resolution bar (propagation tab) and transfer coefficient table (migration tab) from the `details` block.
+- `switchS2Tab(tab)` → toggles `#s2-tab-resumen` / `#s2-tab-dept`.
+- `sortDeptModels(key)` → re-renders the dept model table sorted by column.
 
-**Party color system:** `FIXED` dict for ~18 known parties, auto-assigned from a 10-color palette for the rest. Colors key off party ID and are consistent across rounds.
+**Party color system:** `FIXED` dict for ~18 known parties, auto-assigned from a 10-color palette for the rest. Colors key off party ID and are consistent across all views.
 
-### Propagation Model API Contract
+#### Static Dashboard Generator
 
-`propagation_model.get_projection_data()` returns:
+`generate_static_dashboard.py` produces a fully self-contained `dashboard_static.html` by:
+1. Loading round data from the JSON files directly.
+2. Calling all four model functions (`get_projection_data`, `get_projection_data_by_dept`, `get_migration_data`, `get_migration_data_by_dept`).
+3. Injecting a `window.fetch` override shim before the main script that intercepts the six API calls and resolves them instantly from embedded data.
+4. Replacing the live-dot and refresh button with a "📸 Snapshot · date" label.
+
+```bash
+source .venv/bin/activate
+python generate_static_dashboard.py            # → dashboard_static.html
+python generate_static_dashboard.py out.html   # custom output path
+```
+
+Chart.js still loads from CDN — an internet connection is needed to view charts.
+
+### Propagation Model API Contracts
+
+#### National endpoint — `get_projection_data()`
+
+Returns `{ "ok": true, "data": <payload> }` where payload is:
 ```json
 {
   "model": "dynamic_stratified_propagation",
@@ -215,9 +252,38 @@ const charts = { primera: null, segunda: null };
 }
 ```
 
-Sorted descending by `projected_share`. Excludes party IDs `"80"` and `"81"`. `projected_share` is share of valid votes across all parties (sums to 100% excluding blancos/nulos). At 100% count, `moe` is `0.0`.
+Sorted descending by `projected_share`. Excludes party IDs `"80"` and `"81"`. **`projected_share` uses `votos_validos` (which includes blancos) as its denominator**, so in segunda vuelta the two finalists sum to ~75–85%, not 100%. The function signature `run_dynamic_stratified_projection(..., generate_html=True)` controls whether the standalone Plotly HTML is written. The API path passes `generate_html=False`.
 
-The function signature `run_dynamic_stratified_projection(..., generate_html=True)` controls whether the standalone Plotly HTML is written. The API path passes `generate_html=False`.
+#### Department endpoint — `get_projection_data_by_dept()`
+
+Returns `{ "ok": true, "data": <payload> }` where payload is:
+```json
+{
+  "model": "dynamic_stratified_propagation",
+  "confidence_level": "95%",
+  "departments": {
+    "AMAZONAS": {
+      "n_reported": 34,
+      "n_total": 84,
+      "pct_coverage": 40.48,
+      "tier_counts": { "district": 20, "provincia": 11, "departamento": 3 },
+      "parties": [
+        {
+          "id": "10", "name": "JUNTOS POR EL PERÚ",
+          "observed_votes": 23643, "projected_votes": 79515,
+          "projected_share": 56.32,
+          "valid_share": 44.10,
+          "moe": 3.35, "lower_bound": 52.97, "upper_bound": 59.67
+        }
+      ]
+    }
+  }
+}
+```
+
+Runs `run_dynamic_stratified_projection` independently on each department's subset of `agg_distrital.json` (30 runs total, print output suppressed). `projected_share` here is **head-to-head** (computed client-side in `get_projection_data_by_dept` as `projected_votes / sum_candidate_projected_votes`). `valid_share` is the raw model output (share of all valid including blancos). `tier_counts` is derived from the `is_stable` column the model writes to the df — no new computation.
+
+**Critical: `moe` and CI bounds are in head-to-head space**, scaled from valid-space via `h2h_scale = total_projected_valid / total_candidate_projected`.
 
 ### Vote Migration Model Architecture
 
@@ -305,6 +371,51 @@ The correct formulation: normalize both features and targets by their respective
 
 **Detection logic**: `get_migration_data()` checks `processed_results/idx_codigo_nombre_partido.json`. If it contains parties other than `{"8","10","80","81"}`, it returns `status: "waiting"`. This is the live gate — no other code change is needed when segunda vuelta scraping begins.
 
+#### Department endpoint — `get_migration_data_by_dept()`
+
+Returns the same top-level status envelope as the national endpoint, with an additional `departments` dict:
+
+```json
+{
+  "ok": true,
+  "status": "ok",
+  "model": "vote_migration_wls",
+  "confidence_level": "95%",
+  "n_districts_reported": 1301,
+  "n_districts_total": 2102,
+  "departments": {
+    "AMAZONAS": {
+      "n_reported": 34, "n_total": 84, "pct_coverage": 40.48,
+      "finalists": [
+        {
+          "id": "8", "name": "FUERZA POPULAR",
+          "observed_votes": 23400, "projected_votes": 59100,
+          "projected_share": 58.20, "valid_share": 45.10,
+          "moe": 5.30, "lower_bound": 52.90, "upper_bound": 63.50
+        }
+      ],
+      "details": {
+        "FUERZA POPULAR": {
+          "pool_level": "department",
+          "n_pool": 34,
+          "residual_std": 0.0312,
+          "features": [
+            { "label": "FUERZA POPULAR (propio)", "members": ["8"],  "beta": 0.512 },
+            { "label": "RENOVACIÓN POPULAR, AVANZA PAÍS", "members": ["35","36"], "beta": 0.281 },
+            { "label": "Cola (7 partidos)", "members": ["..."], "beta": 0.095 }
+          ]
+        },
+        "JUNTOS POR EL PERÚ": { ... }
+      }
+    }
+  }
+}
+```
+
+**Per-dept CI**: uses department-level FPC `(1 - n_d/N_d)` and dept residuals (variance of residuals from reported districts in that dept, ddof=1). Scaled from valid-space to finalist-space via `scale = dept_total_valid / dept_total_finalist`.
+
+**`details` block structure**: `pool_level` is `"department"` if the dept had ≥ 8 reported districts (used `dept_betas`), otherwise `"global"`. `features[]` follows the WLS design-matrix index order: index 0 = finalist's own first-round votes, indices 1..k = cluster groups (up to 3 member names + "…" if more), last index = tail group. `beta` is the BVLS coefficient. `residual_std` is `std(dept_residuals)`.
+
 #### Cluster Map JSON Structure
 
 `inputs/migration_cluster_map.json` has four top-level keys:
@@ -354,23 +465,132 @@ Writes synthetic segunda vuelta records (only parties 8, 10, 80, 81) to all five
 - **The scraper's `RUN_MODE`** must be set correctly before election night: `patch` for incremental, `update` for refreshing partials, `force` only for full re-scrape.
 - **Never regenerate `inputs/migration_cluster_map.json` during a live count.** It must be precomputed from first-round data and held constant so regression pools are stable throughout the night.
 - **Migration WLS must operate in share space.** Raw-count regression with a simplex constraint is broken for this problem (see architecture note above). Do not revert to raw counts.
+- **`projected_share` from the national propagation API is NOT head-to-head.** It divides `projected_votes` by `votos_validos`, which includes blancos. In segunda vuelta, the two finalists together sum to ~75–85%, not 100%. Always compute head-to-head client-side: `projected_votes / sum(all_candidate_projected_votes)`.
+- **Never divide projected vote totals by observed partial `votos_emitidos`.** Projected totals are full-election extrapolations; `votos_emitidos` is the current partial count. These are incompatible bases and will always produce proportions > 100% at low coverage. Use the model's own `projected_share` (of valid votes) or compute head-to-head explicitly.
 
-### Current State (as of end of Objective 2)
+### Current State (as of end of Objective 4)
 
 **Done:**
 - Full scraping pipeline operational (5 parallel workers, stop-signal interrupt, atomic JSONL writes)
 - `processData.py` produces district/province/department/ámbito aggregates with `votos_habiles` integration
-- `propagation_model.py`: dynamic stratified projection with per-district fallback to provincial/departmental trends and Bessel's-corrected variance pooling; exports Plotly HTML and JSON API
-- `first_round_agg_results/` populated with final first-round data (100% counted, 38 parties, 2102 districts)
-- `migration_model.py`: full 5-stage pipeline (Hellinger clustering → hierarchical fallback → share-space WLS → FPC ratio estimator with clustered sandwich SE); tested against simulated data
+- `propagation_model.py`: dynamic stratified projection with per-district fallback; exports Plotly HTML and JSON API; `get_projection_data_by_dept()` runs per-dept independently (30 calls, stdout suppressed), returns tier_counts and head-to-head shares
+- `first_round_agg_results/` populated with final first-round data (100% counted, 38 parties, 2102 districts) — frozen, never overwrite
+- `migration_model.py`: full 5-stage pipeline tested against simulated data; `get_migration_data_by_dept()` exposes dept-level CIs, pool_level, residual_std, and beta coefficients per finalist
 - `inputs/migration_cluster_map.json`: precomputed cluster definitions (273 provinces, 30 departments, global)
 - `simulate_segunda_vuelta.py`: test utility for end-to-end validation
-- `app.py`: both model endpoints live (`/api/model/propagation`, `/api/model/migration`), both with 60s cache
-- `dashboard.html`: both model cards active ("Activo" badge), `renderMigr()` handles waiting/insufficient/active states, `projected_share` displays head-to-head (F1 vs F2, sums to 100%), `valid_share` shown as secondary context
+- `app.py`: six endpoints live (four model endpoints + `/api/cache/clear` POST + `/api/history` GET); all model endpoints have 60s in-memory cache; cache keys: `"prop"`, `"prop_dept"`, `"migr"`, `"migr_dept"`; **Actualizar button explicitly clears server cache before refetching**, guaranteeing model recomputation on every manual refresh
+- `generate_static_dashboard.py`: produces self-contained `dashboard_static.html` with all data embedded (fetch-override shim + snapshot label)
+- `dashboard.html`: sub-tab architecture inside segunda vuelta section (`Resumen` | `Por Departamento` | `Evolución`); `renderDeptModels()` separates Peru vs exterior; `#dept-modal` overlay with propagation tab (tier bar + CI) and migration tab (pool badge + beta coefficient table)
+- **Prediction history system**: `prediction_history.jsonl` accumulates timestamped model snapshots throughout the count; `Evolución` tab renders a Chart.js line chart with 95% CI bands, filterable by model and departamento
 
 **Current `processed_results/` state:** Simulated segunda vuelta data is loaded (from `simulate_segunda_vuelta.py`). Run `python simulate_segunda_vuelta.py --restore` before the real election to put first-round data back, then let the scraper pipeline overwrite with real segunda vuelta data.
 
+**Before election night:**
+```bash
+python simulate_segunda_vuelta.py --restore
+rm -f log/*.jsonl log/*.log log/.stop_signal
+rm -f prediction_history.jsonl
+```
+
 **Next objective:**
-- Validate model accuracy and confidence interval behavior as coverage increases (run sensitivity analysis across simulated coverage levels: 10%, 25%, 50%, 75%, 100%)
-- Tune model for election night: verify the 60s cache TTL is appropriate, confirm `--mode patch` scraper behavior with segunda vuelta API endpoints
-- Monitor for data quality issues on election night: ONPE sometimes returns malformed JSON or stale actas counts mid-scrape
+- Consider a hosting/deployment path (local LAN server vs. public URL) for sharing the live dashboard with collaborators on election night
+- Validate model accuracy at low coverage via sensitivity analysis (10%, 25%, 50%, 75% simulated coverage) to understand CI behavior before election night
+
+---
+
+### Prediction History System
+
+#### File: `prediction_history.jsonl`
+
+Append-only JSONL file. One record per snapshot. Written automatically by `app.py` — never written manually.
+
+**Trigger logic (in `_record_snapshot()`):** A snapshot is appended only when ALL FOUR model caches (`"prop"`, `"prop_dept"`, `"migr"`, `"migr_dept"`) are simultaneously populated AND `coverage_pct` has changed by ≥ 0.05% since the last recorded entry. This prevents both incomplete snapshots (written before dept endpoints were called) and duplicate snapshots (written on back-to-back refreshes with no new data).
+
+**Record schema:**
+```json
+{
+  "ts":           1234567890.123,
+  "coverage_pct": 61.8,
+  "n_reported":   1299,
+  "n_total":      2102,
+  "prop": [
+    {
+      "id": "8", "name": "FUERZA POPULAR",
+      "projected_votes": 5200000, "projected_share": 41.48,
+      "lower_bound": 39.10, "upper_bound": 43.86, "moe": 2.38,
+      "observed_votes": 3100000
+    }
+  ],
+  "migr": [
+    {
+      "id": "8", "name": "FUERZA POPULAR",
+      "projected_votes": 7367153, "projected_share": 56.15,
+      "lower_bound": 51.17, "upper_bound": 61.13, "moe": 4.98,
+      "valid_share": 42.32, "observed_votes": 4965952
+    }
+  ],
+  "prop_dept": {
+    "LIMA": {
+      "n_reported": 412, "n_total": 441,
+      "parties": [
+        { "id": "8", "projected_votes": 3518416, "projected_share": 64.07,
+          "lower_bound": 63.78, "upper_bound": 64.36, "moe": 0.29 }
+      ]
+    }
+  },
+  "migr_dept": {
+    "LIMA": {
+      "n_reported": 412, "n_total": 441,
+      "parties": [
+        { "id": "8", "projected_share": 64.58, "valid_share": 49.61,
+          "lower_bound": 64.21, "upper_bound": 64.94, "moe": 0.37 }
+      ]
+    }
+  }
+}
+```
+
+**Critical field notes:**
+- `prop[].projected_share` is in **valid-vote space** (denominator = `votos_validos` including blancos). NOT head-to-head. The chart converts to h2h using `projected_votes / sum(projected_votes)`.
+- `prop[].lower_bound` / `upper_bound` are also in valid-vote space. The chart scales them to h2h space via `scale = h2h_share / valid_share`.
+- `migr[].projected_share` is already **head-to-head** (F1/(F1+F2) × 100). CI bounds are in h2h space. No conversion needed.
+- `prop_dept` stores parties under key `"parties"`. `migr_dept` also stores under key `"parties"` (the recorder normalizes from `finalists`/`parties` at write time — the raw API uses `finalists` but the history file always uses `parties`).
+
+#### API Endpoints (new)
+
+| Route | Method | Description |
+|---|---|---|
+| `GET /api/history` | GET | Returns `{ "ok": true, "data": [...records] }`. Empty array if file doesn't exist. |
+| `POST /api/cache/clear` | POST | Wipes all entries from `_cache`. Returns `{ "ok": true }`. Called by **Actualizar** button before refetching — guarantees model recomputation regardless of TTL. |
+
+#### Dashboard: Evolución Tab
+
+**Location:** Third sub-tab inside `#section-segunda` (`s2tab-evolucion` / `#s2-tab-evolucion`).
+
+**State:** `S.history` — raw array from `/api/history`. `null` until fetched.
+
+**Key functions:**
+- `fetchHistory()` — fetches `/api/history`, stores in `S.history`, calls `populateDeptSelect()`, then `renderEvolucion()` if the tab is active.
+- `populateDeptSelect()` — rebuilds `#evo-dept-select` options from all dept keys found in `prop_dept` / `migr_dept` across all history records. Called after each `fetchHistory()`.
+- `renderEvolucion()` — reads `#evo-model-select` (both/prop/migr) and `#evo-dept-select` (nacional or a dept name), builds Chart.js datasets with CI bands, destroys and recreates `charts.evo`.
+
+**Chart construction:** For each candidate × model combination, three datasets are pushed in order: `_ub_` (upper CI, `fill: '+1'`), `_lb_` (lower CI, `fill: false`), then the main named line. The `fill: '+1'` on the upper dataset causes Chart.js to shade between upper and lower — this ordering is load-bearing. Do not reorder.
+
+**X-axis labels:** Formatted as `dd/mm hh:mm (cov%)` in **UTC−5 (Lima time)**. Conversion uses `new Date((ts - 5*3600) * 1000)` with `getUTC*()` accessors to avoid browser timezone interference.
+
+**Propagation h2h conversion (in `renderEvolucion`):**
+```js
+const totalProj = propSrc.reduce((s, p) => s + (p.projected_votes || 0), 0);
+const h2h   = totalProj > 0 ? (p.projected_votes / totalProj) * 100 : p.projected_share;
+const scale = p.projected_share > 0 ? h2h / p.projected_share : 1;
+// lb_h2h = p.lower_bound * scale, ub_h2h = p.upper_bound * scale
+```
+
+**Tooltip filter:** `filter: ctx => !ctx.dataset.label.startsWith('_')` hides the CI band datasets from tooltips. The tooltip callback for the main line reads back `datasets[i-2]` (upper) and `datasets[i-1]` (lower) to display the CI range inline.
+
+#### Strict Rules for History System
+
+- **Never write to `prediction_history.jsonl` outside of `_record_snapshot()` in `app.py`.** The deduplication logic depends on `_last_recorded_coverage` being in sync with the file.
+- **Clear the file before election night** with `rm -f prediction_history.jsonl`. Snapshots from simulation runs will corrupt the evolution chart.
+- **Do not change the 3-dataset ordering** (ub → lb → line) in `buildDatasets()`. Chart.js `fill: '+1'` resolves relative to dataset index — swapping breaks the CI shading.
+- **The recorder requires all 4 caches to be warm.** If you add a new model endpoint with its own cache key, update the guard in `_record_snapshot()` accordingly or the snapshot will never fire.

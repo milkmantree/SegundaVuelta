@@ -449,6 +449,24 @@ def _project_finalist(r1_df, r2_df, cluster_map, finalists, finalist_idx):
     pred_r2_valid    = 0.0
     pred_residual_var = 0.0
 
+    # Per-department accumulators for dept-level API
+    dept_obs   = {}   # dept → observed finalist votes
+    dept_pred  = {}   # dept → predicted finalist votes (unreported)
+    dept_obs_valid  = {}
+    dept_pred_valid = {}
+    dept_pred_var   = {}
+    dept_n_total    = {}
+
+    for ubigeo, r1_row in r1_df.iterrows():
+        dept_n_total[r1_row["departamento"]] = (
+            dept_n_total.get(r1_row["departamento"], 0) + 1
+        )
+
+    for it in all_reported:
+        d = it["dept"]
+        dept_obs[d]       = dept_obs.get(d, 0.0)       + it["y"]
+        dept_obs_valid[d] = dept_obs_valid.get(d, 0.0) + it["r2_valid"]
+
     for item in unobserved:
         beta = _beta_for(item)
         if beta is None:
@@ -462,13 +480,21 @@ def _project_finalist(r1_df, r2_df, cluster_map, finalists, finalist_idx):
         sigma2_share = pool_sigma2.get(item["dept"], global_sigma2)
         pred_residual_var += sigma2_share * (proj_r2_valid_d ** 2)
 
+        d = item["dept"]
+        dept_pred[d]       = dept_pred.get(d, 0.0)       + y_share_pred * proj_r2_valid_d
+        dept_pred_valid[d] = dept_pred_valid.get(d, 0.0) + proj_r2_valid_d
+        dept_pred_var[d]   = dept_pred_var.get(d, 0.0)   + sigma2_share * (proj_r2_valid_d ** 2)
+
     # Residuals in vote space for FPC formula
     reported_with_resid = []
+    dept_resids = {}
     for it in all_reported:
         beta = _beta_for(it)
         y_hat = (float(it["x_s"] @ beta) * it["r2_valid"]
                  if beta is not None else it["y"])
         reported_with_resid.append({**it, "y_hat": y_hat})
+        d = it["dept"]
+        dept_resids.setdefault(d, []).append(it["y"] - y_hat)
 
     return {
         "finalist":           finalist,
@@ -480,6 +506,20 @@ def _project_finalist(r1_df, r2_df, cluster_map, finalists, finalist_idx):
         "n_reported":         n_reported,
         "n_total":            len(r1_df),
         "reported_items":     reported_with_resid,
+        # dept-level aggregates
+        "dept_obs":       dept_obs,
+        "dept_pred":      dept_pred,
+        "dept_obs_valid": dept_obs_valid,
+        "dept_pred_valid":dept_pred_valid,
+        "dept_pred_var":  dept_pred_var,
+        "dept_n_total":   dept_n_total,
+        "dept_resids":    dept_resids,
+        "r2_over_r1_valid": r2_over_r1_valid,
+        # regression coefficients + pool metadata (for details popup)
+        "dept_betas":      {d: b.tolist() for d, b in dept_betas.items()},
+        "global_beta":     global_beta.tolist() if global_beta is not None else None,
+        "pool_sigma2":     pool_sigma2,
+        "dept_pool_sizes": {d: len(items) for d, items in dept_pool.items()},
     }
 
 
@@ -639,6 +679,199 @@ def get_migration_data(cluster_map_path=CLUSTER_MAP_PATH):
         "n_districts_total":     n_total,
         "pct_coverage":          pct_cover,
         "finalists":             output_finalists,
+    }
+
+
+def get_migration_data_by_dept(cluster_map_path=CLUSTER_MAP_PATH):
+    """
+    Returns per-department migration model projections.
+    Reuses the national WLS fit; accumulates per-dept obs+pred sums.
+    """
+    if not os.path.exists(cluster_map_path):
+        return {"ok": False, "error": "Cluster map not found."}
+    if not os.path.exists(SECOND_ROUND_DISTRITAL):
+        return {"ok": False, "error": "Second-round data not available."}
+
+    with open(cluster_map_path, encoding="utf-8") as f:
+        cluster_map = json.load(f)
+
+    finalists      = cluster_map["_meta"]["finalists"]
+    finalist_names = cluster_map["_meta"]["finalist_names"]
+
+    r2_df, r2_mapping = _load_df(SECOND_ROUND_DISTRITAL, SECOND_ROUND_MAPPING)
+    if not _is_segunda_vuelta(r2_mapping, finalists):
+        return {"ok": False, "status": "waiting", "departments": {}}
+
+    r1_df, _ = _load_df(FIRST_ROUND_DISTRITAL, FIRST_ROUND_MAPPING)
+    r1_df = r1_df.set_index("ubigeo")
+    r2_df = r2_df.set_index("ubigeo")
+
+    n_reported = int((r2_df["actas_contabilizadas"] > 0).sum())
+    if n_reported < 4:
+        return {"ok": True, "status": "insufficient_data", "departments": {}}
+
+    # Run both finalists — we need their dept-level results
+    proj = []
+    for idx in range(2):
+        res = _project_finalist(r1_df, r2_df, cluster_map, finalists, idx)
+        if res is None:
+            return {"ok": False, "error": "WLS fitting failed."}
+        proj.append(res)
+
+    # For each finalist, total projected votes per dept
+    # dept_total_votes[dept][finalist_id] = obs + pred
+    all_depts = set(proj[0]["dept_n_total"].keys()) | set(proj[1]["dept_n_total"].keys())
+
+    # National finalist total for reference (used to normalise valid_share)
+    total_r2_valid = max(
+        proj[0]["obs_r2_valid"] + proj[0]["pred_r2_valid"], 1.0
+    )
+
+    departments = {}
+    for dept in sorted(all_depts):
+        dept_finalists = []
+        dept_total_proj = 0.0
+        dept_total_obs_valid = 0.0
+
+        # Collect totals for both finalists in this dept
+        for pr in proj:
+            obs  = pr["dept_obs"].get(dept, 0.0)
+            pred = pr["dept_pred"].get(dept, 0.0)
+            dept_total_proj += obs + pred
+            dept_total_obs_valid += pr["dept_obs_valid"].get(dept, 0.0)
+
+        dept_total_proj = max(dept_total_proj, 1.0)
+
+        # Compute per-finalist head-to-head share + CI
+        for pr in proj:
+            fid  = pr["finalist"]
+            obs  = pr["dept_obs"].get(dept, 0.0)
+            pred = pr["dept_pred"].get(dept, 0.0)
+            total_f = obs + pred
+
+            # Head-to-head projected share for this finalist in this dept
+            proj_share = total_f / dept_total_proj
+
+            # Dept-level obs valid votes (for valid_share reference)
+            obs_valid_d    = pr["dept_obs_valid"].get(dept, 0.0)
+            pred_valid_d   = pr["dept_pred_valid"].get(dept, 0.0)
+            total_valid_d  = max(obs_valid_d + pred_valid_d, 1.0)
+            valid_share    = total_f / total_valid_d
+
+            # Dept-level CI: FPC-adjusted prediction variance + residual variance
+            n_d  = len(pr["dept_resids"].get(dept, []))
+            N_d  = pr["dept_n_total"].get(dept, 1)
+            fpc  = 1.0 - n_d / N_d if N_d > 0 else 1.0
+
+            resids  = pr["dept_resids"].get(dept, [0.0])
+            sigma2  = float(np.var(resids, ddof=1)) if len(resids) > 1 else float(np.mean([r**2 for r in resids]) if resids else 0.0)
+            pred_var_d = pr["dept_pred_var"].get(dept, 0.0)
+
+            # Ratio variance scaled to share space
+            total_valid_sq = max(total_valid_d ** 2, 1.0)
+            var_share = (fpc * sigma2 * max(n_d, 1) / total_valid_sq
+                         + pred_var_d / total_valid_sq)
+
+            df_t   = max(n_d - 1, 1)
+            t_crit = float(sp_stats.t.ppf(0.975, df=df_t))
+            # Scale from valid-space to finalist-space via chain rule
+            scale  = total_valid_d / dept_total_proj
+            moe    = t_crit * math.sqrt(max(var_share, 0.0)) * scale
+
+            dept_finalists.append({
+                "id":              fid,
+                "name":            finalist_names.get(fid, f"Partido {fid}"),
+                "observed_votes":  int(obs),
+                "projected_votes": int(total_f),
+                "projected_share": round(proj_share * 100, 2),
+                "valid_share":     round(valid_share * 100, 2),
+                "moe":             round(moe * 100, 2),
+                "lower_bound":     round(max(0.0,   proj_share - moe) * 100, 2),
+                "upper_bound":     round(min(1.0,   proj_share + moe) * 100, 2),
+            })
+
+        dept_finalists.sort(key=lambda x: x["projected_share"], reverse=True)
+
+        n_rep   = len(pr["dept_resids"].get(dept, []))  # from last finalist (same coverage)
+        n_total_d = proj[0]["dept_n_total"].get(dept, 0)
+        departments[dept] = {
+            "n_reported":   n_rep,
+            "n_total":      n_total_d,
+            "pct_coverage": round(n_rep / n_total_d * 100, 2) if n_total_d > 0 else 0.0,
+            "parties":      dept_finalists,
+        }
+
+    # ── Second pass: enrich each dept with popup details ──────────────────────
+    with open(FIRST_ROUND_MAPPING, encoding="utf-8") as f:
+        r1_names = json.load(f)
+
+    for dept in departments:
+        dept_details_finalists = {}
+        for pr in proj:
+            fid = pr["finalist"]
+            pool_level = "department" if dept in pr["dept_betas"] else "global"
+            beta = pr["dept_betas"].get(dept) or pr["global_beta"]
+            n_pool = pr["dept_pool_sizes"].get(dept, 0)
+            sigma2_val = pr["pool_sigma2"].get(dept, pr["pool_sigma2"].get("__global__", 0.0))
+            residual_std = round(math.sqrt(max(sigma2_val, 0.0)), 4)
+
+            # Determine cluster_info for this dept
+            n_rep_dept = len(pr["dept_resids"].get(dept, []))
+            if n_rep_dept >= MIN_DISTRICTS:
+                ci = cluster_map["departments"].get(dept, cluster_map["global"])
+            else:
+                ci = cluster_map["global"]
+
+            # Build features list matching _build_x structure
+            features = []
+            if beta is not None:
+                beta_list = beta if isinstance(beta, list) else beta.tolist()
+                # index 0 = finalist's own first-round votes
+                features.append({
+                    "label":   f"{finalist_names.get(fid, fid)} (propio)",
+                    "members": [fid],
+                    "beta":    beta_list[0] if len(beta_list) > 0 else 0.0,
+                })
+                # indices 1..k = clusters
+                for i, cl in enumerate(ci.get("clusters", []), start=1):
+                    mems = cl.get("members", [])
+                    label_parts = [r1_names.get(m, m) for m in mems[:3]]
+                    label = ", ".join(label_parts) + ("…" if len(mems) > 3 else "")
+                    features.append({
+                        "label":   label,
+                        "members": mems,
+                        "beta":    beta_list[i] if i < len(beta_list) else 0.0,
+                    })
+                # last index = tail
+                tail = ci.get("tail", [])
+                if tail:
+                    tail_idx = len(ci.get("clusters", [])) + 1
+                    features.append({
+                        "label":   f"Cola ({len(tail)} partidos)",
+                        "members": tail,
+                        "beta":    beta_list[tail_idx] if tail_idx < len(beta_list) else 0.0,
+                    })
+
+            dept_details_finalists[fid] = {
+                "pool_level":    pool_level,
+                "n_pool":        n_pool,
+                "residual_std":  residual_std,
+                "features":      features,
+            }
+
+        # pool_level for the dept is from the first finalist (same decision for both)
+        top_pool_level = dept_details_finalists[proj[0]["finalist"]]["pool_level"] if proj else "global"
+        departments[dept]["details"] = {
+            "pool_level": top_pool_level,
+            "finalists":  dept_details_finalists,
+        }
+
+    return {
+        "ok":               True,
+        "status":           "ok",
+        "model":            "vote_migration_wls",
+        "confidence_level": "95%",
+        "departments":      departments,
     }
 
 

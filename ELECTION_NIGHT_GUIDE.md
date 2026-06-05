@@ -38,13 +38,14 @@ python migration_model.py --build
 
 This reads `first_round_agg_results/` (which is frozen and correct) and writes `inputs/migration_cluster_map.json`. This is a one-time operation.
 
-### 3. Clear old scraper logs
+### 3. Clear old scraper logs and prediction history
 
 ```bash
 rm -f log/*.jsonl log/*.log log/.stop_signal
+rm -f prediction_history.jsonl
 ```
 
-This prevents stale data from the simulation or test runs from being merged into the live data.
+The first command prevents stale scraper data from being merged into the live count. The second clears the projection history log so the **Evolución** tab in the dashboard starts fresh with real election night data — not test or simulation snapshots.
 
 ### 4. Start the dashboard server
 
@@ -91,6 +92,8 @@ python processData.py
 ```
 
 The dashboard reads from the files `processData.py` writes. The model endpoints cache results for 60 seconds — after running the pipeline, wait up to 60 seconds for the dashboard to reflect the new data, or click the **Actualizar** button on the dashboard to force a cache refresh.
+
+**History snapshots are automatic.** Each time the model cache expires and all four model endpoints are called (which happens on every manual refresh or whenever the browser reloads), a timestamped snapshot is appended to `prediction_history.jsonl`. The **Evolución** tab plots this series over time with 95% CI bands. No extra step is needed — just keep refreshing the dashboard at a regular cadence throughout the night.
 
 **Recommended cadence during the count:**
 
@@ -157,6 +160,8 @@ The propagation model (`propagation_model.py`) and migration model (`migration_m
 
 Click the **Actualizar** button in the dashboard header. This resets the 60-second model cache and immediately re-runs both models against the latest data on disk. Use this after running `merge_workers.py` + `processData.py` if you don't want to wait for the automatic cache expiry.
 
+Each manual refresh also triggers a new history snapshot (if coverage has changed by ≥0.05% since the last one), so clicking **Actualizar** after each pipeline run is both the fastest way to see updated results and the way to build up the evolution chart.
+
 ---
 
 ## Stopping the Scraper
@@ -218,6 +223,7 @@ This is normal. The FPC-corrected sandwich standard errors are intentionally con
 | `onpe_combined_results.jsonl` | `merge_workers.py` | Unified record set; input to `processData.py` |
 | `onpe_combined_errors.jsonl` | `merge_workers.py` | Scrape failures for retry |
 | `processed_results/*.json` | `processData.py` | Aggregates read by the dashboard and models |
+| `prediction_history.jsonl` | `app.py` (auto) | Timestamped model snapshots; powers the Evolución tab |
 | `backups/` | `run_cluster.py` | Timestamped auto-backups created at each run start |
 
 **Never touch `first_round_agg_results/` during the count.** That directory is frozen.
@@ -230,11 +236,12 @@ When `pct_actas_contabilizadas` reaches 100% for both ambieres:
 
 1. Stop the scraper: `touch log/.stop_signal`
 2. Run the pipeline one final time: `python merge_workers.py && python processData.py`
-3. Generate the final standalone projection chart:
+3. Click **Actualizar** on the dashboard to record a final history snapshot
+4. Generate the final standalone projection chart:
    ```bash
    python propagation_model.py
    ```
    This writes `election_projection_dashboard.html` — a self-contained Plotly file you can share or archive
-4. The dashboard will show MOE = 0.0% and all model projections will converge to observed values
+5. The dashboard will show MOE = 0.0% and all model projections will converge to observed values
 
 The `processed_results/` directory now contains the final segunda vuelta aggregates. Archive it alongside `first_round_agg_results/` for the historical record.

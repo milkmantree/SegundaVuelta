@@ -376,6 +376,159 @@
     }
 
     .overflow-x { overflow-x: auto; }
+
+    /* ── Sub-tabs ────────────────────────────────────────────────── */
+    .section-tabs {
+      display: flex; gap: 3px; margin-bottom: 20px;
+      background: var(--card); border-radius: 10px;
+      padding: 6px; box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
+    .section-tab {
+      padding: 7px 18px; border-radius: 7px; border: none;
+      background: transparent; cursor: pointer; font-size: .82rem;
+      font-weight: 600; color: var(--muted); transition: all .15s;
+    }
+    .section-tab.active { background: var(--blue); color: #fff; }
+    .section-tab:not(.active):hover { background: var(--bg); }
+
+    /* ── Dept model table ────────────────────────────────────────── */
+    .dm-table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+    .dm-table th {
+      text-align: center; padding: 7px 10px; background: var(--bg);
+      font-size: .68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .04em; color: var(--muted); white-space: nowrap;
+      cursor: pointer; user-select: none;
+    }
+    .dm-table th:first-child, .dm-table th:nth-child(2) { text-align: left; }
+    .dm-table th:hover { background: #E4EAF2; }
+    .dm-table th.sa { color: var(--blue); }
+    .dm-table td { padding: 6px 10px; border-top: 1px solid var(--border); vertical-align: middle; }
+    .dm-table td:first-child { min-width: 150px; }
+    .dm-table tr:hover td { background: #F8FAFC; }
+    .dm-table .model-group-header th {
+      text-align: center; padding: 4px 10px; font-size: .65rem;
+      background: var(--blue-light); color: var(--blue-mid);
+      letter-spacing: .08em;
+    }
+
+    .dept-link {
+      background: none; border: none; padding: 0; cursor: pointer;
+      font-weight: 700; color: var(--blue); text-decoration: underline dotted;
+      font-size: .8rem;
+    }
+    .dept-link:hover { color: var(--blue-mid); }
+
+    .share-cell { text-align: right; white-space: nowrap; }
+    .share-val  { font-weight: 700; font-size: .85rem; }
+    .share-ci   { font-size: .68rem; color: var(--muted); display: block; }
+    .share-obs  { font-size: .72rem; color: var(--muted); }
+
+    .exterior-toggle {
+      width: 100%; padding: 10px 16px; background: var(--bg);
+      border: none; border-top: 2px solid var(--border);
+      cursor: pointer; text-align: left; font-size: .8rem;
+      font-weight: 700; color: var(--muted); letter-spacing: .04em;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .exterior-toggle:hover { background: #E4EAF2; color: var(--blue); }
+
+    /* ── Modal ───────────────────────────────────────────────────── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 1000;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--card); border-radius: 12px;
+      width: 100%; max-width: 620px; max-height: 85vh;
+      overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,.25);
+    }
+    .modal-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: var(--card); z-index: 1;
+    }
+    .modal-title  { font-size: .95rem; font-weight: 800; }
+    .modal-sub    { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+    .modal-close  {
+      background: var(--bg); border: none; border-radius: 6px;
+      width: 28px; height: 28px; cursor: pointer; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .modal-close:hover { background: var(--border); }
+    .modal-tabs   { display: flex; gap: 2px; padding: 10px 16px 0; border-bottom: 1px solid var(--border); }
+    .modal-tab    {
+      padding: 6px 14px; border: none; background: transparent;
+      cursor: pointer; font-size: .78rem; font-weight: 600;
+      color: var(--muted); border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .modal-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+    .modal-content { padding: 16px 20px; }
+    .modal-section { margin-bottom: 16px; }
+    .modal-section-title {
+      font-size: .68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--muted); margin-bottom: 8px;
+    }
+
+    .tier-bar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; margin: 6px 0 10px; gap: 2px; }
+    .tier-seg { height: 100%; border-radius: 2px; transition: width .5s; }
+    .tier-legend { display: flex; gap: 12px; flex-wrap: wrap; }
+    .tier-item   { display: flex; align-items: center; gap: 5px; font-size: .72rem; }
+    .tier-dot    { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+
+    .beta-table { width: 100%; border-collapse: collapse; font-size: .75rem; }
+    .beta-table th {
+      text-align: left; padding: 4px 8px; background: var(--bg);
+      font-size: .65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .04em; color: var(--muted);
+    }
+    .beta-table td { padding: 5px 8px; border-top: 1px solid var(--border); }
+    .beta-table td:last-child { text-align: right; }
+    .beta-bar-wrap { width: 60px; height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 6px; }
+    .beta-bar-fill { height: 100%; border-radius: 3px; }
+
+    .pool-badge {
+      display: inline-block; padding: 2px 7px; border-radius: 4px;
+      font-size: .65rem; font-weight: 700; letter-spacing: .04em;
+    }
+    .pool-dept   { background: var(--blue-light); color: var(--blue-mid); }
+    .pool-global { background: var(--bg); color: var(--muted); }
+
+    /* ── Evolución tab ───────────────────────────────────────────── */
+    .evo-filters {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      padding: 12px 18px; border-bottom: 1px solid var(--border);
+    }
+    .evo-filter-label {
+      font-size: .7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .05em; color: var(--muted);
+    }
+    .evo-select {
+      padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border);
+      font-size: .78rem; background: #fff; color: var(--text);
+      cursor: pointer; outline: none; min-width: 160px;
+    }
+    .evo-select:focus { border-color: var(--blue); }
+    .evo-chart-wrap { position: relative; width: 100%; }
+    .evo-legend {
+      display: flex; flex-wrap: wrap; gap: 10px 20px;
+      padding: 12px 18px; border-top: 1px solid var(--border);
+      font-size: .72rem;
+    }
+    .evo-legend-item { display: flex; align-items: center; gap: 6px; }
+    .evo-legend-line {
+      width: 22px; height: 3px; border-radius: 2px; flex-shrink: 0;
+    }
+    .evo-legend-band {
+      width: 22px; height: 10px; border-radius: 2px; flex-shrink: 0; opacity: .35;
+    }
+    .evo-note {
+      font-size: .7rem; color: var(--muted);
+      padding: 8px 18px 14px;
+    }
   </style>
 </head>
 <body>
@@ -457,66 +610,141 @@
       <div class="loader"><div class="spinner"></div> Cargando segunda vuelta…</div>
     </div>
 
-    <!-- Live chart -->
-    <div class="card">
-      <div class="card-head">
-        <span class="card-title">Resultados en Curso — Segunda Vuelta</span>
-        <div class="tabs" id="p2-ambito-tabs">
-          <button class="tab active" onclick="switchAmbito('segunda','total',this)">Nacional</button>
-          <button class="tab" onclick="switchAmbito('segunda','1',this)">Perú</button>
-          <button class="tab" onclick="switchAmbito('segunda','2',this)">Exterior</button>
-        </div>
-      </div>
-      <div class="card-body" id="p2-chart">
-        <div class="loader"><div class="spinner"></div> Cargando…</div>
-      </div>
+    <!-- Sub-tab bar -->
+    <div class="section-tabs">
+      <button class="section-tab active" id="s2tab-resumen"   onclick="switchS2Tab('resumen')">Resumen</button>
+      <button class="section-tab"        id="s2tab-dept"      onclick="switchS2Tab('dept')">Por Departamento</button>
+      <button class="section-tab"        id="s2tab-evolucion" onclick="switchS2Tab('evolucion')">Evolución</button>
     </div>
 
-    <!-- Models -->
-    <div class="models-grid">
+    <div id="s2-tab-resumen">
 
-      <div class="model-card">
-        <div class="model-head">
-          <div>
-            <div class="model-name">Modelo de Propagación Dinámica</div>
-            <div class="model-desc">Estratificación adaptativa por distrito con IC 95%</div>
+      <!-- Live chart -->
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">Resultados en Curso — Segunda Vuelta</span>
+          <div class="tabs" id="p2-ambito-tabs">
+            <button class="tab active" onclick="switchAmbito('segunda','total',this)">Nacional</button>
+            <button class="tab" onclick="switchAmbito('segunda','1',this)">Perú</button>
+            <button class="tab" onclick="switchAmbito('segunda','2',this)">Exterior</button>
           </div>
-          <span class="badge badge-on">Activo</span>
         </div>
-        <div class="model-body" id="prop-body">
-          <div class="loader"><div class="spinner"></div> Calculando proyección…</div>
+        <div class="card-body" id="p2-chart">
+          <div class="loader"><div class="spinner"></div> Cargando…</div>
         </div>
       </div>
 
-      <div class="model-card">
-        <div class="model-head">
-          <div>
-            <div class="model-name">Modelo de Migración de Votos</div>
-            <div class="model-desc">WLS simplicial + Estimador FPC por transferencia electoral</div>
+      <!-- Models -->
+      <div class="models-grid">
+
+        <div class="model-card">
+          <div class="model-head">
+            <div>
+              <div class="model-name">Modelo de Propagación Dinámica</div>
+              <div class="model-desc">Estratificación adaptativa por distrito con IC 95%</div>
+            </div>
+            <span class="badge badge-on">Activo</span>
           </div>
-          <span class="badge badge-on">Activo</span>
+          <div class="model-body" id="prop-body">
+            <div class="loader"><div class="spinner"></div> Calculando proyección…</div>
+          </div>
         </div>
-        <div class="model-body" id="migr-body">
-          <div class="loader"><div class="spinner"></div> Calculando migración…</div>
+
+        <div class="model-card">
+          <div class="model-head">
+            <div>
+              <div class="model-name">Modelo de Migración de Votos</div>
+              <div class="model-desc">WLS simplicial + Estimador FPC por transferencia electoral</div>
+            </div>
+            <span class="badge badge-on">Activo</span>
+          </div>
+          <div class="model-body" id="migr-body">
+            <div class="loader"><div class="spinner"></div> Calculando migración…</div>
+          </div>
+        </div>
+
+      </div><!-- /models-grid -->
+
+      <!-- Dept table -->
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">Resultados por Departamento — Segunda Vuelta</span>
+          <span style="font-size:.72rem;color:var(--muted)">Haz clic en columna para ordenar</span>
+        </div>
+        <div id="p2-dept">
+          <div class="loader"><div class="spinner"></div> Cargando…</div>
         </div>
       </div>
 
-    </div><!-- /models-grid -->
+    </div><!-- /s2-tab-resumen -->
 
-    <!-- Dept table -->
-    <div class="card">
-      <div class="card-head">
-        <span class="card-title">Resultados por Departamento — Segunda Vuelta</span>
-        <span style="font-size:.72rem;color:var(--muted)">Haz clic en columna para ordenar</span>
+    <!-- Evolución tab -->
+    <div id="s2-tab-evolucion" style="display:none">
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">Evolución de Proyecciones</span>
+          <span style="font-size:.72rem;color:var(--muted)">Proyección histórica con IC 95% a lo largo del conteo</span>
+        </div>
+        <!-- Filter bar -->
+        <div class="evo-filters">
+          <span class="evo-filter-label">Modelo</span>
+          <select class="evo-select" id="evo-model-select" onchange="renderEvolucion()">
+            <option value="both">Ambos modelos</option>
+            <option value="prop">Solo Propagación</option>
+            <option value="migr">Solo Migración</option>
+          </select>
+          <span class="evo-filter-label" style="margin-left:8px">Ámbito</span>
+          <select class="evo-select" id="evo-dept-select" onchange="renderEvolucion()">
+            <option value="nacional">Nacional</option>
+          </select>
+        </div>
+        <div class="card-body" id="evo-chart-area">
+          <div class="loader"><div class="spinner"></div> Cargando historial…</div>
+        </div>
+        <div class="evo-legend" id="evo-legend"></div>
+        <div class="evo-note" id="evo-note"></div>
       </div>
-      <div id="p2-dept">
-        <div class="loader"><div class="spinner"></div> Cargando…</div>
+    </div><!-- /s2-tab-evolucion -->
+
+    <!-- Dept model detail tab -->
+    <div id="s2-tab-dept" style="display:none">
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="card-title">Proyección por Departamento — Ambos Modelos</span>
+          </div>
+          <span style="font-size:.72rem;color:var(--muted)">Haz clic en columna para ordenar · Haz clic en departamento para detalles</span>
+        </div>
+        <div id="p2-dept-models">
+          <div class="loader"><div class="spinner"></div> Calculando proyecciones departamentales…</div>
+        </div>
       </div>
-    </div>
+    </div><!-- /s2-tab-dept -->
 
   </div><!-- /section-segunda -->
 
 </main>
+
+<!-- Dept detail modal -->
+<div class="modal-overlay" id="dept-modal" onclick="closeDeptModal(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-dept-name">—</div>
+        <div class="modal-sub"  id="modal-dept-sub">—</div>
+      </div>
+      <button class="modal-close" onclick="closeDeptModal()">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="mtab-prop" onclick="switchModalTab('prop')">Propagación</button>
+      <button class="modal-tab"        id="mtab-migr" onclick="switchModalTab('migr')">Migración</button>
+    </div>
+    <div class="modal-content">
+      <div id="modal-prop-content"></div>
+      <div id="modal-migr-content" style="display:none"></div>
+    </div>
+  </div>
+</div>
 
 <script>
 // ─── State ────────────────────────────────────────────────────────────────────
@@ -524,16 +752,22 @@ const S = {
   data:        { primera: null, segunda: null },
   prop:        null,
   migr:        null,
+  propDept:    null,
+  migrDept:    null,
+  history:     null,
   activeRound: 'primera',
+  activeS2Tab: 'resumen',
+  modalDept:   null,
   ambito:      { primera: 'total', segunda: 'total' },
   showAll:     { primera: false, segunda: false },
   dept:        {
-    primera: { key: 'first_share', asc: false },
-    segunda: { key: 'first_share', asc: false },
+    primera:    { key: 'first_share', asc: false },
+    segunda:    { key: 'first_share', asc: false },
+    deptModels: { key: 'dept', asc: true },
   },
 };
 
-const charts = { primera: null, segunda: null };
+const charts = { primera: null, segunda: null, evo: null };
 
 // ─── Colors ───────────────────────────────────────────────────────────────────
 const FIXED = {
@@ -644,6 +878,22 @@ async function fetchMigr() {
     renderMigr();
   } catch(e) {
     setHTML('migr-body', errBox(e));
+  }
+}
+
+async function fetchDeptModels() {
+  setHTML('p2-dept-models', loader('Calculando proyecciones departamentales…'));
+  try {
+    const [rp, rm] = await Promise.all([
+      fetch('/api/model/propagation/dept'),
+      fetch('/api/model/migration/dept'),
+    ]);
+    const [jp, jm] = await Promise.all([rp.json(), rm.json()]);
+    S.propDept = jp.ok ? jp.data : null;
+    S.migrDept = jm.ok ? jm : null;
+    renderDeptModels();
+  } catch(e) {
+    setHTML('p2-dept-models', errBox(e));
   }
 }
 
@@ -851,21 +1101,24 @@ function renderObsChart(round, ad, parties) {
 // ─── Propagation model card ───────────────────────────────────────────────────
 function renderProp() {
   if (!S.prop) return;
-  const valid   = S.prop.parties.filter(p => !BN.includes(p.id));
-  const totalOb = valid.reduce((s, p) => s + p.observed_votes, 0);
-  const top2ids = valid.slice(0, 2).map(p => p.id);
+  const valid     = S.prop.parties.filter(p => !BN.includes(p.id));
+  const totalOb   = valid.reduce((s, p) => s + p.observed_votes,   0);
+  const totalProj = valid.reduce((s, p) => s + p.projected_votes,  0);
+  const top2ids   = valid.slice(0, 2).map(p => p.id);
 
   const rows = valid.slice(0, 12).map(p => {
-    const obs = (p.observed_votes / totalOb) * 100;
-    const adv = top2ids.includes(p.id);
+    const obs      = totalOb   > 0 ? (p.observed_votes  / totalOb)   * 100 : 0;
+    const projHead = totalProj > 0 ? (p.projected_votes / totalProj) * 100 : 0;
+    const adv      = top2ids.includes(p.id);
+    // p.projected_share = share of all valid votes incl. blancos/nulos (server-computed)
+    const validNote = `<span class="ci" style="margin-left:4px">(${f2(p.projected_share)}% válidos)</span>`;
     return `<tr class="${adv ? 'adv' : ''}">
       <td>
         <span class="pdot" style="background:${pColor(p.id)}"></span>
         <strong>${trunc(p.name, 30)}</strong>
-        ${adv ? '<span class="badge badge-adv" style="margin-left:4px">↗ 2da vuelta</span>' : ''}
       </td>
       <td>${f2(obs)}%</td>
-      <td><strong>${f2(p.projected_share)}%</strong></td>
+      <td><strong>${f2(projHead)}%</strong>${validNote}</td>
       <td><span class="ci">[${f2(p.lower_bound)}, ${f2(p.upper_bound)}]</span></td>
     </tr>`;
   }).join('');
@@ -879,7 +1132,7 @@ function renderProp() {
   setHTML('prop-body', `
     <table class="mtable">
       <thead><tr>
-        <th>Partido</th><th>Observado</th><th>Proyectado</th><th>IC 95%</th>
+        <th>Partido</th><th>Observado</th><th>Proyectado (entre cands.)</th><th>IC 95%</th>
       </tr></thead>
       <tbody>${rows}</tbody>
     </table>${note}`);
@@ -952,6 +1205,306 @@ function renderMigr() {
       </tr></thead>
       <tbody>${rows}</tbody>
     </table>${covNote}`);
+}
+
+// ─── Sub-tab switcher ──────────────────────────────────────────────────────────
+function switchS2Tab(tab) {
+  S.activeS2Tab = tab;
+  document.getElementById('s2-tab-resumen').style.display    = tab === 'resumen'    ? '' : 'none';
+  document.getElementById('s2-tab-dept').style.display       = tab === 'dept'       ? '' : 'none';
+  document.getElementById('s2-tab-evolucion').style.display  = tab === 'evolucion'  ? '' : 'none';
+  document.getElementById('s2tab-resumen').classList.toggle('active',    tab === 'resumen');
+  document.getElementById('s2tab-dept').classList.toggle('active',       tab === 'dept');
+  document.getElementById('s2tab-evolucion').classList.toggle('active',  tab === 'evolucion');
+  if (tab === 'evolucion' && S.history) renderEvolucion();
+}
+
+// ─── renderDeptModels — redesigned ───────────────────────────────────────────
+function renderDeptModels() {
+  const pd = S.propDept;
+  const md = S.migrDept;
+
+  if (!pd && (!md || md.status !== 'ok')) {
+    setHTML('p2-dept-models', `<div class="placeholder">
+      <div class="ph-icon">📊</div>
+      <div class="ph-title">Datos insuficientes</div>
+      <div class="ph-text">Se necesitan más distritos reportados para proyección departamental.</div>
+    </div>`);
+    return;
+  }
+
+  const ds = S.dept.deptModels;
+
+  // Build dept → ambito map from already-loaded S.data.segunda
+  const ambitoMap = {};
+  if (S.data.segunda && S.data.segunda.departamental) {
+    S.data.segunda.departamental.forEach(d => { ambitoMap[d.departamento] = d.ambito; });
+  }
+
+  const allDeptNames = new Set([
+    ...Object.keys(pd ? pd.departments : {}),
+    ...Object.keys(md && md.departments ? md.departments : {}),
+  ]);
+
+  const rows = Array.from(allDeptNames).map(dept => {
+    const pd_d = pd ? pd.departments[dept] : null;
+    const md_d = md && md.departments ? md.departments[dept] : null;
+    const p1 = pd_d && pd_d.parties[0] ? pd_d.parties[0] : null;
+    const p2 = pd_d && pd_d.parties[1] ? pd_d.parties[1] : null;
+    const m1 = md_d && md_d.parties[0] ? md_d.parties[0] : null;
+    const m2 = md_d && md_d.parties[1] ? md_d.parties[1] : null;
+    const n_rep = (pd_d || md_d) ? (pd_d || md_d).n_reported : 0;
+    const n_tot = (pd_d || md_d) ? (pd_d || md_d).n_total    : 0;
+    const pct   = n_tot > 0 ? n_rep / n_tot * 100 : 0;
+    const ambito = ambitoMap[dept] || '1';
+    const agree  = p1 && m1 && p1.id === m1.id;
+    const disagree = p1 && m1 && p1.id !== m1.id;
+    return { dept, n_rep, n_tot, pct, ambito, agree, disagree,
+             p1, p2, m1, m2, prop_share: p1 ? p1.projected_share : null,
+             migr_share: m1 ? m1.projected_share : null };
+  });
+
+  rows.sort((a, b) => {
+    const av = a[ds.key], bv = b[ds.key];
+    if (av == null && bv == null) return 0;
+    if (av == null) return 1; if (bv == null) return -1;
+    if (typeof av === 'string') return ds.asc ? av.localeCompare(bv) : bv.localeCompare(av);
+    return ds.asc ? av - bv : bv - av;
+  });
+
+  const peruRows = rows.filter(r => r.ambito === '1');
+  const extRows  = rows.filter(r => r.ambito !== '1');
+
+  const th = (label, key, align='center') => {
+    const active = ds.key === key;
+    const arrow  = active ? (ds.asc ? ' ▲' : ' ▼') : '';
+    return `<th class="${active ? 'sa' : ''}" style="text-align:${align}" onclick="sortDeptModels('${key}')">${label}${arrow}</th>`;
+  };
+
+  const shareCell2 = (party) => {
+    if (!party) return `<td colspan="3" style="text-align:center;color:var(--muted)">—</td>`;
+    const c = pColor(party.id);
+    return `
+      <td style="text-align:right;font-size:.72rem;color:var(--muted)">${f2(party.valid_share != null ? party.valid_share : 0)}%<br><span style="font-size:.62rem">válidos</span></td>
+      <td class="share-cell">
+        <div style="display:flex;align-items:center;gap:4px">
+          <span class="pdot" style="background:${c}"></span>
+          <span class="share-val">${f2(party.projected_share)}%</span>
+          <span style="font-size:.68rem;color:var(--muted)">±${f2(party.moe)}%</span>
+        </div>
+      </td>
+      <td class="share-cell"><span class="ci" style="font-size:.68rem">[${f2(party.lower_bound)}, ${f2(party.upper_bound)}]</span></td>`;
+  };
+
+  const buildRow = (r) => {
+    const agreeBadge = r.agree
+      ? '<span class="badge badge-on" style="font-size:.58rem;padding:1px 5px;margin-left:4px">✓</span>'
+      : r.disagree
+        ? '<span class="badge" style="background:#FEF3C7;color:#92400E;font-size:.58rem;padding:1px 5px;margin-left:4px">!</span>'
+        : '';
+    const cov = `
+      <div style="display:flex;align-items:center;gap:5px;white-space:nowrap">
+        <div class="mbar-t" style="width:36px"><div class="mbar-f" style="width:${f1(r.pct)}%"></div></div>
+        <span style="font-size:.72rem">${r.n_rep}/${r.n_tot}</span>
+      </div>
+      <div style="font-size:.68rem;color:var(--muted)">${f1(r.pct)}%</div>`;
+    return `<tr>
+      <td>
+        <button class="dept-link" onclick="openDeptModal('${r.dept.replace(/'/g,"\\'")}')">
+          ${r.dept}
+        </button>${agreeBadge}
+      </td>
+      <td>${cov}</td>
+      ${shareCell2(r.p1)}
+      ${shareCell2(r.m1)}
+    </tr>`;
+  };
+
+  const tableOpen = `
+    <div class="overflow-x">
+    <table class="dm-table">
+      <thead>
+        <tr class="model-group-header">
+          <th style="text-align:left" colspan="2"></th>
+          <th colspan="3">PROPAGACIÓN DINÁMICA</th>
+          <th colspan="3">MIGRACIÓN WLS</th>
+        </tr>
+        <tr>
+          ${th('Departamento',  'dept', 'left')}
+          ${th('Cobertura',     'pct',  'left')}
+          <th style="text-align:right">Válidos obs.</th>
+          ${th('Proyectado',    'prop_share')}
+          <th>IC 95%</th>
+          <th style="text-align:right">Válidos obs.</th>
+          ${th('Proyectado',    'migr_share')}
+          <th>IC 95%</th>
+        </tr>
+      </thead>
+      <tbody>`;
+
+  const tableClose = `</tbody></table></div>`;
+
+  let html = tableOpen + peruRows.map(buildRow).join('') + tableClose;
+
+  if (extRows.length) {
+    const extId = 'ext-rows-' + Date.now();
+    html += `
+      <button class="exterior-toggle" onclick="
+        const el=document.getElementById('${extId}');
+        const open=el.style.display!=='none';
+        el.style.display=open?'none':'';
+        this.textContent=(open?'▶':'▼')+' 🌐 EXTERIOR ('+${extRows.length}+' regiones)';
+      ">▶ 🌐 EXTERIOR (${extRows.length} regiones)</button>
+      <div id="${extId}" style="display:none">
+      ${tableOpen}${extRows.map(buildRow).join('')}${tableClose}
+      </div>`;
+  }
+
+  html += `<div style="font-size:.7rem;color:var(--muted);padding:10px 18px 6px">
+    ✓ Ambos modelos coinciden en el candidato líder &nbsp;·&nbsp; ! Modelos difieren &nbsp;·&nbsp; Válidos obs. = % de votos válidos observados (inc. blancos)
+  </div>`;
+
+  setHTML('p2-dept-models', html);
+}
+
+function sortDeptModels(key) {
+  const ds = S.dept.deptModels;
+  ds.key === key ? (ds.asc = !ds.asc) : (ds.key = key, ds.asc = key === 'dept');
+  renderDeptModels();
+}
+
+// ─── Dept modal ────────────────────────────────────────────────────────────────
+function openDeptModal(dept) {
+  S.modalDept = dept;
+  document.getElementById('modal-dept-name').textContent = dept;
+
+  const pd_d = S.propDept && S.propDept.departments ? S.propDept.departments[dept] : null;
+  const md_d = S.migrDept && S.migrDept.departments ? S.migrDept.departments[dept] : null;
+
+  const sub = pd_d
+    ? `${pd_d.n_reported}/${pd_d.n_total} actas · ${f1(pd_d.pct_coverage)}% de cobertura`
+    : '';
+  document.getElementById('modal-dept-sub').textContent = sub;
+
+  // Propagation panel
+  let propHtml = '';
+  if (pd_d) {
+    const tc = (pd_d.tier_counts) || {};
+    const tDist = tc.district    || 0;
+    const tProv = tc.provincia   || 0;
+    const tDept = tc.departamento || 0;
+    const tTotal = Math.max(tDist + tProv + tDept, 1);
+    const pDist = tDist / tTotal * 100;
+    const pProv = tProv / tTotal * 100;
+    const pDept = tDept / tTotal * 100;
+    propHtml += `
+      <div class="modal-section">
+        <div class="modal-section-title">Resolución por nivel</div>
+        <div class="tier-bar">
+          <div class="tier-seg" style="width:${pDist}%;background:#1A3A6B;flex-shrink:0"></div>
+          <div class="tier-seg" style="width:${pProv}%;background:#2d5aa0;flex-shrink:0"></div>
+          <div class="tier-seg" style="width:${pDept}%;background:#76B7B2;flex-shrink:0"></div>
+        </div>
+        <div class="tier-legend">
+          <div class="tier-item"><div class="tier-dot" style="background:#1A3A6B"></div>${tDist} distritos — datos propios</div>
+          <div class="tier-item"><div class="tier-dot" style="background:#2d5aa0"></div>${tProv} distritos — tendencia provincial</div>
+          <div class="tier-item"><div class="tier-dot" style="background:#76B7B2"></div>${tDept} distritos — tendencia departamental</div>
+        </div>
+      </div>`;
+    propHtml += `<div class="modal-section"><div class="modal-section-title">Proyección</div>`;
+    (pd_d.parties || []).forEach(p => {
+      propHtml += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span class="pdot" style="background:${pColor(p.id)}"></span>
+        <span style="font-weight:600;font-size:.8rem">${trunc(p.name, 28)}</span>
+        <span style="margin-left:auto;font-size:.8rem">
+          <strong>${f2(p.projected_share)}%</strong>
+          <span class="ci"> [${f2(p.lower_bound)}, ${f2(p.upper_bound)}] ±${f2(p.moe)}%</span>
+        </span>
+      </div>`;
+    });
+    propHtml += `</div>`;
+  } else {
+    propHtml = `<div class="info-note">Sin datos de propagación para este departamento.</div>`;
+  }
+  setHTML('modal-prop-content', propHtml);
+
+  // Migration panel
+  let migrHtml = '';
+  if (md_d) {
+    const details = md_d.details || {};
+    const pool_level = details.pool_level || '—';
+    migrHtml += `<div class="modal-section" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span class="modal-section-title" style="margin-bottom:0">Pool de regresión:</span>
+      <span class="pool-badge ${pool_level === 'department' ? 'pool-dept' : 'pool-global'}">
+        ${pool_level === 'department' ? 'Departamental' : 'Global (fallback)'}
+      </span>`;
+    const finalists_map = details.finalists || {};
+    const fin0Details = Object.values(finalists_map)[0];
+    if (fin0Details) {
+      migrHtml += `<span style="font-size:.72rem;color:var(--muted)">${fin0Details.n_pool} distritos en pool · σ residual = ${fin0Details.residual_std}</span>`;
+    }
+    migrHtml += `</div>`;
+
+    // One beta table per finalist
+    (md_d.parties || []).forEach(party => {
+      const fDet = (details.finalists || {})[party.id];
+      if (!fDet || !fDet.features) return;
+      migrHtml += `<div class="modal-section">
+        <div class="modal-section-title" style="display:flex;align-items:center;gap:6px">
+          <span class="pdot" style="background:${pColor(party.id)}"></span>
+          Coef. de transferencia → ${trunc(party.name, 24)}
+          <span style="margin-left:auto;font-weight:700">${f2(party.projected_share)}% <span class="ci">[${f2(party.lower_bound)}, ${f2(party.upper_bound)}]</span></span>
+        </div>
+        <table class="beta-table">
+          <thead><tr><th>Grupo / Cluster</th><th>β</th></tr></thead>
+          <tbody>`;
+      fDet.features.forEach(feat => {
+        const bPct = Math.min(100, Math.max(0, feat.beta * 100));
+        const bColor = feat.label.includes('propio') ? pColor(party.id) : '#94A3B8';
+        migrHtml += `<tr>
+          <td>${feat.label}</td>
+          <td style="text-align:right;white-space:nowrap">
+            ${f2(feat.beta * 100)}%
+            <span class="beta-bar-wrap"><span class="beta-bar-fill" style="width:${bPct}%;background:${bColor}"></span></span>
+          </td>
+        </tr>`;
+      });
+      migrHtml += `</tbody></table></div>`;
+    });
+
+    migrHtml += `<div class="modal-section"><div class="modal-section-title">Proyección</div>`;
+    (md_d.parties || []).forEach(p => {
+      migrHtml += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span class="pdot" style="background:${pColor(p.id)}"></span>
+        <span style="font-weight:600;font-size:.8rem">${trunc(p.name, 28)}</span>
+        <span style="margin-left:auto;font-size:.8rem">
+          <strong>${f2(p.projected_share)}%</strong>
+          <span class="ci"> [${f2(p.lower_bound)}, ${f2(p.upper_bound)}] ±${f2(p.moe)}%</span>
+        </span>
+      </div>`;
+    });
+    migrHtml += `</div>`;
+  } else {
+    migrHtml = `<div class="info-note">Sin datos de migración para este departamento.</div>`;
+  }
+  setHTML('modal-migr-content', migrHtml);
+
+  switchModalTab('prop');
+  document.getElementById('dept-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDeptModal(e) {
+  if (e && e.target !== document.getElementById('dept-modal')) return;
+  document.getElementById('dept-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function switchModalTab(tab) {
+  document.getElementById('modal-prop-content').style.display = tab === 'prop' ? '' : 'none';
+  document.getElementById('modal-migr-content').style.display = tab === 'migr' ? '' : 'none';
+  document.getElementById('mtab-prop').classList.toggle('active', tab === 'prop');
+  document.getElementById('mtab-migr').classList.toggle('active', tab === 'migr');
 }
 
 // ─── Department table ─────────────────────────────────────────────────────────
@@ -1030,6 +1583,280 @@ function renderDeptTable(round, departamental, parties) {
     </div>`);
 }
 
+// ─── History fetch ────────────────────────────────────────────────────────────
+async function fetchHistory() {
+  try {
+    const r = await fetch('/api/history');
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || 'history error');
+    S.history = j.data;
+    populateDeptSelect();
+    if (S.activeS2Tab === 'evolucion') renderEvolucion();
+  } catch(e) {
+    setHTML('evo-chart-area', errBox(e));
+  }
+}
+
+function populateDeptSelect() {
+  const sel = document.getElementById('evo-dept-select');
+  if (!sel) return;
+  const current = sel.value;
+  const depts = new Set();
+  (S.history || []).forEach(rec => {
+    Object.keys(rec.prop_dept || {}).forEach(d => depts.add(d));
+    Object.keys(rec.migr_dept || {}).forEach(d => depts.add(d));
+  });
+  const sorted = Array.from(depts).sort();
+  // Rebuild options
+  sel.innerHTML = '<option value="nacional">Nacional</option>';
+  sorted.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d; opt.textContent = d;
+    sel.appendChild(opt);
+  });
+  if (current && (current === 'nacional' || depts.has(current))) sel.value = current;
+}
+
+// ─── Evolución render ─────────────────────────────────────────────────────────
+function renderEvolucion() {
+  const hist = S.history;
+  if (!hist) return;
+
+  const area  = document.getElementById('evo-chart-area');
+  const modelSel = document.getElementById('evo-model-select');
+  const deptSel  = document.getElementById('evo-dept-select');
+  const modelFilter = modelSel ? modelSel.value : 'both';
+  const deptFilter  = deptSel  ? deptSel.value  : 'nacional';
+
+  if (hist.length === 0) {
+    setHTML('evo-chart-area', `<div class="placeholder">
+      <div class="ph-icon">📈</div>
+      <div class="ph-title">Sin historial aún</div>
+      <div class="ph-text">Las proyecciones se registran cada vez que se actualizan los modelos. Vuelve durante el escrutinio.</div>
+    </div>`);
+    setHTML('evo-legend', '');
+    setHTML('evo-note', '');
+    return;
+  }
+
+  // Extract time series for the chosen dept + model
+  // Returns {ts, coverage, value, lb, ub} per candidate per model
+  const isNacional = deptFilter === 'nacional';
+
+  // Collect candidate IDs from any record
+  const candidateIds = [];
+  const candidateNames = {};
+  const refRecord = hist.find(r => (r.migr && r.migr.length) || (r.prop && r.prop.length));
+  if (refRecord) {
+    (refRecord.migr || refRecord.prop || []).forEach(p => {
+      candidateIds.push(p.id);
+      candidateNames[p.id] = p.name;
+    });
+  }
+  // also propagation names
+  (refRecord && refRecord.prop || []).forEach(p => { candidateNames[p.id] = candidateNames[p.id] || p.name; });
+
+  // Build series: { prop: {id: [{ts,coverage,value,lb,ub}]}, migr: {id: [...]} }
+  const series = { prop: {}, migr: {} };
+  candidateIds.forEach(id => { series.prop[id] = []; series.migr[id] = []; });
+
+  hist.forEach(rec => {
+    const ts  = rec.ts;
+    const cov = rec.coverage_pct || 0;
+
+    // PROPAGATION
+    const propSrc = isNacional ? (rec.prop || []) : ((rec.prop_dept || {})[deptFilter] || {}).parties || [];
+    if (propSrc.length) {
+      const totalProj = propSrc.reduce((s, p) => s + (p.projected_votes || 0), 0);
+      propSrc.forEach(p => {
+        if (!series.prop[p.id]) { series.prop[p.id] = []; candidateIds.push(p.id); }
+        const h2h = totalProj > 0 ? (p.projected_votes / totalProj) * 100 : p.projected_share;
+        // Scale CI from valid-space to h2h-space
+        const scale = p.projected_share > 0 ? h2h / p.projected_share : 1;
+        series.prop[p.id].push({
+          ts, cov,
+          value: +h2h.toFixed(4),
+          lb:    +(p.lower_bound * scale).toFixed(4),
+          ub:    +(p.upper_bound * scale).toFixed(4),
+        });
+      });
+    }
+
+    // MIGRATION
+    const migrSrc = isNacional
+      ? (rec.migr || [])
+      : ((rec.migr_dept || {})[deptFilter] || {}).parties || [];
+    migrSrc.forEach(f => {
+      if (!series.migr[f.id]) { series.migr[f.id] = []; }
+      series.migr[f.id].push({
+        ts, cov,
+        value: +(f.projected_share).toFixed(4),
+        lb:    +(f.lower_bound).toFixed(4),
+        ub:    +(f.upper_bound).toFixed(4),
+      });
+    });
+  });
+
+  // X-axis labels: coverage %
+  const allTs = [...new Set(hist.map(r => r.ts))].sort();
+  const xLabels = allTs.map(ts => {
+    const rec = hist.find(r => r.ts === ts);
+    // GMT-5: subtract 5 hours in ms
+    const d = new Date((ts - 5 * 3600) * 1000);
+    const dd = d.getUTCDate().toString().padStart(2,'0');
+    const mo = (d.getUTCMonth() + 1).toString().padStart(2,'0');
+    const hh = d.getUTCHours().toString().padStart(2,'0');
+    const mm = d.getUTCMinutes().toString().padStart(2,'0');
+    return `${dd}/${mo} ${hh}:${mm} (${(rec.coverage_pct||0).toFixed(1)}%)`;
+  });
+
+  // Build Chart.js datasets
+  const datasets = [];
+  const legendItems = [];
+
+  const buildDatasets = (model, lineDash) => {
+    const modelLabel = model === 'prop' ? 'Propagación' : 'Migración';
+    candidateIds.forEach(id => {
+      const pts = series[model][id] || [];
+      if (pts.length === 0) return;
+      const color = pColor(id);
+      const name  = candidateNames[id] || id;
+      const short = trunc(name, 22);
+
+      // Map points to x-axis by ts index
+      const tsIdx = ts => allTs.indexOf(ts);
+      const toDataArr = (arr, valFn) => {
+        const out = new Array(allTs.length).fill(null);
+        arr.forEach(pt => { const i = tsIdx(pt.ts); if (i >= 0) out[i] = valFn(pt); });
+        return out;
+      };
+
+      const valData = toDataArr(pts, p => p.value);
+      const ubData  = toDataArr(pts, p => p.ub);
+      const lbData  = toDataArr(pts, p => p.lb);
+
+      const ciColor  = color + '30'; // ~19% opacity hex
+      const ciColor2 = color + '00';
+
+      // Upper CI band (fill toward lower)
+      datasets.push({
+        label:        `_ub_${model}_${id}`,
+        data:         ubData,
+        borderColor:  ciColor2,
+        borderWidth:  0,
+        pointRadius:  0,
+        fill:         '+1',
+        backgroundColor: color + '28',
+        tension:      0.35,
+      });
+      // Lower CI band
+      datasets.push({
+        label:        `_lb_${model}_${id}`,
+        data:         lbData,
+        borderColor:  ciColor2,
+        borderWidth:  0,
+        pointRadius:  0,
+        fill:         false,
+        tension:      0.35,
+      });
+      // Main line
+      datasets.push({
+        label:        `${short} · ${modelLabel}`,
+        data:         valData,
+        borderColor:  color,
+        borderWidth:  2.5,
+        borderDash:   lineDash,
+        pointRadius:  3,
+        pointHoverRadius: 5,
+        backgroundColor: color,
+        fill:         false,
+        tension:      0.35,
+      });
+
+      legendItems.push({ color, name: `${short} · ${modelLabel}`, dash: lineDash });
+    });
+  };
+
+  if (modelFilter !== 'migr') buildDatasets('prop', []);
+  if (modelFilter !== 'prop') buildDatasets('migr', [5, 3]);
+
+  // Render canvas
+  area.innerHTML = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'evo-chart-wrap';
+  wrap.style.height = '420px';
+  const canvas = document.createElement('canvas');
+  wrap.appendChild(canvas);
+  area.appendChild(wrap);
+
+  if (charts.evo) { charts.evo.destroy(); charts.evo = null; }
+
+  charts.evo = new Chart(canvas, {
+    type: 'line',
+    data: { labels: xLabels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      animation: { duration: 400 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          filter: ctx => !ctx.dataset.label.startsWith('_'),
+          callbacks: {
+            label: ctx => {
+              if (ctx.parsed.y == null) return null;
+              const i = ctx.datasetIndex;
+              // find upper dataset for this series (3 datasets per series: ub, lb, line)
+              // the main line is at offset +2 from ub; ub is at -2
+              const ubDs = charts.evo.data.datasets[i - 2];
+              const lbDs = charts.evo.data.datasets[i - 1];
+              const ub = ubDs ? ubDs.data[ctx.dataIndex] : null;
+              const lb = lbDs ? lbDs.data[ctx.dataIndex] : null;
+              const ciStr = (lb != null && ub != null)
+                ? ` [${lb.toFixed(1)}, ${ub.toFixed(1)}]` : '';
+              return ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}%${ciStr}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { font: { size: 11 }, maxRotation: 35, autoSkip: true, maxTicksLimit: 12 },
+          grid: { color: '#F0F4F8' },
+          title: { display: true, text: 'Hora del conteo (cobertura %)', font: { size: 11 } },
+        },
+        y: {
+          min: 0, max: 100,
+          ticks: { callback: v => v + '%', font: { size: 11 } },
+          grid: { color: '#F0F4F8' },
+          title: { display: true, text: '% entre finalistas (cabeza a cabeza)', font: { size: 11 } },
+        },
+      },
+    },
+  });
+
+  // Legend
+  const legHtml = legendItems.map(item => {
+    const dashStyle = item.dash.length
+      ? `border-top: 2.5px dashed ${item.color}; background: none;`
+      : `background: ${item.color};`;
+    return `<div class="evo-legend-item">
+      <div class="evo-legend-line" style="${dashStyle}"></div>
+      <span>${item.name}</span>
+    </div>
+    <div class="evo-legend-item">
+      <div class="evo-legend-band" style="background:${item.color}"></div>
+      <span>IC 95%</span>
+    </div>`;
+  }).join('');
+  setHTML('evo-legend', legHtml);
+
+  const scopeLabel = isNacional ? 'Nacional' : deptFilter;
+  const nPts = hist.length;
+  setHTML('evo-note', `${nPts} snapshot${nPts !== 1 ? 's' : ''} registrado${nPts !== 1 ? 's' : ''} · Ámbito: ${scopeLabel} · Eje Y: % cabeza a cabeza entre los dos finalistas (Propagación: escala h2h a partir de votos proyectados; Migración: % directo del modelo)`);
+}
+
 // ─── Events ───────────────────────────────────────────────────────────────────
 function switchRound(round) {
   S.activeRound = round;
@@ -1063,6 +1890,9 @@ async function refreshAll() {
   const btn = document.getElementById('btn-refresh');
   btn.disabled = true; btn.textContent = '↻ Actualizando…';
 
+  // Clear server-side model cache so models recompute immediately
+  try { await fetch('/api/cache/clear', { method: 'POST' }); } catch(_) {}
+
   // Reset loaders
   ['primera','segunda'].forEach(r => {
     const p = r === 'primera' ? 'p1' : 'p2';
@@ -1072,15 +1902,19 @@ async function refreshAll() {
     S.data[r] = null;
     if (charts[r]) { charts[r].destroy(); charts[r] = null; }
   });
-  S.prop = null;
-  S.migr = null;
+  S.prop = null; S.migr = null; S.propDept = null; S.migrDept = null; S.history = null;
+  if (charts.evo) { charts.evo.destroy(); charts.evo = null; }
   setHTML('p1-finalists', '');
-  setHTML('prop-body', loader('Calculando proyección…'));
-  setHTML('migr-body', loader('Calculando migración…'));
+  setHTML('prop-body',      loader('Calculando proyección…'));
+  setHTML('migr-body',      loader('Calculando migración…'));
+  setHTML('p2-dept-models', loader('Calculando proyecciones departamentales…'));
+  setHTML('evo-chart-area', loader('Cargando historial…'));
 
   await Promise.all([fetchRound('primera'), fetchRound('segunda')]);
   fetchProp();
   fetchMigr();
+  fetchDeptModels();
+  fetchHistory();
 
   btn.disabled = false; btn.textContent = '↻ Actualizar';
 }
@@ -1088,8 +1922,10 @@ async function refreshAll() {
 // ─── Init ──────────────────────────────────────────────────────────────────────
 (async () => {
   await Promise.all([fetchRound('primera'), fetchRound('segunda')]);
-  fetchProp();   // background, no await
-  fetchMigr();   // background, no await
+  fetchProp();        // background, no await
+  fetchMigr();        // background, no await
+  fetchDeptModels();  // background, no await
+  fetchHistory();     // background, no await
 })();
 </script>
 </body>
