@@ -11,3 +11,4 @@ dashboard.html
 __pycache__/app.cpython-314.pyc
 
 .claude/
+inputs/all_actas_merged.jsonl
