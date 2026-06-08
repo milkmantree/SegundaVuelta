@@ -327,17 +327,17 @@ def _project_finalist(r1_df, r2_df, cluster_map, finalists, finalist_idx):
             dept = r1_df.loc[ubigeo, "departamento"]
             dept_reported[dept] = dept_reported.get(dept, 0) + 1
 
-    # Observed aggregate stats (from R2) — computed before building pools so we
-    # know r2_valid_ratio for the share normalisation.
-    obs_finalist_sum = 0.0
+    # Observed aggregate stats (from R2) — raw counts only; the pending fraction
+    # of partial districts is handled later by a separate projection loop (option 2).
+    obs_finalist_raw = 0.0
     obs_r2_valid_sum = 0.0
     obs_r2_emit_sum  = 0.0
     obs_r1_valid_sum = 0.0
     obs_r1_emit_sum  = 0.0
     for ubigeo in r1_df.index:
         if ubigeo in r2_df.index and r2_df.loc[ubigeo, "actas_contabilizadas"] > 0:
-            r2_row = r2_df.loc[ubigeo]
-            obs_finalist_sum += float(r2_row.get(finalist, 0.0))
+            r2_row  = r2_df.loc[ubigeo]
+            obs_finalist_raw += float(r2_row.get(finalist, 0.0))
             obs_r2_valid_sum += float(r2_row.get("votos_validos", 0.0))
             obs_r2_emit_sum  += float(r2_row.get("votos_emitidos", 0.0))
             obs_r1_valid_sum += float(r1_df.loc[ubigeo, "votos_validos"])
@@ -375,13 +375,17 @@ def _project_finalist(r1_df, r2_df, cluster_map, finalists, finalist_idx):
 
         if is_rep:
             r2_row    = r2_df.loc[ubigeo]
+            actas_c   = float(r2_row.get("actas_contabilizadas", 0.0))
+            actas_t   = float(r2_row.get("actas_total", actas_c))
             r2_valid  = max(float(r2_row.get("votos_validos", 0.0)), 1.0)
             r2_emit   = float(r2_row.get("votos_emitidos", 0.0))
             y_share   = float(r2_row.get(finalist, 0.0)) / r2_valid
+            y_raw     = float(r2_row.get(finalist, 0.0))
             item = {
                 "x_s":       x_shares,
                 "y_s":       y_share,
-                "y":         float(r2_row.get(finalist, 0.0)),
+                "y":         y_raw,
+                "y_raw":     y_raw,
                 "w":         weight,
                 "r2_valid":  r2_valid,
                 "r2_emitted":r2_emit,
@@ -389,6 +393,8 @@ def _project_finalist(r1_df, r2_df, cluster_map, finalists, finalist_idx):
                 "r1_emitted":r1_emit,
                 "dept":      dept,
                 "level":     level,
+                "actas_c":   actas_c,
+                "actas_t":   actas_t,
             }
             if level == "department":
                 dept_pool.setdefault(dept, []).append(item)
@@ -450,7 +456,8 @@ def _project_finalist(r1_df, r2_df, cluster_map, finalists, finalist_idx):
     pred_residual_var = 0.0
 
     # Per-department accumulators for dept-level API
-    dept_obs   = {}   # dept → observed finalist votes
+    dept_obs     = {}   # dept → observed finalist votes (raw counts)
+    dept_obs_raw = {}   # dept → same as dept_obs; kept for API compatibility
     dept_pred  = {}   # dept → predicted finalist votes (unreported)
     dept_obs_valid  = {}
     dept_pred_valid = {}
@@ -465,6 +472,7 @@ def _project_finalist(r1_df, r2_df, cluster_map, finalists, finalist_idx):
     for it in all_reported:
         d = it["dept"]
         dept_obs[d]       = dept_obs.get(d, 0.0)       + it["y"]
+        dept_obs_raw[d]   = dept_obs_raw.get(d, 0.0)   + it["y_raw"]
         dept_obs_valid[d] = dept_obs_valid.get(d, 0.0) + it["r2_valid"]
 
     for item in unobserved:
@@ -485,6 +493,31 @@ def _project_finalist(r1_df, r2_df, cluster_map, finalists, finalist_idx):
         dept_pred_valid[d] = dept_pred_valid.get(d, 0.0) + proj_r2_valid_d
         dept_pred_var[d]   = dept_pred_var.get(d, 0.0)   + sigma2_share * (proj_r2_valid_d ** 2)
 
+    # Project the unreported fraction of partial districts.
+    # Each partial district (0 < actas_c < actas_t) contributes its counted votes
+    # to obs and its pending actas to pred — using the same WLS betas as for fully
+    # unreported districts, scaled by the pending fraction of R1 valid votes.
+    for it in all_reported:
+        actas_c = it.get("actas_c", 0.0)
+        actas_t = it.get("actas_t", actas_c)
+        if actas_t <= 0 or actas_c >= actas_t:
+            continue
+        pending_frac      = (actas_t - actas_c) / actas_t
+        beta              = _beta_for(it)
+        if beta is None:
+            continue
+        y_share_pred      = max(0.0, float(it["x_s"] @ beta))
+        proj_r2_valid_pnd = it["r1_valid"] * pending_frac * r2_over_r1_valid
+        pred_finalist    += y_share_pred * proj_r2_valid_pnd
+        pred_r2_valid    += proj_r2_valid_pnd
+        sigma2_share      = pool_sigma2.get(it["dept"], global_sigma2)
+        pred_residual_var += sigma2_share * (proj_r2_valid_pnd ** 2)
+
+        d = it["dept"]
+        dept_pred[d]       = dept_pred.get(d, 0.0)       + y_share_pred * proj_r2_valid_pnd
+        dept_pred_valid[d] = dept_pred_valid.get(d, 0.0) + proj_r2_valid_pnd
+        dept_pred_var[d]   = dept_pred_var.get(d, 0.0)   + sigma2_share * (proj_r2_valid_pnd ** 2)
+
     # Residuals in vote space for FPC formula
     reported_with_resid = []
     dept_resids = {}
@@ -498,7 +531,8 @@ def _project_finalist(r1_df, r2_df, cluster_map, finalists, finalist_idx):
 
     return {
         "finalist":           finalist,
-        "obs_finalist":       obs_finalist_sum,
+        "obs_finalist":       obs_finalist_raw,
+        "obs_finalist_raw":   obs_finalist_raw,
         "pred_finalist":      pred_finalist,
         "obs_r2_valid":       obs_r2_valid_sum,
         "pred_r2_valid":      pred_r2_valid,
@@ -508,6 +542,7 @@ def _project_finalist(r1_df, r2_df, cluster_map, finalists, finalist_idx):
         "reported_items":     reported_with_resid,
         # dept-level aggregates
         "dept_obs":       dept_obs,
+        "dept_obs_raw":   dept_obs_raw,
         "dept_pred":      dept_pred,
         "dept_obs_valid": dept_obs_valid,
         "dept_pred_valid":dept_pred_valid,
@@ -544,11 +579,12 @@ def _compute_variance(pr, projected_share, total_r2_valid):
     if V_bar <= 0:
         return 0.0
 
-    # Residuals for ratio estimator: e_d = y_d - P_hat * V_d
+    # Residuals for model-assisted sandwich estimator: e_d = y_d - ŷ_d (regression prediction).
+    # Using projected_share * V_d here would be ~450x larger per department because it treats
+    # each department's geographic lean as model error — the WLS already captures that via features.
     residuals_by_dept = {}
     for it in reported:
-        V_d  = it["r2_valid"]
-        e_d  = it["y"] - projected_share * V_d
+        e_d  = it["y"] - it["y_hat"]
         residuals_by_dept.setdefault(it["dept"], []).append(e_d)
 
     # Department-clustered sum of squared cluster-level residuals
@@ -659,7 +695,7 @@ def get_migration_data(cluster_map_path=CLUSTER_MAP_PATH):
         output_finalists.append({
             "id":              pr["finalist"],
             "name":            finalist_names.get(pr["finalist"], f"Partido {pr['finalist']}"),
-            "observed_votes":  int(pr["obs_finalist"]),
+            "observed_votes":  int(pr["obs_finalist_raw"]),
             "projected_votes": int(total_proj),
             "projected_share": round(proj_share * 100, 2),
             "valid_share":     round(valid_share * 100, 2),
@@ -781,7 +817,7 @@ def get_migration_data_by_dept(cluster_map_path=CLUSTER_MAP_PATH):
             dept_finalists.append({
                 "id":              fid,
                 "name":            finalist_names.get(fid, f"Partido {fid}"),
-                "observed_votes":  int(obs),
+                "observed_votes":  int(pr["dept_obs_raw"].get(dept, 0.0)),
                 "projected_votes": int(total_f),
                 "projected_share": round(proj_share * 100, 2),
                 "valid_share":     round(valid_share * 100, 2),

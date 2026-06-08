@@ -676,6 +676,35 @@
         </div>
       </div>
 
+      <!-- Unreported district predictions -->
+      <div class="card" id="unreported-card" style="display:none">
+        <div class="card-head">
+          <span class="card-title">Voto que falta contar — neto por departamento</span>
+          <span style="font-size:.72rem;color:var(--muted)">Votos proyectados pendientes · barras divergentes por candidato</span>
+        </div>
+        <!-- chart tab switcher -->
+        <div style="display:flex;gap:6px;padding:0 0 10px 0;border-bottom:1px solid var(--border);margin-bottom:12px" id="unrep-tabs">
+          <button class="modal-tab active" onclick="switchUnrepTab('prop')">Propagación</button>
+          <button class="modal-tab"        onclick="switchUnrepTab('migr')">Migración</button>
+          <button class="modal-tab"        onclick="switchUnrepTab('tabla')">Tabla</button>
+        </div>
+        <div id="unrep-panel-prop">
+          <div id="unrep-legend-prop" style="display:flex;gap:18px;justify-content:center;font-size:.78rem;margin-bottom:6px"></div>
+          <div id="wrap-unrep-prop" style="position:relative"><canvas id="chart-unrep-prop"></canvas></div>
+        </div>
+        <div id="unrep-panel-migr" style="display:none">
+          <div id="unrep-legend-migr" style="display:flex;gap:18px;justify-content:center;font-size:.78rem;margin-bottom:6px"></div>
+          <div id="wrap-unrep-migr" style="position:relative"><canvas id="chart-unrep-migr"></canvas></div>
+        </div>
+        <div id="unrep-panel-tabla" style="display:none">
+          <div id="unreported-body"><div class="loader"><div class="spinner"></div> Cargando…</div></div>
+        </div>
+        <div style="margin-top:8px;font-size:.73rem;color:var(--muted)">
+          Positivo (→) = le suma al líder de cada modelo · Negativo (←) = le suma al segundo.
+          Votos estimados = votos válidos R1 × ratio R2/R1 observado en distritos reportados.
+        </div>
+      </div>
+
     </div><!-- /s2-tab-resumen -->
 
     <!-- Evolución tab -->
@@ -767,7 +796,7 @@ const S = {
   },
 };
 
-const charts = { primera: null, segunda: null, evo: null };
+const charts = { primera: null, segunda: null, evo: null, unrepProp: null, unrepMigr: null };
 
 // ─── Colors ───────────────────────────────────────────────────────────────────
 const FIXED = {
@@ -800,6 +829,90 @@ const fTs = ts => new Date(ts*1000).toLocaleString('es-PE',{
 const trunc = (s, n) => s.length > n ? s.slice(0, n-1) + '…' : s;
 
 const BN = ['80', '81'];
+
+// ─── Domestic / exterior split helper ─────────────────────────────────────────
+function buildAmbitoMap() {
+  const m = {};
+  if (S.data.segunda && S.data.segunda.departamental)
+    S.data.segunda.departamental.forEach(d => { m[d.departamento] = d.ambito; });
+  return m;
+}
+
+// Aggregate projected votes + propagate CI variance across depts, split by ambito.
+// deptData: the `.departments` dict from prop or migr dept endpoint.
+// Returns { dom: { [id]: {name,obs,proj,varVotes} }, ext: {...} }
+function splitByAmbito(deptData) {
+  const ambitoMap = buildAmbitoMap();
+  const result = { dom: {}, ext: {} };
+  for (const [deptName, dept] of Object.entries(deptData || {})) {
+    const scope = (ambitoMap[deptName] === '2') ? 'ext' : 'dom';
+    const parties = dept.parties || dept.finalists || [];
+    const totalProj = parties.reduce((s, p) => s + (p.projected_votes || 0), 0);
+    for (const p of parties) {
+      if (!result[scope][p.id])
+        result[scope][p.id] = { name: p.name, obs: 0, proj: 0, varVotes: 0 };
+      const se_d = (p.moe || 0) / 1.96 / 100; // SE as fraction of h2h
+      const seVotes = se_d * totalProj;
+      result[scope][p.id].obs       += p.observed_votes || 0;
+      result[scope][p.id].proj      += p.projected_votes || 0;
+      result[scope][p.id].varVotes  += seVotes * seVotes;
+    }
+  }
+  return result;
+}
+
+// Given a scope dict {id: {obs,proj,varVotes}}, compute aggregate h2h CI for id1 vs id2.
+function scopeCI(scope, id1, id2) {
+  const f1 = scope[id1], f2 = scope[id2];
+  if (!f1 || !f2) return null;
+  const total = f1.proj + f2.proj;
+  if (total === 0) return null;
+  const h2h = f1.proj / total * 100;
+  const se1 = Math.sqrt(f1.varVotes), se2 = Math.sqrt(f2.varVotes);
+  const d1 = f2.proj / (total * total) * 100;
+  const d2 = f1.proj / (total * total) * 100;
+  const moe = 1.96 * Math.sqrt((se1 * d1) ** 2 + (se2 * d2) ** 2);
+  return { h2h, moe, lb: Math.max(0, h2h - moe), ub: Math.min(100, h2h + moe),
+           obs1: f1.obs, proj1: f1.proj, obs2: f2.obs, proj2: f2.proj };
+}
+
+// Render a compact 2-scope breakdown table (dom + ext) for two finalists.
+// ids: [id1, id2], names: [name1, name2]
+function renderScopeSplit(split, ids, names) {
+  const [id1, id2] = ids;
+  const domCI = scopeCI(split.dom, id1, id2);
+  const extCI = scopeCI(split.ext, id1, id2);
+
+  function scopeRow(label, ci) {
+    if (!ci) return `<tr><td colspan="5" style="color:var(--muted);font-size:.8rem">${label}: sin datos</td></tr>`;
+    const margin = ci.proj1 - ci.proj2;
+    const leader = margin >= 0 ? names[0] : names[1];
+    const abs    = Math.abs(margin);
+    return `<tr>
+      <td style="font-weight:600">${label}</td>
+      <td><span class="pdot" style="background:${pColor(id1)}"></span>${f2(ci.h2h)}%</td>
+      <td><span class="pdot" style="background:${pColor(id2)}"></span>${f2(100 - ci.h2h)}%</td>
+      <td><span class="ci">[${f2(ci.lb)}, ${f2(ci.ub)}]</span></td>
+      <td style="font-size:.8rem;color:var(--muted)">${leader} +${fN(Math.round(abs))}</td>
+    </tr>`;
+  }
+
+  return `
+    <div style="margin-top:12px;font-size:.78rem;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid var(--border)">Doméstico vs Extranjero</div>
+    <table class="mtable" style="margin-top:6px">
+      <thead><tr>
+        <th>Ámbito</th>
+        <th>${trunc(names[0], 20)} H2H</th>
+        <th>${trunc(names[1], 20)} H2H</th>
+        <th>IC 95% (${trunc(names[0], 12)})</th>
+        <th>Margen (votos)</th>
+      </tr></thead>
+      <tbody>
+        ${scopeRow('🇵🇪 Doméstico', domCI)}
+        ${scopeRow('🌐 Extranjero', extCI)}
+      </tbody>
+    </table>`;
+}
 
 // ─── Data helpers ──────────────────────────────────────────────────────────────
 function mergeAmbitos(arr) {
@@ -892,6 +1005,8 @@ async function fetchDeptModels() {
     S.propDept = jp.ok ? jp.data : null;
     S.migrDept = jm.ok ? jm : null;
     renderDeptModels();
+    renderProp();
+    renderMigr();
   } catch(e) {
     setHTML('p2-dept-models', errBox(e));
   }
@@ -1136,13 +1251,39 @@ function renderProp() {
     ? '<div class="info-note">✓ Escrutinio al 100% — la proyección confirma los resultados definitivos.</div>'
     : '';
 
+  const voteRows = valid.slice(0, 12).map(p => {
+    const pending = p.projected_votes - p.observed_votes;
+    return `<tr class="${top2ids.includes(p.id) ? 'adv' : ''}">
+      <td><span class="pdot" style="background:${pColor(p.id)}"></span><strong>${trunc(p.name, 30)}</strong></td>
+      <td>${fN(p.observed_votes)}</td>
+      <td>+ ${fN(Math.round(pending))}</td>
+      <td><strong>${fN(p.projected_votes)}</strong></td>
+    </tr>`;
+  }).join('');
+
+  // Domestic / exterior split from dept data
+  let propSplitHtml = '';
+  if (S.propDept && S.propDept.departments) {
+    const split = splitByAmbito(S.propDept.departments);
+    const top2  = valid.slice(0, 2);
+    const ids   = top2.map(p => p.id);
+    const names = top2.map(p => p.name);
+    propSplitHtml = renderScopeSplit(split, ids, names);
+  }
+
   setHTML('prop-body', `
     <table class="mtable">
       <thead><tr>
         <th>Partido</th><th>Observado</th><th>Proyectado (entre cands.)</th><th>IC 95%</th>
       </tr></thead>
       <tbody>${rows}</tbody>
-    </table>${note}`);
+    </table>
+    <table class="mtable" style="margin-top:10px">
+      <thead><tr>
+        <th>Partido</th><th>Votos observados</th><th>Votos estimados pendientes</th><th>Total proyectado</th>
+      </tr></thead>
+      <tbody>${voteRows}</tbody>
+    </table>${propSplitHtml}${note}`);
 }
 
 // ─── Migration model card ─────────────────────────────────────────────────────
@@ -1210,13 +1351,38 @@ function renderMigr() {
         (${f1(pct)}% de cobertura) — IC 95% con estimador FPC.
       </div>`;
 
+  const migrVoteRows = finalists.map(f => {
+    const pending = f.projected_votes - f.observed_votes;
+    return `<tr class="adv">
+      <td><span class="pdot" style="background:${pColor(f.id)}"></span><strong>${trunc(f.name, 30)}</strong></td>
+      <td>${fN(f.observed_votes)}</td>
+      <td>+ ${fN(Math.round(pending))}</td>
+      <td><strong>${fN(f.projected_votes)}</strong></td>
+    </tr>`;
+  }).join('');
+
+  // Domestic / exterior split from dept data
+  let splitHtml = '';
+  if (S.migrDept && S.migrDept.departments) {
+    const split = splitByAmbito(S.migrDept.departments);
+    const ids   = finalists.map(f => f.id);
+    const names = finalists.map(f => f.name);
+    splitHtml = renderScopeSplit(split, ids, names);
+  }
+
   setHTML('migr-body', `
     <table class="mtable">
       <thead><tr>
         <th>Candidato</th><th>Observado</th><th>Proyectado (F1 vs F2)</th><th>IC 95%</th>
       </tr></thead>
       <tbody>${rows}</tbody>
-    </table>${covNote}`);
+    </table>
+    <table class="mtable" style="margin-top:10px">
+      <thead><tr>
+        <th>Candidato</th><th>Votos observados</th><th>Votos estimados pendientes</th><th>Total proyectado</th>
+      </tr></thead>
+      <tbody>${migrVoteRows}</tbody>
+    </table>${splitHtml}${covNote}`);
 }
 
 // ─── Sub-tab switcher ──────────────────────────────────────────────────────────
@@ -1902,6 +2068,220 @@ function sortDept(round, key) {
   if (S.data[round]) renderDeptTable(round, S.data[round].departamental, S.data[round].parties);
 }
 
+function switchUnrepTab(tab) {
+  ['prop','migr','tabla'].forEach(t => {
+    document.getElementById(`unrep-panel-${t}`).style.display = t === tab ? '' : 'none';
+    document.querySelectorAll('#unrep-tabs .modal-tab')[['prop','migr','tabla'].indexOf(t)]
+      .classList.toggle('active', t === tab);
+  });
+}
+
+function renderDivergingChart(canvasId, chartKey, deptData, f1Id, f2Id, f1Name, f2Name, netKey) {
+  // Sort by absolute net descending, exclude zero rows
+  const rows = deptData
+    .filter(d => d[netKey] !== 0)
+    .sort((a, b) => Math.abs(b[netKey]) - Math.abs(a[netKey]));
+
+  const labels  = rows.map(d => d.dept);
+  // Convention: positive = f1 leads (left in image = Sánchez), negative = f2 leads (right = Keiko)
+  // We negate so f2 (FP/Keiko) goes RIGHT (positive x) matching the example
+  const values  = rows.map(d => -d[netKey]);
+
+  const f1Color = pColor(f1Id);  // JPP → left bars (negative values)
+  const f2Color = pColor(f2Id);  // FP  → right bars (positive values)
+  const bgColors = values.map(v => v >= 0 ? f2Color + 'CC' : f1Color + 'CC');
+  const borderColors = values.map(v => v >= 0 ? f2Color : f1Color);
+
+  const barHeight = 32;
+  const minH = 200;
+  const px = Math.max(minH, rows.length * barHeight + 80);
+  const canvas = document.getElementById(canvasId);
+  const wrapper = canvas.parentElement;
+  wrapper.style.height = px + 'px';
+
+  if (charts[chartKey]) { charts[chartKey].destroy(); charts[chartKey] = null; }
+
+  const maxAbs = Math.max(...values.map(Math.abs), 1);
+
+  // Inline datalabels plugin
+  const datalabelsPlugin = {
+    id: 'datalabels',
+    afterDatasetsDraw(chart) {
+      const ctx = chart.ctx;
+      const meta = chart.getDatasetMeta(0);
+      ctx.save();
+      ctx.font = 'bold 11px system-ui, sans-serif';
+      meta.data.forEach((bar, i) => {
+        const v = values[i];
+        if (v === 0) return;
+        const label = (v > 0 ? '+' : '') + Math.round(Math.abs(v)).toLocaleString('es-PE');
+        ctx.fillStyle = '#111';
+        ctx.textAlign = v > 0 ? 'left' : 'right';
+        ctx.textBaseline = 'middle';
+        const pad = 5;
+        ctx.fillText(label, v > 0 ? bar.x + pad : bar.x - pad, bar.y);
+      });
+      ctx.restore();
+    }
+  };
+
+  charts[chartKey] = new Chart(canvas, {
+    type: 'bar',
+    plugins: [datalabelsPlugin],
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: bgColors,
+        borderColor: borderColors,
+        borderWidth: 1,
+        borderRadius: 3,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { right: 80, left: 80 } },
+      plugins: {
+        legend: { display: false },
+        title: { display: false },
+        tooltip: {
+          callbacks: {
+            label(ctx) {
+              const v = ctx.raw;
+              const leader = v > 0 ? f2Name : f1Name;
+              return ` ${leader}: ${Math.abs(Math.round(v)).toLocaleString('es-PE')} votos neto`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: -maxAbs * 1.35,
+          max:  maxAbs * 1.35,
+          ticks: {
+            callback: v => (v > 0 ? '+' : '') + Math.round(v / 1000) + 'k',
+            font: { size: 11 },
+          },
+          grid: { color: '#E2E8F0' },
+          afterFit(axis) {
+            // Draw zero line annotation label
+          }
+        },
+        y: {
+          ticks: { font: { size: 11 }, color: '#374151' },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+
+  // Draw legend manually below title
+  const ctx2 = canvas.getContext('2d');
+  // (labels drawn by datalabels plugin already)
+}
+
+async function fetchUnreported() {
+  const card = document.getElementById('unreported-card');
+  setHTML('unreported-body', loader('Cargando predicciones…'));
+  try {
+    const r = await fetch('/api/model/unreported');
+    const j = await r.json();
+    if (!j.ok) { setHTML('unreported-body', errBox({message: j.error})); return; }
+
+    const districts = j.districts || [];
+    if (districts.length === 0) {
+      card.style.display = 'none';
+      return;
+    }
+    card.style.display = '';
+
+    const f1id   = j.f1_id   || districts[0]?.f1_id;
+    const f2id   = j.f2_id   || districts[0]?.f2_id;
+    const f1name = districts[0]?.f1_name || f1id;
+    const f2name = districts[0]?.f2_name || f2id;
+    const deptChart = j.dept_chart || [];
+
+    // Render diverging bar charts for both models
+    renderDivergingChart('chart-unrep-prop', 'unrepProp', deptChart, f1id, f2id, f1name, f2name, 'prop_net');
+    renderDivergingChart('chart-unrep-migr', 'unrepMigr', deptChart, f1id, f2id, f1name, f2name, 'migr_net');
+
+    // Legend for both charts
+    const legendHtml = `
+      <span><span class="pdot" style="background:${pColor(f1id)}"></span>← Le suma a ${trunc(f1name, 22)}</span>
+      <span><span class="pdot" style="background:${pColor(f2id)}"></span>→ Le suma a ${trunc(f2name, 22)}</span>`;
+    setHTML('unrep-legend-prop', legendHtml);
+    setHTML('unrep-legend-migr', legendHtml);
+    const trunc20 = s => s && s.length > 20 ? s.slice(0, 19) + '…' : (s || '');
+
+    function ciCell(h2h, lb, ub) {
+      if (h2h == null) return '<td class="ci">—</td>';
+      return `<td><strong>${f2(h2h)}%</strong><br><span class="ci">[${f2(lb)},${f2(ub)}]</span></td>`;
+    }
+
+    const domRows  = districts.filter(d => d.ambito !== '2');
+    const extRows  = districts.filter(d => d.ambito === '2');
+
+    function buildRows(rows) {
+      return rows.map(d => {
+        const agree = d.f1_prop_h2h != null && d.f1_migr_h2h != null
+          ? Math.abs(d.f1_prop_h2h - d.f1_migr_h2h) < 5
+          : null;
+        const flagStyle = agree === false ? 'background:rgba(239,68,68,.08)' : '';
+        const pctLabel = d.pct_reported > 0
+          ? `<span style="font-size:.68rem;color:#f59e0b;font-weight:600">${f1(d.pct_reported)}% contado</span><br>`
+          : '';
+        return `<tr style="${flagStyle}">
+          <td style="white-space:nowrap">
+            <span style="font-size:.72rem;color:var(--muted)">${d.dept}</span><br>
+            <strong>${d.dist}</strong>
+          </td>
+          <td style="text-align:center">
+            ${pctLabel}${fN(d.actas_remain)} / ${fN(d.actas_total)}
+          </td>
+          <td style="text-align:center">
+            <span class="pdot" style="background:${pColor(f1id)}"></span>${f2(d.f1_r1_share)}%<br>
+            <span class="pdot" style="background:${pColor(f2id)}"></span>${f2(d.f2_r1_share)}%
+          </td>
+          ${ciCell(d.f1_prop_h2h, d.f1_prop_lb, d.f1_prop_ub)}
+          ${ciCell(d.f1_migr_h2h, d.f1_migr_lb, d.f1_migr_ub)}
+          <td style="text-align:center;font-size:.8rem">
+            ${agree === false ? '<span style="color:#dc2626;font-weight:700">↕ discrepa</span>' : agree === true ? '<span style="color:#16a34a">≈ acuerdo</span>' : '—'}
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    const extSection = extRows.length === 0 ? '' : `
+      <tr><td colspan="6" style="background:#F0F4F8;font-size:.72rem;font-weight:700;color:var(--muted);letter-spacing:.06em;padding:6px 8px">🌐 EXTERIOR (${extRows.length} regiones)</td></tr>
+      ${buildRows(extRows)}`;
+
+    setHTML('unreported-body', `
+      <div style="overflow-x:auto">
+      <table class="mtable">
+        <thead><tr>
+          <th>Distrito</th>
+          <th style="text-align:center">Actas pendientes</th>
+          <th>R1 (${trunc20(f1name)} / ${trunc20(f2name)})</th>
+          <th>Propagación H2H (${trunc20(f1name)})<br><span style="font-weight:400;font-size:.72rem">IC 95%</span></th>
+          <th>Migración H2H (${trunc20(f1name)})<br><span style="font-weight:400;font-size:.72rem">IC 95%</span></th>
+          <th>Modelos</th>
+        </tr></thead>
+        <tbody>
+          ${buildRows(domRows)}
+          ${extSection}
+        </tbody>
+      </table>
+      </div>
+      <div style="margin-top:6px;font-size:.75rem;color:var(--muted)">
+        Rojo = modelos difieren >5pp · Propagación usa promedio departamental como fallback para distritos sin datos · Migración usa WLS por coeficientes de transferencia
+      </div>`);
+  } catch(e) {
+    setHTML('unreported-body', errBox(e));
+  }
+}
+
 async function refreshAll() {
   const btn = document.getElementById('btn-refresh');
   btn.disabled = true; btn.textContent = '↻ Actualizando…';
@@ -1925,12 +2305,14 @@ async function refreshAll() {
   setHTML('migr-body',      loader('Calculando migración…'));
   setHTML('p2-dept-models', loader('Calculando proyecciones departamentales…'));
   setHTML('evo-chart-area', loader('Cargando historial…'));
+  setHTML('unreported-body', loader('Cargando predicciones…'));
 
   await Promise.all([fetchRound('primera'), fetchRound('segunda')]);
   fetchProp();
   fetchMigr();
   fetchDeptModels();
   fetchHistory();
+  fetchUnreported();
 
   btn.disabled = false; btn.textContent = '↻ Actualizar';
 }
@@ -1938,10 +2320,11 @@ async function refreshAll() {
 // ─── Init ──────────────────────────────────────────────────────────────────────
 (async () => {
   await Promise.all([fetchRound('primera'), fetchRound('segunda')]);
-  fetchProp();        // background, no await
-  fetchMigr();        // background, no await
-  fetchDeptModels();  // background, no await
-  fetchHistory();     // background, no await
+  fetchProp();           // background, no await
+  fetchMigr();           // background, no await
+  fetchDeptModels();     // background, no await
+  fetchHistory();        // background, no await
+  fetchUnreported();     // background, no await
 })();
 </script>
 </body>

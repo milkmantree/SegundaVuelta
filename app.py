@@ -207,6 +207,173 @@ def api_model_migration():
         return jsonify({"ok": False, "error": str(exc)}), 500
 
 
+@app.route("/api/model/unreported")
+def api_model_unreported():
+    now = time.time()
+    if "unreported" in _cache and now - _cache["unreported"]["ts"] < CACHE_TTL:
+        return jsonify(_cache["unreported"]["data"])
+    try:
+        from propagation_model import get_projection_data_by_dept
+        from migration_model import get_migration_data_by_dept
+
+        r2_districts = _read("processed_results/agg_distrital.json")
+        r1_index = {d["ubigeo"]: d for d in _read("first_round_agg_results/agg_distrital.json")}
+
+        prop_dept = get_projection_data_by_dept()
+        migr_dept = get_migration_data_by_dept()
+
+        prop_depts = prop_dept.get("departments", {})
+        migr_depts = migr_dept.get("departments", {}) if migr_dept.get("ok") else {}
+
+        def dept_h2h(depts, dept_name, finalist_id):
+            d = depts.get(dept_name)
+            if not d:
+                return None, None, None
+            parties = d.get("parties") or d.get("finalists") or []
+            total = sum(p["projected_votes"] for p in parties)
+            if total == 0:
+                return None, None, None
+            hit = next((p for p in parties if p["id"] == finalist_id), None)
+            if not hit:
+                return None, None, None
+            h2h = hit["projected_votes"] / total * 100
+            scale = h2h / hit["projected_share"] if hit.get("projected_share", 0) > 0 else 1
+            return h2h, hit.get("lower_bound", h2h) * scale, hit.get("upper_bound", h2h) * scale
+
+        # R2/R1 valid ratio from reported districts (used to estimate R2 valid for unreported)
+        agg_ambito = _read("processed_results/agg_ambito.json")
+        r2_valid_obs = sum(a["votos_validos"] for a in agg_ambito)
+        reported_r1_valid = sum(
+            r1_index[d["ubigeo"]]["votos_validos"]
+            for d in r2_districts
+            if d.get("pct_actas_contabilizadas", 0) > 0 and d["ubigeo"] in r1_index
+               and r1_index[d["ubigeo"]]["votos_validos"] > 0
+        )
+        r2_r1_ratio = r2_valid_obs / reported_r1_valid if reported_r1_valid > 0 else 1.0
+
+        # Determine finalist IDs once from migration dept data
+        fin_ids = []
+        for md in migr_depts.values():
+            parties = md.get("parties") or md.get("finalists") or []
+            if parties:
+                fin_ids = [p["id"] for p in parties]
+                break
+        if not fin_ids:
+            for pd2 in prop_depts.values():
+                parties = pd2.get("parties") or []
+                if parties:
+                    fin_ids = [p["id"] for p in sorted(parties, key=lambda x: -x["projected_votes"])[:2]]
+                    break
+
+        rows = []
+        for d in r2_districts:
+            pct = d.get("pct_actas_contabilizadas", d.get("totales", {}).get("pct_actas_contabilizadas", 0))
+            if pct >= 100:
+                continue
+            ubigeo = d["ubigeo"]
+            r1 = r1_index.get(ubigeo)
+            if not r1 or r1["votos_validos"] == 0:
+                continue
+            dept_name = r1["departamento"]
+            r1v    = r1["votos_validos"]
+            vp     = r1["votos_partidos"]
+            actas_total = d.get("actas_total", d.get("totales", {}).get("actas_total", 0))
+            actas_cont  = d.get("actas_contabilizadas", d.get("totales", {}).get("actas_contabilizadas", 0))
+            ambito = d.get("ambito", "1")
+
+            # Remaining fraction of actas not yet counted
+            remaining_frac = 1.0 - pct / 100.0
+
+            # Estimated R2 valid votes still to arrive from this district
+            est_valid = round(r1v * r2_r1_ratio * remaining_frac)
+            if est_valid == 0:
+                continue
+
+            row = {
+                "ubigeo":       ubigeo,
+                "dept":         dept_name,
+                "prov":         r1["provincia"],
+                "dist":         r1["distrito"],
+                "ambito":       ambito,
+                "pct_reported": round(pct, 2),
+                "actas_total":  actas_total,
+                "actas_cont":   actas_cont,
+                "actas_remain": actas_total - actas_cont,
+                "r1_habiles":   r1.get("votos_habiles", 0),
+                "r1_valid":     r1v,
+                "est_valid":    est_valid,
+            }
+            for i, pid in enumerate(fin_ids[:2]):
+                key = "f1" if i == 0 else "f2"
+                r1_sh = int(vp.get(pid, 0)) / r1v * 100
+                row[f"{key}_id"]       = pid
+                row[f"{key}_r1_share"] = round(r1_sh, 2)
+
+                h2h, lb, ub = dept_h2h(prop_depts, dept_name, pid)
+                row[f"{key}_prop_h2h"]   = round(h2h, 2) if h2h is not None else None
+                row[f"{key}_prop_lb"]    = round(lb, 2)  if lb  is not None else None
+                row[f"{key}_prop_ub"]    = round(ub, 2)  if ub  is not None else None
+                row[f"{key}_prop_votes"] = round(h2h / 100 * est_valid) if h2h is not None else None
+
+                h2h, lb, ub = dept_h2h(migr_depts, dept_name, pid)
+                row[f"{key}_migr_h2h"]   = round(h2h, 2) if h2h is not None else None
+                row[f"{key}_migr_lb"]    = round(lb, 2)  if lb  is not None else None
+                row[f"{key}_migr_ub"]    = round(ub, 2)  if ub  is not None else None
+                row[f"{key}_migr_votes"] = round(h2h / 100 * est_valid) if h2h is not None else None
+
+            rows.append(row)
+
+        # Attach names from idx
+        idx = _read("processed_results/idx_codigo_nombre_partido.json")
+        for row in rows:
+            row["f1_name"] = idx.get(row.get("f1_id"), row.get("f1_id", ""))
+            row["f2_name"] = idx.get(row.get("f2_id"), row.get("f2_id", ""))
+
+        rows.sort(key=lambda r: -r["actas_remain"])
+
+        # Pre-aggregate by department for chart consumption
+        dept_agg: dict = {}
+        for row in rows:
+            dept = row["dept"]
+            if dept not in dept_agg:
+                dept_agg[dept] = {
+                    "dept": dept, "ambito": row["ambito"],
+                    "f1_id": row.get("f1_id"), "f2_id": row.get("f2_id"),
+                    "f1_name": row.get("f1_name"), "f2_name": row.get("f2_name"),
+                    "n_districts": 0, "actas_remain": 0,
+                    "f1_prop_votes": 0, "f2_prop_votes": 0,
+                    "f1_migr_votes": 0, "f2_migr_votes": 0,
+                }
+            da = dept_agg[dept]
+            da["n_districts"]  += 1
+            da["actas_remain"] += row["actas_remain"]
+            for model in ("prop", "migr"):
+                for fk in ("f1", "f2"):
+                    v = row.get(f"{fk}_{model}_votes")
+                    if v is not None:
+                        da[f"{fk}_{model}_votes"] += v
+
+        # Net margin per dept (f1 - f2), positive = f1 leads
+        for da in dept_agg.values():
+            da["prop_net"] = da["f1_prop_votes"] - da["f2_prop_votes"]
+            da["migr_net"] = da["f1_migr_votes"] - da["f2_migr_votes"]
+
+        data = {
+            "ok": True,
+            "districts": rows,
+            "n": len(rows),
+            "r2_r1_ratio": round(r2_r1_ratio, 4),
+            "dept_chart": sorted(dept_agg.values(), key=lambda x: -x["actas_remain"]),
+            "f1_id": fin_ids[0] if fin_ids else None,
+            "f2_id": fin_ids[1] if len(fin_ids) > 1 else None,
+        }
+        _cache["unreported"] = {"ts": now, "data": data}
+        return jsonify(data)
+    except Exception as exc:
+        import traceback; traceback.print_exc()
+        return jsonify({"ok": False, "error": str(exc)}), 500
+
+
 @app.route("/api/cache/clear", methods=["POST"])
 def api_cache_clear():
     _cache.clear()

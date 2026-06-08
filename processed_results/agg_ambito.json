@@ -2,33 +2,33 @@
   {
     "ambito": "1",
     "actas_total": 90223,
-    "actas_contabilizadas": 52538,
-    "pct_actas_contabilizadas": 58.231,
-    "pct_participacion": 45.53,
-    "votos_emitidos": 11890190,
-    "votos_validos": 11110814,
+    "actas_contabilizadas": 87762,
+    "pct_actas_contabilizadas": 97.272,
+    "pct_participacion": 72.351,
+    "votos_emitidos": 18894488,
+    "votos_validos": 17656998,
     "votos_habiles": 26114918,
     "votos_partidos": {
-      "8": 5875149,
-      "10": 5274472,
-      "80": 63586,
-      "81": 718686
+      "10": 8845108,
+      "8": 8813402,
+      "81": 1124222,
+      "80": 113307
     }
   },
   {
     "ambito": "2",
     "actas_total": 2543,
-    "actas_contabilizadas": 0,
-    "pct_actas_contabilizadas": 0.0,
-    "pct_participacion": 0.0,
-    "votos_emitidos": 0,
-    "votos_validos": 0,
+    "actas_contabilizadas": 103,
+    "pct_actas_contabilizadas": 4.05,
+    "pct_participacion": 1.707,
+    "votos_emitidos": 20674,
+    "votos_validos": 18977,
     "votos_habiles": 1210813,
     "votos_partidos": {
-      "8": 0,
-      "10": 0,
-      "80": 0,
-      "81": 0
+      "8": 10768,
+      "10": 8209,
+      "80": 179,
+      "81": 1518
     }
   }
 ]
