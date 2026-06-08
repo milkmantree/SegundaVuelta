@@ -50,8 +50,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(f"ONPEScraper_{WORKER_ID}")
 
-URL_PARTICIPANTES = "https://resultadoelectoral.onpe.gob.pe/presentacion-backend/eleccion-presidencial/participantes-ubicacion-geografica-nombre"
-URL_TOTALES = "https://resultadoelectoral.onpe.gob.pe/presentacion-backend/resumen-general/totales"
+URL_PARTICIPANTES = "https://resultadosegundavuelta.onpe.gob.pe/presentacion-backend/eleccion-presidencial/participantes-ubicacion-geografica-nombre"
+URL_TOTALES = "https://resultadosegundavuelta.onpe.gob.pe/presentacion-backend/resumen-general/totales"
 
 
 def load_completed_state(mode: str) -> Dict[str, Dict[str, Any]]:

@@ -3,510 +3,510 @@
     "ambito": "1",
     "departamento": "AMAZONAS",
     "actas_total": 1278,
-    "actas_contabilizadas": 325,
-    "pct_actas_contabilizadas": 25.43,
-    "pct_participacion": 16.83,
-    "votos_emitidos": 58104,
-    "votos_validos": 58071,
+    "actas_contabilizadas": 525,
+    "pct_actas_contabilizadas": 41.08,
+    "pct_participacion": 29.322,
+    "votos_emitidos": 101233,
+    "votos_validos": 94248,
     "votos_habiles": 345245,
     "votos_partidos": {
-      "8": 19639,
-      "10": 23643,
-      "80": 9002,
-      "81": 5787
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "APURÍMAC",
-    "actas_total": 1317,
-    "actas_contabilizadas": 616,
-    "pct_actas_contabilizadas": 46.773,
-    "pct_participacion": 30.581,
-    "votos_emitidos": 110501,
-    "votos_validos": 109468,
-    "votos_habiles": 361338,
-    "votos_partidos": {
-      "8": 23229,
-      "10": 59498,
-      "80": 16991,
-      "81": 9750
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "AREQUIPA",
-    "actas_total": 4215,
-    "actas_contabilizadas": 2719,
-    "pct_actas_contabilizadas": 64.508,
-    "pct_participacion": 48.937,
-    "votos_emitidos": 600224,
-    "votos_validos": 596272,
-    "votos_habiles": 1226525,
-    "votos_partidos": {
-      "8": 237584,
-      "10": 214541,
-      "80": 89795,
-      "81": 54352
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "AYACUCHO",
-    "actas_total": 1900,
-    "actas_contabilizadas": 960,
-    "pct_actas_contabilizadas": 50.526,
-    "pct_participacion": 32.567,
-    "votos_emitidos": 169424,
-    "votos_validos": 168981,
-    "votos_habiles": 520238,
-    "votos_partidos": {
-      "8": 44327,
-      "10": 82761,
-      "80": 26730,
-      "81": 15163
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "CAJAMARCA",
-    "actas_total": 4240,
-    "actas_contabilizadas": 2721,
-    "pct_actas_contabilizadas": 64.175,
-    "pct_participacion": 44.645,
-    "votos_emitidos": 535196,
-    "votos_validos": 532485,
-    "votos_habiles": 1198773,
-    "votos_partidos": {
-      "8": 162038,
-      "10": 245509,
-      "80": 76494,
-      "81": 48444
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "CALLAO",
-    "actas_total": 2898,
-    "actas_contabilizadas": 2166,
-    "pct_actas_contabilizadas": 74.741,
-    "pct_participacion": 55.189,
-    "votos_emitidos": 474220,
-    "votos_validos": 471679,
-    "votos_habiles": 859267,
-    "votos_partidos": {
-      "8": 224946,
-      "10": 133146,
-      "80": 70351,
-      "81": 43236
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "CUSCO",
-    "actas_total": 3983,
-    "actas_contabilizadas": 2510,
-    "pct_actas_contabilizadas": 63.018,
-    "pct_participacion": 45.249,
-    "votos_emitidos": 513016,
-    "votos_validos": 508783,
-    "votos_habiles": 1133754,
-    "votos_partidos": {
-      "8": 157038,
-      "10": 223398,
-      "80": 78255,
-      "81": 50092
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "HUANCAVELICA",
-    "actas_total": 1273,
-    "actas_contabilizadas": 585,
-    "pct_actas_contabilizadas": 45.954,
-    "pct_participacion": 27.492,
-    "votos_emitidos": 93320,
-    "votos_validos": 92944,
-    "votos_habiles": 339448,
-    "votos_partidos": {
-      "8": 21056,
-      "10": 50357,
-      "80": 13723,
-      "81": 7808
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "HUÁNUCO",
-    "actas_total": 2341,
-    "actas_contabilizadas": 1423,
-    "pct_actas_contabilizadas": 60.786,
-    "pct_participacion": 39.953,
-    "votos_emitidos": 262300,
-    "votos_validos": 261371,
-    "votos_habiles": 656517,
-    "votos_partidos": {
-      "8": 87721,
-      "10": 109486,
-      "80": 41095,
-      "81": 23069
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "ICA",
-    "actas_total": 2443,
-    "actas_contabilizadas": 1898,
-    "pct_actas_contabilizadas": 77.691,
-    "pct_participacion": 60.399,
-    "votos_emitidos": 431244,
-    "votos_validos": 429657,
-    "votos_habiles": 713997,
-    "votos_partidos": {
-      "8": 197204,
-      "10": 125360,
-      "80": 67348,
-      "81": 39745
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "JUNÍN",
-    "actas_total": 3691,
-    "actas_contabilizadas": 1724,
-    "pct_actas_contabilizadas": 46.708,
-    "pct_participacion": 32.984,
-    "votos_emitidos": 350458,
-    "votos_validos": 348445,
-    "votos_habiles": 1062500,
-    "votos_partidos": {
-      "8": 137326,
-      "10": 120394,
-      "80": 57202,
-      "81": 33523
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "LA LIBERTAD",
-    "actas_total": 5302,
-    "actas_contabilizadas": 2967,
-    "pct_actas_contabilizadas": 55.96,
-    "pct_participacion": 39.658,
-    "votos_emitidos": 615761,
-    "votos_validos": 609710,
-    "votos_habiles": 1552691,
-    "votos_partidos": {
-      "8": 259589,
-      "10": 185465,
-      "80": 101334,
-      "81": 63322
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "LAMBAYEQUE",
-    "actas_total": 3590,
-    "actas_contabilizadas": 2099,
-    "pct_actas_contabilizadas": 58.468,
-    "pct_participacion": 42.873,
-    "votos_emitidos": 450748,
-    "votos_validos": 446359,
-    "votos_habiles": 1051350,
-    "votos_partidos": {
-      "8": 203220,
-      "10": 132142,
-      "80": 67739,
-      "81": 43258
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "LIMA",
-    "actas_total": 29247,
-    "actas_contabilizadas": 19453,
-    "pct_actas_contabilizadas": 66.513,
-    "pct_participacion": 50.343,
-    "votos_emitidos": 4355178,
-    "votos_validos": 4338203,
-    "votos_habiles": 8651028,
-    "votos_partidos": {
-      "8": 2165757,
-      "10": 1169798,
-      "80": 628759,
-      "81": 373889
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "LORETO",
-    "actas_total": 2697,
-    "actas_contabilizadas": 852,
-    "pct_actas_contabilizadas": 31.591,
-    "pct_participacion": 16.138,
-    "votos_emitidos": 125222,
-    "votos_validos": 124377,
-    "votos_habiles": 775923,
-    "votos_partidos": {
-      "8": 48573,
-      "10": 41289,
-      "80": 22652,
-      "81": 11863
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "MADRE DE DIOS",
-    "actas_total": 507,
-    "actas_contabilizadas": 71,
-    "pct_actas_contabilizadas": 14.004,
-    "pct_participacion": 8.444,
-    "votos_emitidos": 12461,
-    "votos_validos": 12420,
-    "votos_habiles": 147577,
-    "votos_partidos": {
-      "8": 3295,
-      "10": 5838,
-      "80": 2172,
-      "81": 1115
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "MOQUEGUA",
-    "actas_total": 578,
-    "actas_contabilizadas": 538,
-    "pct_actas_contabilizadas": 93.08,
-    "pct_participacion": 70.45,
-    "votos_emitidos": 115980,
-    "votos_validos": 115068,
-    "votos_habiles": 164628,
-    "votos_partidos": {
-      "8": 42359,
-      "10": 43944,
-      "80": 18049,
-      "81": 10716
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "PASCO",
-    "actas_total": 802,
-    "actas_contabilizadas": 395,
-    "pct_actas_contabilizadas": 49.252,
-    "pct_participacion": 29.984,
-    "votos_emitidos": 67072,
-    "votos_validos": 66396,
-    "votos_habiles": 223695,
-    "votos_partidos": {
-      "8": 22336,
-      "10": 27410,
-      "80": 10644,
-      "81": 6006
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "PIURA",
-    "actas_total": 5281,
-    "actas_contabilizadas": 2986,
-    "pct_actas_contabilizadas": 56.542,
-    "pct_participacion": 39.731,
-    "votos_emitidos": 609501,
-    "votos_validos": 607590,
-    "votos_habiles": 1534085,
-    "votos_partidos": {
-      "8": 275131,
-      "10": 173021,
-      "80": 98211,
-      "81": 61227
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "PUNO",
-    "actas_total": 3397,
-    "actas_contabilizadas": 2263,
-    "pct_actas_contabilizadas": 66.618,
-    "pct_participacion": 51.06,
-    "votos_emitidos": 491960,
-    "votos_validos": 487418,
-    "votos_habiles": 963489,
-    "votos_partidos": {
-      "8": 140291,
-      "10": 227122,
-      "80": 72766,
-      "81": 47239
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "SAN MARTÍN",
-    "actas_total": 2534,
-    "actas_contabilizadas": 1478,
-    "pct_actas_contabilizadas": 58.327,
-    "pct_participacion": 42.014,
-    "votos_emitidos": 304017,
-    "votos_validos": 302785,
-    "votos_habiles": 723605,
-    "votos_partidos": {
-      "8": 118841,
-      "10": 101463,
-      "80": 51564,
-      "81": 30917
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "TACNA",
-    "actas_total": 1041,
-    "actas_contabilizadas": 1010,
-    "pct_actas_contabilizadas": 97.022,
-    "pct_participacion": 75.838,
-    "votos_emitidos": 229496,
-    "votos_validos": 229268,
-    "votos_habiles": 302615,
-    "votos_partidos": {
-      "8": 86662,
-      "10": 87910,
-      "80": 34183,
-      "81": 20513
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "TUMBES",
-    "actas_total": 632,
-    "actas_contabilizadas": 435,
-    "pct_actas_contabilizadas": 68.829,
-    "pct_participacion": 51.422,
-    "votos_emitidos": 93237,
-    "votos_validos": 93074,
-    "votos_habiles": 181317,
-    "votos_partidos": {
-      "8": 44166,
-      "10": 24645,
-      "80": 14827,
-      "81": 9436
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "UCAYALI",
-    "actas_total": 1564,
-    "actas_contabilizadas": 354,
-    "pct_actas_contabilizadas": 22.634,
-    "pct_participacion": 14.412,
-    "votos_emitidos": 65418,
-    "votos_validos": 65331,
-    "votos_habiles": 453928,
-    "votos_partidos": {
-      "8": 27408,
-      "10": 20127,
-      "80": 11403,
-      "81": 6393
+      "8": 38632,
+      "10": 55616,
+      "80": 787,
+      "81": 6198
     }
   },
   {
     "ambito": "1",
     "departamento": "ÁNCASH",
     "actas_total": 3472,
-    "actas_contabilizadas": 2350,
-    "pct_actas_contabilizadas": 67.684,
-    "pct_participacion": 48.407,
-    "votos_emitidos": 470216,
-    "votos_validos": 465429,
+    "actas_contabilizadas": 1900,
+    "pct_actas_contabilizadas": 54.724,
+    "pct_participacion": 42.004,
+    "votos_emitidos": 408020,
+    "votos_validos": 373859,
     "votos_habiles": 971385,
     "votos_partidos": {
-      "8": 182843,
-      "10": 156541,
-      "80": 76313,
-      "81": 49732
+      "8": 173764,
+      "10": 212516,
+      "80": 3273,
+      "81": 32146
     }
   },
   {
-    "ambito": "2",
-    "departamento": "AMÉRICA",
-    "actas_total": 1570,
-    "actas_contabilizadas": 323,
-    "pct_actas_contabilizadas": 20.573,
-    "pct_participacion": 5.613,
-    "votos_emitidos": 42531,
-    "votos_validos": 42066,
-    "votos_habiles": 757697,
+    "ambito": "1",
+    "departamento": "APURÍMAC",
+    "actas_total": 1317,
+    "actas_contabilizadas": 525,
+    "pct_actas_contabilizadas": 39.863,
+    "pct_participacion": 30.208,
+    "votos_emitidos": 109153,
+    "votos_validos": 102785,
+    "votos_habiles": 361338,
     "votos_partidos": {
-      "8": 20146,
-      "10": 10661,
-      "80": 7462,
-      "81": 3797
+      "8": 22922,
+      "10": 81610,
+      "80": 740,
+      "81": 5724
     }
   },
   {
-    "ambito": "2",
-    "departamento": "ASIA",
-    "actas_total": 107,
-    "actas_contabilizadas": 44,
-    "pct_actas_contabilizadas": 41.121,
-    "pct_participacion": 8.007,
-    "votos_emitidos": 3316,
-    "votos_validos": 3315,
-    "votos_habiles": 41413,
+    "ambito": "1",
+    "departamento": "AREQUIPA",
+    "actas_total": 4215,
+    "actas_contabilizadas": 3176,
+    "pct_actas_contabilizadas": 75.35,
+    "pct_participacion": 62.073,
+    "votos_emitidos": 761335,
+    "votos_validos": 713339,
+    "votos_habiles": 1226525,
     "votos_partidos": {
-      "8": 1972,
-      "10": 575,
-      "80": 515,
-      "81": 253
+      "10": 437237,
+      "8": 276102,
+      "81": 45353,
+      "80": 2643
     }
   },
   {
-    "ambito": "2",
-    "departamento": "EUROPA",
-    "actas_total": 839,
-    "actas_contabilizadas": 145,
-    "pct_actas_contabilizadas": 17.282,
-    "pct_participacion": 6.21,
-    "votos_emitidos": 25049,
-    "votos_validos": 24664,
-    "votos_habiles": 403388,
+    "ambito": "1",
+    "departamento": "AYACUCHO",
+    "actas_total": 1900,
+    "actas_contabilizadas": 840,
+    "pct_actas_contabilizadas": 44.211,
+    "pct_participacion": 33.855,
+    "votos_emitidos": 176126,
+    "votos_validos": 167046,
+    "votos_habiles": 520238,
     "votos_partidos": {
-      "8": 10941,
-      "10": 7150,
-      "80": 4330,
-      "81": 2243
+      "10": 128204,
+      "8": 38979,
+      "81": 8142,
+      "80": 946
     }
   },
   {
-    "ambito": "2",
-    "departamento": "OCEANÍA",
-    "actas_total": 21,
-    "actas_contabilizadas": 6,
-    "pct_actas_contabilizadas": 28.571,
-    "pct_participacion": 7.653,
-    "votos_emitidos": 606,
-    "votos_validos": 601,
-    "votos_habiles": 7918,
+    "ambito": "1",
+    "departamento": "CAJAMARCA",
+    "actas_total": 4240,
+    "actas_contabilizadas": 1701,
+    "pct_actas_contabilizadas": 40.118,
+    "pct_participacion": 30.251,
+    "votos_emitidos": 362642,
+    "votos_validos": 334829,
+    "votos_habiles": 1198773,
     "votos_partidos": {
-      "8": 299,
-      "10": 168,
-      "80": 90,
-      "81": 44
+      "8": 129531,
+      "10": 206416,
+      "80": 3134,
+      "81": 24748
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "CALLAO",
+    "actas_total": 2898,
+    "actas_contabilizadas": 1976,
+    "pct_actas_contabilizadas": 68.185,
+    "pct_participacion": 52.961,
+    "votos_emitidos": 455074,
+    "votos_validos": 423997,
+    "votos_habiles": 859267,
+    "votos_partidos": {
+      "8": 287419,
+      "10": 141477,
+      "81": 29231,
+      "80": 2133
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "CUSCO",
+    "actas_total": 3983,
+    "actas_contabilizadas": 2245,
+    "pct_actas_contabilizadas": 56.365,
+    "pct_participacion": 43.225,
+    "votos_emitidos": 490069,
+    "votos_validos": 457357,
+    "votos_habiles": 1133754,
+    "votos_partidos": {
+      "8": 125266,
+      "10": 338038,
+      "80": 2780,
+      "81": 30256
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "HUANCAVELICA",
+    "actas_total": 1273,
+    "actas_contabilizadas": 456,
+    "pct_actas_contabilizadas": 35.821,
+    "pct_participacion": 25.367,
+    "votos_emitidos": 86108,
+    "votos_validos": 81527,
+    "votos_habiles": 339448,
+    "votos_partidos": {
+      "8": 13579,
+      "10": 68615,
+      "80": 585,
+      "81": 4037
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "HUÁNUCO",
+    "actas_total": 2341,
+    "actas_contabilizadas": 1205,
+    "pct_actas_contabilizadas": 51.474,
+    "pct_participacion": 36.9,
+    "votos_emitidos": 242258,
+    "votos_validos": 226101,
+    "votos_habiles": 656517,
+    "votos_partidos": {
+      "10": 135498,
+      "8": 94789,
+      "81": 14863,
+      "80": 1578
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "ICA",
+    "actas_total": 2443,
+    "actas_contabilizadas": 1550,
+    "pct_actas_contabilizadas": 63.447,
+    "pct_participacion": 52.014,
+    "votos_emitidos": 371376,
+    "votos_validos": 350161,
+    "votos_habiles": 713997,
+    "votos_partidos": {
+      "8": 188872,
+      "10": 161289,
+      "81": 19115,
+      "80": 2100
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "JUNÍN",
+    "actas_total": 3691,
+    "actas_contabilizadas": 2281,
+    "pct_actas_contabilizadas": 61.799,
+    "pct_participacion": 47.257,
+    "votos_emitidos": 502106,
+    "votos_validos": 470406,
+    "votos_habiles": 1062500,
+    "votos_partidos": {
+      "8": 217912,
+      "10": 253198,
+      "80": 2682,
+      "81": 29066
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "LA LIBERTAD",
+    "actas_total": 5302,
+    "actas_contabilizadas": 3379,
+    "pct_actas_contabilizadas": 63.731,
+    "pct_participacion": 49.153,
+    "votos_emitidos": 763200,
+    "votos_validos": 707223,
+    "votos_habiles": 1552691,
+    "votos_partidos": {
+      "8": 435287,
+      "10": 272935,
+      "80": 3612,
+      "81": 52488
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "LAMBAYEQUE",
+    "actas_total": 3590,
+    "actas_contabilizadas": 2598,
+    "pct_actas_contabilizadas": 72.368,
+    "pct_participacion": 56.36,
+    "votos_emitidos": 592538,
+    "votos_validos": 546938,
+    "votos_habiles": 1051350,
+    "votos_partidos": {
+      "8": 330238,
+      "10": 216700,
+      "81": 42261,
+      "80": 3339
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "LIMA",
+    "actas_total": 29247,
+    "actas_contabilizadas": 17881,
+    "pct_actas_contabilizadas": 61.138,
+    "pct_participacion": 48.596,
+    "votos_emitidos": 4204051,
+    "votos_validos": 3947042,
+    "votos_habiles": 8651028,
+    "votos_partidos": {
+      "8": 2539397,
+      "10": 1408007,
+      "80": 19689,
+      "81": 237332
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "LORETO",
+    "actas_total": 2697,
+    "actas_contabilizadas": 795,
+    "pct_actas_contabilizadas": 29.477,
+    "pct_participacion": 19.457,
+    "votos_emitidos": 150971,
+    "votos_validos": 140926,
+    "votos_habiles": 775923,
+    "votos_partidos": {
+      "10": 67012,
+      "81": 9218,
+      "8": 78097,
+      "80": 1096
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "MADRE DE DIOS",
+    "actas_total": 507,
+    "actas_contabilizadas": 292,
+    "pct_actas_contabilizadas": 57.594,
+    "pct_participacion": 42.236,
+    "votos_emitidos": 62330,
+    "votos_validos": 59139,
+    "votos_habiles": 147577,
+    "votos_partidos": {
+      "8": 20237,
+      "10": 39640,
+      "80": 376,
+      "81": 2843
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "MOQUEGUA",
+    "actas_total": 578,
+    "actas_contabilizadas": 469,
+    "pct_actas_contabilizadas": 81.142,
+    "pct_participacion": 66.563,
+    "votos_emitidos": 109582,
+    "votos_validos": 103083,
+    "votos_habiles": 164628,
+    "votos_partidos": {
+      "8": 29714,
+      "10": 73369,
+      "80": 524,
+      "81": 5975
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "PASCO",
+    "actas_total": 802,
+    "actas_contabilizadas": 334,
+    "pct_actas_contabilizadas": 41.646,
+    "pct_participacion": 29.112,
+    "votos_emitidos": 65123,
+    "votos_validos": 60616,
+    "votos_habiles": 223695,
+    "votos_partidos": {
+      "10": 35376,
+      "8": 25240,
+      "81": 4141,
+      "80": 366
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "PIURA",
+    "actas_total": 5281,
+    "actas_contabilizadas": 3012,
+    "pct_actas_contabilizadas": 57.035,
+    "pct_participacion": 44.526,
+    "votos_emitidos": 683069,
+    "votos_validos": 629512,
+    "votos_habiles": 1534085,
+    "votos_partidos": {
+      "8": 395941,
+      "10": 233571,
+      "80": 4591,
+      "81": 48966
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "PUNO",
+    "actas_total": 3397,
+    "actas_contabilizadas": 1820,
+    "pct_actas_contabilizadas": 53.577,
+    "pct_participacion": 43.437,
+    "votos_emitidos": 418511,
+    "votos_validos": 398514,
+    "votos_habiles": 963489,
+    "votos_partidos": {
+      "8": 62145,
+      "10": 336369,
+      "80": 1415,
+      "81": 18582
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "SAN MARTÍN",
+    "actas_total": 2534,
+    "actas_contabilizadas": 1272,
+    "pct_actas_contabilizadas": 50.197,
+    "pct_participacion": 37.545,
+    "votos_emitidos": 271680,
+    "votos_validos": 251160,
+    "votos_habiles": 723605,
+    "votos_partidos": {
+      "8": 123314,
+      "10": 127846,
+      "80": 2116,
+      "81": 18404
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "TACNA",
+    "actas_total": 1041,
+    "actas_contabilizadas": 853,
+    "pct_actas_contabilizadas": 81.94,
+    "pct_participacion": 67.449,
+    "votos_emitidos": 204110,
+    "votos_validos": 192499,
+    "votos_habiles": 302615,
+    "votos_partidos": {
+      "8": 58467,
+      "10": 134032,
+      "80": 964,
+      "81": 10647
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "TUMBES",
+    "actas_total": 632,
+    "actas_contabilizadas": 584,
+    "pct_actas_contabilizadas": 92.405,
+    "pct_participacion": 70.48,
+    "votos_emitidos": 127793,
+    "votos_validos": 117723,
+    "votos_habiles": 181317,
+    "votos_partidos": {
+      "8": 76135,
+      "10": 41588,
+      "81": 9162,
+      "80": 908
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "UCAYALI",
+    "actas_total": 1564,
+    "actas_contabilizadas": 869,
+    "pct_actas_contabilizadas": 55.563,
+    "pct_participacion": 37.832,
+    "votos_emitidos": 171732,
+    "votos_validos": 160784,
+    "votos_habiles": 453928,
+    "votos_partidos": {
+      "8": 93170,
+      "10": 68313,
+      "80": 1209,
+      "81": 9788
     }
   },
   {
     "ambito": "2",
     "departamento": "ÁFRICA",
     "actas_total": 6,
-    "actas_contabilizadas": 2,
-    "pct_actas_contabilizadas": 33.333,
-    "pct_participacion": 7.053,
-    "votos_emitidos": 28,
-    "votos_validos": 28,
+    "actas_contabilizadas": 0,
+    "pct_actas_contabilizadas": 0.0,
+    "pct_participacion": 0.0,
+    "votos_emitidos": 0,
+    "votos_validos": 0,
     "votos_habiles": 397,
     "votos_partidos": {
-      "8": 15,
-      "10": 6,
-      "80": 5,
-      "81": 2
+      "8": 0,
+      "10": 0,
+      "80": 0,
+      "81": 0
+    }
+  },
+  {
+    "ambito": "2",
+    "departamento": "AMÉRICA",
+    "actas_total": 1570,
+    "actas_contabilizadas": 0,
+    "pct_actas_contabilizadas": 0.0,
+    "pct_participacion": 0.0,
+    "votos_emitidos": 0,
+    "votos_validos": 0,
+    "votos_habiles": 757697,
+    "votos_partidos": {
+      "8": 0,
+      "10": 0,
+      "80": 0,
+      "81": 0
+    }
+  },
+  {
+    "ambito": "2",
+    "departamento": "ASIA",
+    "actas_total": 107,
+    "actas_contabilizadas": 0,
+    "pct_actas_contabilizadas": 0.0,
+    "pct_participacion": 0.0,
+    "votos_emitidos": 0,
+    "votos_validos": 0,
+    "votos_habiles": 41413,
+    "votos_partidos": {
+      "8": 0,
+      "10": 0,
+      "80": 0,
+      "81": 0
+    }
+  },
+  {
+    "ambito": "2",
+    "departamento": "EUROPA",
+    "actas_total": 839,
+    "actas_contabilizadas": 0,
+    "pct_actas_contabilizadas": 0.0,
+    "pct_participacion": 0.0,
+    "votos_emitidos": 0,
+    "votos_validos": 0,
+    "votos_habiles": 403388,
+    "votos_partidos": {
+      "8": 0,
+      "10": 0,
+      "80": 0,
+      "81": 0
+    }
+  },
+  {
+    "ambito": "2",
+    "departamento": "OCEANÍA",
+    "actas_total": 21,
+    "actas_contabilizadas": 0,
+    "pct_actas_contabilizadas": 0.0,
+    "pct_participacion": 0.0,
+    "votos_emitidos": 0,
+    "votos_validos": 0,
+    "votos_habiles": 7918,
+    "votos_partidos": {
+      "8": 0,
+      "10": 0,
+      "80": 0,
+      "81": 0
     }
   }
 ]

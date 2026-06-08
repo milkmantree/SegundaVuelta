@@ -80,6 +80,9 @@ def run_dynamic_stratified_projection(
     df["rule_2_passed"] = df["actas_contabilizadas"] >= 14
     df["is_stable"] = df["rule_1_passed"] | df["rule_2_passed"]
 
+    # Drop districts with no actas at all — they contribute nothing and cause 0/0 NaN
+    df = df[df["actas_total"] > 0].copy()
+
     # Global weights and infrastructure metrics
     N_total = df["actas_total"].sum()
     df["W_h"] = df["actas_total"] / N_total
@@ -164,7 +167,7 @@ def run_dynamic_stratified_projection(
                 national_variance += variance_term
 
         projected_votes = observed_total_votes + estimated_pending_votes
-        margin_of_error = z_score * np.sqrt(national_variance)
+        margin_of_error = z_score * np.sqrt(max(0.0, national_variance))
 
         projected_share = (
             (projected_votes / total_projected_valid_votes) * 100

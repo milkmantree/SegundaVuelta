@@ -1,4 +1,5 @@
 import json
+import math
 import os
 import sys
 import time
@@ -12,6 +13,17 @@ CACHE_TTL = 60  # seconds before model result is recomputed
 
 HISTORY_FILE = "prediction_history.jsonl"
 _last_recorded_coverage: float | None = None
+
+
+def _sanitize(obj):
+    """Recursively replace NaN/Inf floats with None so JSON serialization is browser-safe."""
+    if isinstance(obj, float):
+        return None if (math.isnan(obj) or math.isinf(obj)) else obj
+    if isinstance(obj, dict):
+        return {k: _sanitize(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_sanitize(v) for v in obj]
+    return obj
 
 
 def _record_snapshot() -> None:
@@ -84,7 +96,7 @@ def _record_snapshot() -> None:
         }
 
     with open(HISTORY_FILE, "a", encoding="utf-8") as fh:
-        fh.write(json.dumps(record, ensure_ascii=False) + "\n")
+        fh.write(json.dumps(_sanitize(record), ensure_ascii=False) + "\n")
 
     _last_recorded_coverage = coverage_pct
 
@@ -211,7 +223,7 @@ def api_history():
             line = line.strip()
             if line:
                 try:
-                    records.append(json.loads(line))
+                    records.append(_sanitize(json.loads(line)))
                 except json.JSONDecodeError:
                     pass
     return jsonify({"ok": True, "data": records})

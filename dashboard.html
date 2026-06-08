@@ -1106,6 +1106,10 @@ function renderProp() {
   const totalProj = valid.reduce((s, p) => s + p.projected_votes,  0);
   const top2ids   = valid.slice(0, 2).map(p => p.id);
 
+  // Convert valid-space share to % of votos emitidos using observed ratio
+  const ad2 = S.data.segunda ? getAmbito(S.data.segunda, 'total') : null;
+  const validToEmit = (ad2 && ad2.votos_emitidos > 0) ? (ad2.votos_validos / ad2.votos_emitidos) : 1;
+
   const rows = valid.slice(0, 12).map(p => {
     const obs      = totalOb   > 0 ? (p.observed_votes  / totalOb)   * 100 : 0;
     const projHead = totalProj > 0 ? (p.projected_votes / totalProj) * 100 : 0;
@@ -1114,7 +1118,8 @@ function renderProp() {
     const lbH2h    = p.lower_bound * scale;
     const ubH2h    = p.upper_bound * scale;
     const adv      = top2ids.includes(p.id);
-    const validNote = `<span class="ci" style="margin-left:4px">(${f2(p.projected_share)}% válidos)</span>`;
+    const emitShare = p.projected_share * validToEmit;
+    const validNote = `<span class="ci" style="margin-left:4px">(${f2(emitShare)}% emitidos)</span>`;
     return `<tr class="${adv ? 'adv' : ''}">
       <td>
         <span class="pdot" style="background:${pColor(p.id)}"></span>
@@ -1126,7 +1131,6 @@ function renderProp() {
     </tr>`;
   }).join('');
 
-  const ad2  = S.data.segunda ? getAmbito(S.data.segunda, 'total') : null;
   const pct  = ad2 ? ad2.pct_actas_contabilizadas : 0;
   const note = pct >= 100
     ? '<div class="info-note">✓ Escrutinio al 100% — la proyección confirma los resultados definitivos.</div>'
@@ -1179,10 +1183,15 @@ function renderMigr() {
   const totalObs = finalists.reduce((s, f) => s + f.observed_votes, 0);
   const pct      = d.pct_coverage || 0;
 
+  // Convert valid-space share to % of votos emitidos using observed ratio
+  const ad2m = S.data.segunda ? getAmbito(S.data.segunda, 'total') : null;
+  const validToEmitM = (ad2m && ad2m.votos_emitidos > 0) ? (ad2m.votos_validos / ad2m.votos_emitidos) : 1;
+
   const rows = finalists.map(f => {
     const obs = totalObs > 0 ? (f.observed_votes / totalObs) * 100 : 0;
-    const validNote = f.valid_share != null
-      ? `<span class="ci" style="margin-left:4px">(${f2(f.valid_share)}% válidos)</span>` : '';
+    const emitShare = f.valid_share != null ? f.valid_share * validToEmitM : null;
+    const validNote = emitShare != null
+      ? `<span class="ci" style="margin-left:4px">(${f2(emitShare)}% emitidos)</span>` : '';
     return `<tr class="adv">
       <td>
         <span class="pdot" style="background:${pColor(f.id)}"></span>
