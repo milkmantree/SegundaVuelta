@@ -1,3 +1,7 @@
+## Runtime directories
+backups/
+log/
+
 ## Generated outputs
 election_projection_dashboard.html
 dashboard_static.html
