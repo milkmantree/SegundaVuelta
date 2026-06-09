@@ -312,6 +312,41 @@ def main():
     print(f"  * participación R1 exterior ({r1_part_rate*100:.1f}%)")
     print(f"  V.resto = votos válidos exteriores restantes (total proyectado − ya contabilizados)")
     print(f"  Neto positivo = FP gana el exterior   Neto negativo = JPP gana el exterior")
+
+    # ── Total exterior differential (observed + remaining) ───────────────────
+    ext_obs_net = ext_fp_obs - ext_jpp_obs
+    print()
+    print(f"  Diferencial TOTAL del exterior para FP — observado + proyectado restante")
+    print(f"  Observado ya contabilizado: {_sign(ext_obs_net)} votos netos FP")
+    print(f"  Filas = tasa de participación exterior supuesta")
+    print(f"  Columnas = % de votos válidos restantes del exterior que obtiene FP")
+    print()
+
+    col_w3 = 10
+    fp_hdr3 = "  ".join(f"FP={int(p*100)}%".center(col_w3) for p in fp_pcts)
+    print(f"  {'Part%':>6}  {'V.resto':>9}  {'V.total':>9}  {fp_hdr3}")
+    print("  " + "─" * (6 + 2 + 9 + 2 + 9 + 2 + len(fp_hdr3) + 2))
+
+    for pt in part_rates:
+        is_r1    = abs(pt - r1_part_rate) < 0.0001
+        label    = f"{pt*100:.0f}%{'*' if is_r1 else ' '}"
+        v_total  = r1_hab * pt * r1_valid_rate
+        v_remain = max(0.0, v_total - ext_valid_obs)
+
+        cells = []
+        for fp_p in fp_pcts:
+            net_remaining = (2 * fp_p - 1) * v_remain
+            total_ext_net = ext_obs_net + net_remaining
+            sym = "▲" if total_ext_net > 0 else ("▼" if total_ext_net < 0 else "=")
+            cells.append(f"{sym}{total_ext_net/1000:>+5.1f}k".center(col_w3))
+
+        tag = " ← R1" if is_r1 else ""
+        print(f"  {label:>6}  {v_remain:>9,.0f}  {v_total:>9,.0f}  {'  '.join(cells)}{tag}")
+
+    print()
+    print(f"  Valores = diferencial neto FP total del exterior (observado + restante proyectado)")
+    print(f"  ▲ = FP lidera en exterior   ▼ = JPP lidera en exterior")
+    print(f"  * participación R1 exterior ({r1_part_rate*100:.1f}%)")
     print("  " + "═" * W)
     print()
 
