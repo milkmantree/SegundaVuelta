@@ -180,8 +180,8 @@
     "votos_validos": 538859,
     "votos_habiles": 713997,
     "votos_partidos": {
-      "10": 259131,
       "8": 279728,
+      "10": 259131,
       "81": 28799,
       "80": 3332
     }
@@ -197,8 +197,8 @@
     "votos_validos": 712633,
     "votos_habiles": 1062500,
     "votos_partidos": {
-      "10": 391453,
       "8": 321180,
+      "10": 391453,
       "81": 44841,
       "80": 4673
     }
@@ -231,8 +231,8 @@
     "votos_validos": 740416,
     "votos_habiles": 1051350,
     "votos_partidos": {
-      "8": 435721,
       "10": 304695,
+      "8": 435721,
       "81": 55368,
       "80": 5215
     }
@@ -248,8 +248,8 @@
     "votos_validos": 6211917,
     "votos_habiles": 8651028,
     "votos_partidos": {
-      "10": 2267411,
       "8": 3944506,
+      "10": 2267411,
       "81": 373411,
       "80": 32057
     }
@@ -258,17 +258,17 @@
     "ambito": "1",
     "departamento": "LORETO",
     "actas_total": 2697,
-    "actas_contabilizadas": 2429,
-    "pct_actas_contabilizadas": 90.063,
-    "pct_participacion": 51.93,
-    "votos_emitidos": 402935,
-    "votos_validos": 374951,
+    "actas_contabilizadas": 2440,
+    "pct_actas_contabilizadas": 90.471,
+    "pct_participacion": 52.103,
+    "votos_emitidos": 404280,
+    "votos_validos": 376229,
     "votos_habiles": 775923,
     "votos_partidos": {
-      "10": 171408,
-      "81": 24795,
-      "8": 203543,
-      "80": 3189
+      "10": 172417,
+      "8": 203812,
+      "81": 24849,
+      "80": 3202
     }
   },
   {
@@ -326,17 +326,17 @@
     "ambito": "1",
     "departamento": "PIURA",
     "actas_total": 5281,
-    "actas_contabilizadas": 5216,
-    "pct_actas_contabilizadas": 98.769,
-    "pct_participacion": 72.361,
-    "votos_emitidos": 1110084,
-    "votos_validos": 1021984,
+    "actas_contabilizadas": 5217,
+    "pct_actas_contabilizadas": 98.788,
+    "pct_participacion": 72.374,
+    "votos_emitidos": 1110283,
+    "votos_validos": 1022174,
     "votos_habiles": 1534085,
     "votos_partidos": {
-      "10": 439893,
-      "8": 582091,
-      "81": 79105,
-      "80": 8995
+      "10": 439958,
+      "8": 582216,
+      "81": 79113,
+      "80": 8996
     }
   },
   {
@@ -445,17 +445,17 @@
     "ambito": "2",
     "departamento": "AMÉRICA",
     "actas_total": 1570,
-    "actas_contabilizadas": 631,
-    "pct_actas_contabilizadas": 40.191,
-    "pct_participacion": 9.65,
-    "votos_emitidos": 73114,
-    "votos_validos": 69014,
+    "actas_contabilizadas": 638,
+    "pct_actas_contabilizadas": 40.637,
+    "pct_participacion": 9.746,
+    "votos_emitidos": 73844,
+    "votos_validos": 69711,
     "votos_habiles": 757697,
     "votos_partidos": {
-      "8": 47715,
-      "10": 21359,
-      "80": 384,
-      "81": 3718
+      "8": 48195,
+      "10": 21516,
+      "80": 387,
+      "81": 3746
     }
   },
   {
