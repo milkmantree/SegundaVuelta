@@ -445,17 +445,17 @@
     "ambito": "2",
     "departamento": "AMÉRICA",
     "actas_total": 1570,
-    "actas_contabilizadas": 449,
-    "pct_actas_contabilizadas": 28.599,
-    "pct_participacion": 7.769,
-    "votos_emitidos": 58866,
-    "votos_validos": 55292,
+    "actas_contabilizadas": 526,
+    "pct_actas_contabilizadas": 33.503,
+    "pct_participacion": 8.527,
+    "votos_emitidos": 64611,
+    "votos_validos": 60828,
     "votos_habiles": 757697,
     "votos_partidos": {
-      "8": 37740,
-      "10": 17552,
-      "80": 344,
-      "81": 3230
+      "8": 41887,
+      "10": 18941,
+      "80": 362,
+      "81": 3421
     }
   },
   {
@@ -479,17 +479,17 @@
     "ambito": "2",
     "departamento": "EUROPA",
     "actas_total": 839,
-    "actas_contabilizadas": 61,
-    "pct_actas_contabilizadas": 7.271,
-    "pct_participacion": 2.091,
-    "votos_emitidos": 8434,
-    "votos_validos": 8026,
+    "actas_contabilizadas": 100,
+    "pct_actas_contabilizadas": 11.919,
+    "pct_participacion": 4.01,
+    "votos_emitidos": 16177,
+    "votos_validos": 15267,
     "votos_habiles": 403388,
     "votos_partidos": {
-      "8": 4267,
-      "10": 3759,
-      "80": 36,
-      "81": 372
+      "8": 8318,
+      "10": 7702,
+      "80": 93,
+      "81": 853
     }
   },
   {
