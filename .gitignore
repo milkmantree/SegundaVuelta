@@ -1,14 +1,22 @@
-processed_results/test_payload.json
+## Generated outputs
 election_projection_dashboard.html
-__pycache__/propagation_model.cpython-314.pyc
-cloude_exports/dev-log-objective-1.md
-__pycache__/migration_model.cpython-314.pyc
-cloude_exports/dev-log-objective-2.md
 dashboard_static.html
-dashboard.html
+web/templates/dashboard_static.html
 
-.claude/worktrees/agent-a70d08c0ac00fecfe
-__pycache__/app.cpython-314.pyc
+## Test/simulation artifacts
+data/round2/test_payload.json
+data/round2_backup_r1/
 
+## Large data files
+data/inputs/all_actas_merged.jsonl
+actas/actas_results.jsonl
+actas/actas_jee.jsonl
+
+## Pycache
+__pycache__/
+**/__pycache__/
+*.pyc
+
+## Claude internal
 .claude/
-inputs/all_actas_merged.jsonl
+
