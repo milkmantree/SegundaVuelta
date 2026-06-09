@@ -151,7 +151,7 @@ def load_domestic_projection():
     """
     buf = io.StringIO()
     with redirect_stdout(buf):
-        from propagation_model import get_projection_data
+        from models.propagation import get_projection_data
         result = get_projection_data()
 
     parties = {p["id"]: p for p in result.get("parties", [])}
