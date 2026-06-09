@@ -17,13 +17,16 @@ Usage:
     python exterior_analysis.py --skip-model   # usa 0 como proyección doméstica
 """
 
-import argparse, json, math, sys, io
+import argparse, json, math, sys, io, os
 from pathlib import Path
 from contextlib import redirect_stdout
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from paths import ROUND1, ROUND2
+
 ROOT             = Path(__file__).parent
-R1_DEPARTAMENTAL = ROOT / "first_round_agg_results" / "agg_departamental.json"
-R2_AMBITO        = ROOT / "processed_results"        / "agg_ambito.json"
+R1_DEPARTAMENTAL = ROUND1 / "agg_departamental.json"
+R2_AMBITO        = ROUND2 / "agg_ambito.json"
 
 EXTERIOR_DEPTS = {"AMERICA", "AMÉRICА", "EUROPA", "ASIA", "OCEANIA", "OCEANÍA", "AFRICA", "ÁFRICA"}
 
@@ -117,7 +120,7 @@ def load_observed_exterior_by_region():
     Returns a dict region_name → {fp, jpp, valid} from processed_results/ agg_departamental.json.
     Falls back to zeros if file absent.
     """
-    dept_file = ROOT / "processed_results" / "agg_departamental.json"
+    dept_file = ROUND2 / "agg_departamental.json"
     if not dept_file.exists():
         return {}
     rows = json.loads(dept_file.read_text(encoding="utf-8"))

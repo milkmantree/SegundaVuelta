@@ -16,6 +16,7 @@ Entry points:
 import json
 import math
 import os
+import sys
 import time
 import warnings
 
@@ -24,12 +25,15 @@ import pandas as pd
 from scipy.cluster.hierarchy import fcluster, linkage
 from scipy import stats as sp_stats
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from paths import ROUND1, ROUND2, INPUTS, MIGRATION_CLUSTERS
+
 # ── Paths ─────────────────────────────────────────────────────────────────────
-FIRST_ROUND_DISTRITAL  = "first_round_agg_results/agg_distrital.json"
-FIRST_ROUND_MAPPING    = "first_round_agg_results/idx_codigo_nombre_partido.json"
-CLUSTER_MAP_PATH       = "inputs/migration_cluster_map.json"
-SECOND_ROUND_DISTRITAL = "processed_results/agg_distrital.json"
-SECOND_ROUND_MAPPING   = "processed_results/idx_codigo_nombre_partido.json"
+FIRST_ROUND_DISTRITAL  = str(ROUND1 / "agg_distrital.json")
+FIRST_ROUND_MAPPING    = str(ROUND1 / "idx_codigo_nombre_partido.json")
+CLUSTER_MAP_PATH       = str(MIGRATION_CLUSTERS)
+SECOND_ROUND_DISTRITAL = str(ROUND2 / "agg_distrital.json")
+SECOND_ROUND_MAPPING   = str(ROUND2 / "idx_codigo_nombre_partido.json")
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 BLANK_NULL       = {"80", "81"}

@@ -10,13 +10,16 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from paths import UBIGEO_MAP, LOG_DIR as _LOG_DIR, BACKUP_DIR as _BACKUP_DIR, SCRAPER_STOP_SIGNAL
+
 # --- GLOBAL ONPE CONFIGURATION ---
-ID_ELECCION = "10"  
+ID_ELECCION = "10"
 TOTAL_WORKERS = 5
 
-INPUT_FILE = "inputs/onpe_ubigeo_map.json"
-BACKUP_DIR = "backups"
-LOG_DIR = "log"
+INPUT_FILE = str(UBIGEO_MAP)
+BACKUP_DIR = str(_BACKUP_DIR)
+LOG_DIR = str(_LOG_DIR)
 
 os.makedirs(LOG_DIR, exist_ok=True)
 
@@ -34,7 +37,7 @@ WORKER_ID = get_worker_id()
 RUN_MODE = os.getenv("RUN_MODE", "patch")  
 
 # Signal file path that tells this worker to wrap up and exit safely
-STOP_SIGNAL_FILE = os.path.join(LOG_DIR, ".stop_signal")
+STOP_SIGNAL_FILE = str(SCRAPER_STOP_SIGNAL)
 
 RESULTS_FILE = os.path.join(LOG_DIR, f"onpe_combined_results_worker_{WORKER_ID}.jsonl")
 ERROR_FILE = os.path.join(LOG_DIR, f"onpe_combined_errors_worker_{WORKER_ID}.jsonl")

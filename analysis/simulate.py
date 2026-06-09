@@ -22,16 +22,20 @@ Simulation design:
 import json
 import math
 import os
+import sys
 import shutil
 
 import numpy as np
 import pandas as pd
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from paths import ROUND1, ROUND2
+
 SEED = 42
 rng  = np.random.default_rng(SEED)
 
-OUT_DIR    = "processed_results"
-BACKUP_DIR = "processed_results_backup_r1"
+OUT_DIR    = str(ROUND2)
+BACKUP_DIR = str(ROUND2.parent / "round2_backup_r1")
 
 # ── Migration rates: fraction of each R1 party's votes that go to R2 finalist ─
 # Each entry: (to_F1=party8, to_F2=party10, to_blank, to_null)
@@ -233,9 +237,9 @@ def _aggregate(records, group_keys):
 def run_simulation():
     # ── 1. Load R1 source ────────────────────────────────────────────────────
     print("Loading first-round district data...")
-    with open("first_round_agg_results/agg_distrital.json", encoding="utf-8") as f:
+    with open(str(ROUND1 / "agg_distrital.json"), encoding="utf-8") as f:
         r1_records = json.load(f)
-    with open("first_round_agg_results/idx_codigo_nombre_partido.json", encoding="utf-8") as f:
+    with open(str(ROUND1 / "idx_codigo_nombre_partido.json"), encoding="utf-8") as f:
         r1_mapping = json.load(f)
 
     all_party_cols = list(r1_mapping.keys())

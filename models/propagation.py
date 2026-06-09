@@ -1,17 +1,20 @@
 import json
 import os
+import sys
+
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.io as pio
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+from paths import ROUND1, ROUND2
+
 # Fallback participation rate applied to exterior districts when no R1 data
 # can be inferred. Exterior turnout is ~25–34% vs ~73% domestic, so without
 # this correction the model fabricates ~3–4× too many pending overseas votes.
 _EXT_PART_FALLBACK = 0.32
-_R1_DEPT_PATH = os.path.join(
-    os.path.dirname(__file__), "first_round_agg_results", "agg_departamental.json"
-)
+_R1_DEPT_PATH = str(ROUND1 / "agg_departamental.json")
 
 
 def _load_r1_ext_part_rates():
@@ -284,7 +287,7 @@ def create_interactive_dashboard(results_df, resolved_tier):
         xaxis=dict(range=[0, min(100, max(shares) + max(moe) + 5)]),
     )
 
-    filename = "election_projection_dashboard.html"
+    filename = str(ROUND2.parent.parent / "election_projection_dashboard.html")
     pio.write_html(fig, file=filename, auto_open=False)
     print(f"🌐 Interactive dashboard exported successfully as '{filename}'")
 
@@ -294,9 +297,9 @@ def get_projection_data_by_dept(data_path=None, mapping_path=None, z_score=1.96)
     import io, contextlib
 
     if data_path is None:
-        data_path = os.path.join("processed_results", "agg_distrital.json")
+        data_path = str(ROUND2 / "agg_distrital.json")
     if mapping_path is None:
-        mapping_path = os.path.join("processed_results", "idx_codigo_nombre_partido.json")
+        mapping_path = str(ROUND2 / "idx_codigo_nombre_partido.json")
 
     if not os.path.exists(data_path) or not os.path.exists(mapping_path):
         return {"error": "Data files not found", "departments": {}}
@@ -382,9 +385,9 @@ def get_projection_data_by_dept(data_path=None, mapping_path=None, z_score=1.96)
 def get_projection_data(data_path=None, mapping_path=None, z_score=1.96):
     """Returns projection results as a JSON-serializable dict for the web API."""
     if data_path is None:
-        data_path = os.path.join("processed_results", "agg_distrital.json")
+        data_path = str(ROUND2 / "agg_distrital.json")
     if mapping_path is None:
-        mapping_path = os.path.join("processed_results", "idx_codigo_nombre_partido.json")
+        mapping_path = str(ROUND2 / "idx_codigo_nombre_partido.json")
 
     if not os.path.exists(data_path) or not os.path.exists(mapping_path):
         return {"error": "Data files not found", "parties": []}
@@ -416,8 +419,8 @@ def get_projection_data(data_path=None, mapping_path=None, z_score=1.96):
 
 
 if __name__ == "__main__":
-    DATA_PATH = "processed_results/agg_distrital.json"
-    MAPPING_PATH = "processed_results/idx_codigo_nombre_partido.json"
+    DATA_PATH = str(ROUND2 / "agg_distrital.json")
+    MAPPING_PATH = str(ROUND2 / "idx_codigo_nombre_partido.json")
 
     if os.path.exists(DATA_PATH) and os.path.exists(MAPPING_PATH):
         processed_results, candidate_columns, party_mapping_dict = (

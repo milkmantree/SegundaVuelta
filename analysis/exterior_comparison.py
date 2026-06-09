@@ -25,14 +25,19 @@ Usage
 import argparse
 import csv
 import json
+import os
 import re
+import sys
 import unicodedata
 from pathlib import Path
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from paths import EXTERIOR_2021_CSV, ROUND2
+
 ROOT = Path(__file__).parent
 
-CSV_2021   = ROOT / "inputs" / "segunda_vuelta_2021.csv"
-DISTRITAL  = ROOT / "processed_results" / "agg_distrital.json"
+CSV_2021   = EXTERIOR_2021_CSV
+DISTRITAL  = ROUND2 / "agg_distrital.json"
 
 FP_ID  = "8"
 JPP_ID = "10"

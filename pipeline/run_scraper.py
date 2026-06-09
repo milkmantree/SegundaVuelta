@@ -6,10 +6,13 @@ import subprocess
 import shutil
 from typing import List
 
-SCRAPER_SCRIPT = "scraper.py"
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from paths import LOG_DIR as _LOG_DIR, SCRAPER_STOP_SIGNAL
+
+SCRAPER_SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scraper.py")
 TOTAL_WORKERS = 5
-LOG_DIR = "log"
-STOP_SIGNAL_FILE = os.path.join(LOG_DIR, ".stop_signal")
+LOG_DIR = str(_LOG_DIR)
+STOP_SIGNAL_FILE = str(SCRAPER_STOP_SIGNAL)
 
 def check_environment() -> None:
     if not os.path.exists(SCRAPER_SCRIPT):

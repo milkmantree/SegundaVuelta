@@ -29,15 +29,18 @@ import sys
 import time
 from pathlib import Path
 
-WORKER_SCRIPT  = os.path.join(os.path.dirname(__file__), "actas_worker.py")
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from paths import LOG_DIR as _LOG_DIR, ACTAS_STOP_SIGNAL
+
+WORKER_SCRIPT  = os.path.join(os.path.dirname(__file__), "worker.py")
 TOTAL_WORKERS  = 5
-_ROOT          = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOG_DIR        = os.path.join(_ROOT, "log")
-STOP_FILE      = os.path.join(LOG_DIR, ".actas_stop_signal")
+LOG_DIR        = str(_LOG_DIR)
+STOP_FILE      = str(ACTAS_STOP_SIGNAL)
 
 # Merged output (written after all workers finish)
-RESULTS_FILE = os.path.join(os.path.dirname(__file__), "actas_results.jsonl")
-JEE_FILE     = os.path.join(os.path.dirname(__file__), "actas_jee.jsonl")
+_ACTAS_DIR   = os.path.dirname(__file__)
+RESULTS_FILE = os.path.join(_ACTAS_DIR, "actas_results.jsonl")
+JEE_FILE     = os.path.join(_ACTAS_DIR, "actas_jee.jsonl")
 
 # ── JEE detection (mirrors actas_worker.py — kept in sync manually) ───────────
 _STATUS_FIELDS = {

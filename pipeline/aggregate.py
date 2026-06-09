@@ -1,14 +1,17 @@
 import os
+import sys
 import json
 import glob
 import pandas as pd
 from typing import Dict, Any, List
 
-LOG_DIR = "log"
-INPUT_DIR = "inputs"
-OUTPUT_DIR = "processed_results"
-VOTOS_HABILES_FILE = os.path.join(INPUT_DIR, "ubigeo_votos_habiles.json")
-PARTY_INDEX_FILE = os.path.join(OUTPUT_DIR, "idx_codigo_nombre_partido.json")
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from paths import LOG_DIR as _LOG_DIR, VOTER_ROLLS, ROUND2
+
+LOG_DIR    = str(_LOG_DIR)
+OUTPUT_DIR = str(ROUND2)
+VOTOS_HABILES_FILE = str(VOTER_ROLLS)
+PARTY_INDEX_FILE   = str(ROUND2 / "idx_codigo_nombre_partido.json")
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 

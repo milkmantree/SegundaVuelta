@@ -15,6 +15,9 @@ import sys
 import time
 from pathlib import Path
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from paths import ROUND1, ROUND2
+
 
 class _Encoder(json.JSONEncoder):
     """Handle numpy scalars that may come from model outputs."""
@@ -37,21 +40,23 @@ def _read(path):
         return json.load(f)
 
 
-def load_round(base, is_final):
-    paths = {
-        "ambito":        f"{base}/agg_ambito.json",
-        "departamental": f"{base}/agg_departamental.json",
-        "parties":       f"{base}/idx_codigo_nombre_partido.json",
+def load_round(base_dir, is_final):
+    from pathlib import Path as _P
+    base = _P(base_dir)
+    file_paths = {
+        "ambito":        base / "agg_ambito.json",
+        "departamental": base / "agg_departamental.json",
+        "parties":       base / "idx_codigo_nombre_partido.json",
     }
-    missing = [p for p in paths.values() if not os.path.exists(p)]
+    missing = [str(p) for p in file_paths.values() if not p.exists()]
     if missing:
         print(f"  Warning: missing files in {base}: {missing}")
         return None
     return {
-        "ambito":        _read(paths["ambito"]),
-        "departamental": _read(paths["departamental"]),
-        "parties":       _read(paths["parties"]),
-        "last_updated":  os.path.getmtime(paths["departamental"]),
+        "ambito":        _read(str(file_paths["ambito"])),
+        "departamental": _read(str(file_paths["departamental"])),
+        "parties":       _read(str(file_paths["parties"])),
+        "last_updated":  os.path.getmtime(str(file_paths["departamental"])),
         "is_final":      is_final,
     }
 
@@ -60,12 +65,12 @@ def main():
     out_path = sys.argv[1] if len(sys.argv) > 1 else "dashboard_static.html"
 
     print("Loading round data...")
-    first  = load_round("first_round_agg_results", is_final=True)
-    second = load_round("processed_results",        is_final=False)
+    first  = load_round(ROUND1, is_final=True)
+    second = load_round(ROUND2, is_final=False)
 
     print("Running propagation model...")
     try:
-        from propagation_model import get_projection_data
+        from models.propagation import get_projection_data
         prop = get_projection_data()
         print(f"  OK — {len(prop.get('parties', []))} parties")
     except Exception as exc:
@@ -74,7 +79,7 @@ def main():
 
     print("Running propagation model (by dept)...")
     try:
-        from propagation_model import get_projection_data_by_dept
+        from models.propagation import get_projection_data_by_dept
         prop_dept = get_projection_data_by_dept()
         print(f"  OK — {len(prop_dept.get('departments', {}))} departments")
     except Exception as exc:
@@ -83,7 +88,7 @@ def main():
 
     print("Running migration model...")
     try:
-        from migration_model import get_migration_data
+        from models.migration import get_migration_data
         migr = get_migration_data()
         status = migr.get("status", "ok") if migr else "error"
         print(f"  OK — status={status}")
@@ -93,7 +98,7 @@ def main():
 
     print("Running migration model (by dept)...")
     try:
-        from migration_model import get_migration_data_by_dept
+        from models.migration import get_migration_data_by_dept
         migr_dept = get_migration_data_by_dept()
         status = migr_dept.get("status", "ok") if migr_dept else "error"
         print(f"  OK — status={status}, {len(migr_dept.get('departments', {}))} departments")

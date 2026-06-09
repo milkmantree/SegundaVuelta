@@ -30,13 +30,15 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from paths import UBIGEO_MAP, ROUND2, BACKUP_DIR as _BACKUP_DIR, LOG_DIR as _LOG_DIR, ACTAS_STOP_SIGNAL
+
 # ── Identity ──────────────────────────────────────────────────────────────────
-_ROOT        = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-INPUT_FILE   = os.path.join(_ROOT, "inputs", "onpe_ubigeo_map.json")
-DISTRITAL    = os.path.join(_ROOT, "processed_results", "agg_distrital.json")
-BACKUP_DIR   = os.path.join(_ROOT, "backups")
-LOG_DIR      = os.path.join(_ROOT, "log")
-STOP_FILE    = os.path.join(LOG_DIR, ".actas_stop_signal")
+INPUT_FILE    = str(UBIGEO_MAP)
+DISTRITAL     = str(ROUND2 / "agg_distrital.json")
+BACKUP_DIR    = str(_BACKUP_DIR)
+LOG_DIR       = str(_LOG_DIR)
+STOP_FILE     = str(ACTAS_STOP_SIGNAL)
 TOTAL_WORKERS = 5
 
 os.makedirs(LOG_DIR, exist_ok=True)

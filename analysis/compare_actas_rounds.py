@@ -18,13 +18,18 @@ Usage:
 import argparse
 import csv
 import json
+import os
+import sys
 import unicodedata
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-JSONL_PATH       = Path(__file__).parent / "inputs" / "all_actas_merged.jsonl"
-SECOND_ROUND_AGG = Path(__file__).parent / "processed_results" / "agg_departamental.json"
-SECOND_AMBITO    = Path(__file__).parent / "processed_results" / "agg_ambito.json"
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from paths import INPUTS, ROUND2
+
+JSONL_PATH       = INPUTS / "all_actas_merged.jsonl"
+SECOND_ROUND_AGG = ROUND2 / "agg_departamental.json"
+SECOND_AMBITO    = ROUND2 / "agg_ambito.json"
 
 
 # ---------------------------------------------------------------------------

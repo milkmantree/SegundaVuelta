@@ -6,12 +6,15 @@ import time
 
 from flask import Flask, jsonify, send_file
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from paths import ROUND1, ROUND2, PREDICTION_HISTORY
+
 app = Flask(__name__)
 
 _cache: dict = {}
 CACHE_TTL = 60  # seconds before model result is recomputed
 
-HISTORY_FILE = "prediction_history.jsonl"
+HISTORY_FILE = str(PREDICTION_HISTORY)
 _last_recorded_coverage: float | None = None
 
 
@@ -111,28 +114,30 @@ def index():
     return send_file("dashboard.html")
 
 
-def _round_payload(base: str, is_final: bool):
-    paths = {
-        "ambito":       f"{base}/agg_ambito.json",
-        "departamental":f"{base}/agg_departamental.json",
-        "parties":      f"{base}/idx_codigo_nombre_partido.json",
+def _round_payload(base_dir, is_final: bool):
+    from pathlib import Path
+    base = Path(base_dir)
+    file_paths = {
+        "ambito":        base / "agg_ambito.json",
+        "departamental": base / "agg_departamental.json",
+        "parties":       base / "idx_codigo_nombre_partido.json",
     }
-    missing = [p for p in paths.values() if not os.path.exists(p)]
+    missing = [str(p) for p in file_paths.values() if not p.exists()]
     if missing:
         return None, missing
     data = {
-        "ambito":       _read(paths["ambito"]),
-        "departamental":_read(paths["departamental"]),
-        "parties":      _read(paths["parties"]),
-        "last_updated": os.path.getmtime(paths["departamental"]),
-        "is_final":     is_final,
+        "ambito":        _read(str(file_paths["ambito"])),
+        "departamental": _read(str(file_paths["departamental"])),
+        "parties":       _read(str(file_paths["parties"])),
+        "last_updated":  os.path.getmtime(str(file_paths["departamental"])),
+        "is_final":      is_final,
     }
     return data, None
 
 
 @app.route("/api/round/first")
 def api_first_round():
-    data, missing = _round_payload("first_round_agg_results", is_final=True)
+    data, missing = _round_payload(ROUND1, is_final=True)
     if missing:
         return jsonify({"ok": False, "error": f"Missing: {missing}"}), 404
     return jsonify({"ok": True, "data": data})
@@ -141,7 +146,7 @@ def api_first_round():
 @app.route("/api/round/second")
 @app.route("/api/observed")          # keep old path working
 def api_second_round():
-    data, missing = _round_payload("processed_results", is_final=False)
+    data, missing = _round_payload(ROUND2, is_final=False)
     if missing:
         return jsonify({"ok": False, "error": f"Missing: {missing}"}), 404
     return jsonify({"ok": True, "data": data})
@@ -153,7 +158,7 @@ def api_model_propagation():
     if "prop" in _cache and now - _cache["prop"]["ts"] < CACHE_TTL:
         return jsonify({"ok": True, "data": _cache["prop"]["data"]})
     try:
-        from propagation_model import get_projection_data
+        from models.propagation import get_projection_data
         data = get_projection_data()
         _cache["prop"] = {"ts": now, "data": data}
         _record_snapshot()
@@ -168,7 +173,7 @@ def api_model_propagation_dept():
     if "prop_dept" in _cache and now - _cache["prop_dept"]["ts"] < CACHE_TTL:
         return jsonify({"ok": True, "data": _cache["prop_dept"]["data"]})
     try:
-        from propagation_model import get_projection_data_by_dept
+        from models.propagation import get_projection_data_by_dept
         data = get_projection_data_by_dept()
         _cache["prop_dept"] = {"ts": now, "data": data}
         _record_snapshot()
@@ -183,7 +188,7 @@ def api_model_migration_dept():
     if "migr_dept" in _cache and now - _cache["migr_dept"]["ts"] < CACHE_TTL:
         return jsonify(_cache["migr_dept"]["data"])
     try:
-        from migration_model import get_migration_data_by_dept
+        from models.migration import get_migration_data_by_dept
         data = get_migration_data_by_dept()
         _cache["migr_dept"] = {"ts": now, "data": data}
         _record_snapshot()
@@ -198,7 +203,7 @@ def api_model_migration():
     if "migr" in _cache and now - _cache["migr"]["ts"] < CACHE_TTL:
         return jsonify(_cache["migr"]["data"])
     try:
-        from migration_model import get_migration_data
+        from models.migration import get_migration_data
         data = get_migration_data()
         _cache["migr"] = {"ts": now, "data": data}
         _record_snapshot()
@@ -213,11 +218,11 @@ def api_model_unreported():
     if "unreported" in _cache and now - _cache["unreported"]["ts"] < CACHE_TTL:
         return jsonify(_cache["unreported"]["data"])
     try:
-        from propagation_model import get_projection_data_by_dept
-        from migration_model import get_migration_data_by_dept
+        from models.propagation import get_projection_data_by_dept
+        from models.migration import get_migration_data_by_dept
 
-        r2_districts = _read("processed_results/agg_distrital.json")
-        r1_index = {d["ubigeo"]: d for d in _read("first_round_agg_results/agg_distrital.json")}
+        r2_districts = _read(str(ROUND2 / "agg_distrital.json"))
+        r1_index = {d["ubigeo"]: d for d in _read(str(ROUND1 / "agg_distrital.json"))}
 
         prop_dept = get_projection_data_by_dept()
         migr_dept = get_migration_data_by_dept()
@@ -241,7 +246,7 @@ def api_model_unreported():
             return h2h, hit.get("lower_bound", h2h) * scale, hit.get("upper_bound", h2h) * scale
 
         # R2/R1 valid ratio from reported districts (used to estimate R2 valid for unreported)
-        agg_ambito = _read("processed_results/agg_ambito.json")
+        agg_ambito = _read(str(ROUND2 / "agg_ambito.json"))
         r2_valid_obs = sum(a["votos_validos"] for a in agg_ambito)
         reported_r1_valid = sum(
             r1_index[d["ubigeo"]]["votos_validos"]
@@ -324,7 +329,7 @@ def api_model_unreported():
             rows.append(row)
 
         # Attach names from idx
-        idx = _read("processed_results/idx_codigo_nombre_partido.json")
+        idx = _read(str(ROUND2 / "idx_codigo_nombre_partido.json"))
         for row in rows:
             row["f1_name"] = idx.get(row.get("f1_id"), row.get("f1_id", ""))
             row["f2_name"] = idx.get(row.get("f2_id"), row.get("f2_id", ""))

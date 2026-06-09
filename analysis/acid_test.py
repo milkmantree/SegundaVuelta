@@ -12,9 +12,12 @@ Usage:
     python acid_test.py --threshold 50 60 70   # run multiple thresholds
 """
 
-import argparse, json, sys, io
+import argparse, json, sys, io, os
 from contextlib import redirect_stdout
 from pathlib import Path
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from paths import ROUND1, ROUND2
 
 ROOT = Path(__file__).parent
 JPP, FP = "10", "8"
@@ -30,8 +33,8 @@ SCENARIOS = [
 def load_models():
     buf = io.StringIO()
     with redirect_stdout(buf):
-        from propagation_model import get_projection_data_by_dept
-        from migration_model import get_migration_data_by_dept
+        from models.propagation import get_projection_data_by_dept
+        from models.migration import get_migration_data_by_dept
         prop = get_projection_data_by_dept()
         migr = get_migration_data_by_dept()
     return prop, migr
@@ -153,10 +156,10 @@ def main():
     prop_depts = prop_dept.get("departments", {})
     migr_depts = migr_dept.get("departments", {}) if migr_dept.get("ok") else {}
 
-    r2_districts = json.loads((ROOT / "processed_results/agg_distrital.json").read_text())
+    r2_districts = json.loads((ROUND2 / "agg_distrital.json").read_text())
     r1_index     = {d["ubigeo"]: d
-                    for d in json.loads((ROOT / "first_round_agg_results/agg_distrital.json").read_text())}
-    agg_ambito   = json.loads((ROOT / "processed_results/agg_ambito.json").read_text())
+                    for d in json.loads((ROUND1 / "agg_distrital.json").read_text())}
+    agg_ambito   = json.loads((ROUND2 / "agg_ambito.json").read_text())
 
     # Domestic observed only (ambito 1)
     obs_fp  = sum(a["votos_partidos"].get(FP,  0) for a in agg_ambito if str(a.get("ambito", "1")) == "1")
