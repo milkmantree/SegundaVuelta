@@ -1,6 +1,6 @@
 # Segunda Vuelta — Peru 2026 Live Election Results System
 
-A production-grade election intelligence platform targeting the ONPE (Oficina Nacional de Procesos Electorales) API. Scrapes live vote tallies across all 2,102 Peruvian districts, aggregates results in real time, and projects final outcomes using two independent statistical models — all surfaced through a self-contained web dashboard.
+A production-grade election intelligence platform targeting the ONPE (Oficina Nacional de Procesos Electorales) API. Scrapes live vote tallies across all 2,312 Peruvian districts, aggregates results in real time, and projects final outcomes using two independent statistical models — all surfaced through a self-contained web dashboard.
 
 ---
 
@@ -17,64 +17,123 @@ A production-grade election intelligence platform targeting the ONPE (Oficina Na
 
 ---
 
+## Project Layout
+
+```
+segundaVuelta/
+│
+├── paths.py                        # Single source of truth for all file paths
+├── requirements.txt
+│
+├── pipeline/                       # Data ingestion
+│   ├── run_scraper.py              # Orchestrator — spawns 5 workers, live TUI
+│   ├── scraper.py                  # Worker — scrapes one ubigeo chunk
+│   ├── merge.py                    # Merges per-worker JSONL into unified file
+│   └── aggregate.py                # Builds district/province/dept/ambito aggregates
+│
+├── models/                         # Statistical projection
+│   ├── propagation.py              # Dynamic stratified sampling, 95% CI
+│   └── migration.py                # Hellinger-clustered WLS regression, 95% CI
+│
+├── web/                            # Dashboard server
+│   ├── server.py                   # Flask API
+│   ├── generate_static.py          # Generates self-contained dashboard_static.html
+│   └── templates/
+│       └── dashboard.html          # Single-file frontend (Chart.js, inline CSS/JS)
+│
+├── actas/                          # JEE acta tracker (challenged ballots)
+│   ├── run_actas.py                # Orchestrator — 5 parallel workers
+│   └── worker.py                   # Worker — fetches acta status per ubigeo
+│
+├── analysis/                       # Standalone analysis scripts
+│   ├── acid_test.py                # Worst-case scenario stress test
+│   ├── exterior_sensitivity.py     # 2D sensitivity table for overseas votes
+│   ├── exterior_comparison.py      # 2026 vs 2021 exterior results comparison
+│   ├── simulate.py                 # Generates synthetic segunda vuelta data
+│   ├── compare_actas_rounds.py     # R1 vs R2 actas coverage by department
+│   ├── actas_by_dept_at_coverage.py
+│   └── watch_exterior.py
+│
+└── data/
+    ├── inputs/                     # Static reference files — never modified at runtime
+    │   ├── onpe_ubigeo_map.json    # All 2,312 districts with ubigeo codes
+    │   ├── ubigeo_votos_habiles.json  # Eligible voter counts per district
+    │   ├── migration_cluster_map.json # Precomputed Hellinger clusters (built once)
+    │   └── segunda_vuelta_2021.csv    # 2021 runoff exterior results (analysis only)
+    │
+    ├── round1/                     # FROZEN — complete primera vuelta archive
+    │   ├── agg_ambito.json
+    │   ├── agg_departamental.json
+    │   ├── agg_provincial.json
+    │   ├── agg_distrital.json
+    │   └── idx_codigo_nombre_partido.json
+    │
+    └── round2/                     # LIVE — updated by pipeline on election night
+        └── (same schema as round1/)
+```
+
+Runtime directories (`log/`, `backups/`) and pipeline output files (`onpe_combined_results.jsonl`, `prediction_history.jsonl`) are gitignored.
+
+---
+
 ## Architecture
 
 ```
 ONPE API
     │
     ▼
-run_cluster.py          ← 5 parallel workers, live TUI dashboard
+pipeline/run_scraper.py     ← 5 parallel workers, live TUI dashboard
     │ writes
     ▼
 log/onpe_combined_results_worker_N.jsonl
     │
-merge_workers.py        ← merges worker outputs
+pipeline/merge.py           ← merges worker outputs
     │
 onpe_combined_results.jsonl
     │
-processData.py          ← builds hierarchical aggregates
+pipeline/aggregate.py       ← builds hierarchical aggregates
     │
-processed_results/      ← live segunda vuelta data (read by dashboard + models)
+data/round2/                ← live segunda vuelta data
     │
-    ├── propagation_model.py   ← stratified projection, 95% CI
-    ├── migration_model.py     ← WLS migration model, 95% CI
-    └── app.py                 ← Flask API + dashboard.html
+    ├── models/propagation.py   ← stratified projection, 95% CI
+    ├── models/migration.py     ← WLS migration model, 95% CI
+    └── web/server.py           ← Flask API + dashboard
 ```
 
-`first_round_agg_results/` holds the complete frozen primera vuelta archive (90,223 domestic actas, 16.4M valid votes across 38 parties) and is never modified by the pipeline.
+`data/round1/` holds the complete frozen primera vuelta archive and is never modified by the pipeline.
 
 ---
 
 ## Statistical Models
 
-### Propagation Model (`propagation_model.py`)
+### Propagation Model (`models/propagation.py`)
 
-Dynamic Per-District Stratified Sampling. Each of the 2,102 districts is assessed for stability:
+Dynamic Per-District Stratified Sampling. Each district is assessed for stability:
 
 - **Stable** (`≥50%` actas reported OR `≥14` actas counted): uses its own observed vote share
-- **Unstable**: falls back to the provincial trend, then departmental, then national
+- **Unstable**: falls back to the provincial trend, then departmental
 
-Variance is pooled across strata using Bessel's correction. Output: projected national vote share with 95% CI error bars. At 100% count, MOE collapses to 0.
+Variance is pooled across strata using Bessel's correction. Output: projected national vote share with 95% CI. At 100% count, MOE collapses to 0.
 
-### Migration Model (`migration_model.py`)
+**Exterior correction:** Overseas districts report `votos_emitidos = 0` in the ONPE feed. The model applies actual R1 participation rates per exterior department (loaded from `data/round1/`) to avoid a ~3–4× overcount of pending overseas votes. Fallback rate: 32%.
 
-Five-stage pipeline predicting how the 38 first-round parties' votes split between the two second-round finalists:
+### Migration Model (`models/migration.py`)
+
+Five-stage pipeline predicting how the 38 first-round parties' votes split between the two finalists:
 
 1. **Significance filter** — candidates below 1.5% of province emitted votes are collapsed into a `tail` group
-2. **Hellinger clustering** — candidate vote-share vectors are sqrt-transformed (making Euclidean = Hellinger distance) and Ward-clustered. `k = min(sig_candidates, ⌊√n_districts⌋, 6)` per scope
+2. **Hellinger clustering** — candidate vote-share vectors are sqrt-transformed and Ward-clustered. `k = min(sig_candidates, ⌊√n_districts⌋, 6)` per scope
 3. **Hierarchical fallback** — provinces with <8 districts inherit cluster definitions from department or global scope
-4. **Share-space WLS** — features are R1 group votes / R1 valid (dimensionless shares); targets are R2 finalist votes / R2 valid. Solved via BVLS (`scipy.optimize.lsq_linear`, bounds [0,1]). Regression pools at department level if ≥8 districts reported, otherwise global
-5. **FPC ratio estimator** — `P̂ = (obs + pred_unreported) / (obs_valid + pred_valid_unreported)`. Variance uses `(1 − n/N)` finite population correction with department-clustered Huber-White sandwich SE. CI uses Student's t with `n−1` df
+4. **Share-space WLS** — features are R1 group votes / R1 valid; targets are R2 finalist votes / R2 valid. Solved via BVLS (`scipy.optimize.lsq_linear`, bounds [0,1]). Regression pools at department level if ≥8 districts reported, otherwise global
+5. **FPC ratio estimator** — variance uses `(1 − n/N)` finite population correction with department-clustered Huber-White sandwich SE. CI uses Student's t with `n−1` df
 
-The cluster map (273 provinces, 30 departments, 6 global clusters) is precomputed once from first-round data and held constant throughout the live count for stable regression pools.
-
-> **Design invariant:** The model operates in share space, not raw counts. Regressing raw counts with a simplex constraint `Σβ ≤ 1` makes it mathematically impossible to predict finalists receiving more votes than their largest single feature group — a guarantee that is routinely violated in runoffs. Share-space normalization removes this ceiling.
+> **Design invariant:** The model operates in share space, not raw counts. Regressing raw counts with a simplex constraint makes it impossible to predict finalists receiving more votes than their largest single feature group — a guarantee routinely violated in runoffs. Share-space normalization removes this ceiling.
 
 ---
 
 ## Setup
 
-**Requirements:** Python 3.10+, virtual environment
+**Requirements:** Python 3.10+
 
 ```bash
 git clone <repo-url>
@@ -83,16 +142,16 @@ cd segundaVuelta
 python -m venv .venv
 source .venv/bin/activate
 
-pip install requests pandas numpy plotly flask scipy
+pip install -r requirements.txt
 ```
 
 **Pre-election — build the cluster map once:**
 
 ```bash
-python migration_model.py --build
+python models/migration.py --build
 ```
 
-Reads `first_round_agg_results/` and writes `inputs/migration_cluster_map.json`. Do not run again during a live count.
+Reads `data/round1/agg_distrital.json` and writes `data/inputs/migration_cluster_map.json`. Do not run again during a live count.
 
 ---
 
@@ -102,17 +161,17 @@ Reads `first_round_agg_results/` and writes `inputs/migration_cluster_map.json`.
 source .venv/bin/activate
 
 # 1. Scrape (5 parallel workers, live TUI)
-python run_cluster.py --mode patch
+python pipeline/run_scraper.py --mode patch
 
 # 2. Merge worker outputs
-python merge_workers.py
+python pipeline/merge.py
 
 # 3. Build aggregates
-python processData.py
+python pipeline/aggregate.py
 
 # 4. Start dashboard
-python app.py                # http://127.0.0.1:5000
-python app.py 8080           # custom port
+python web/server.py            # http://127.0.0.1:5000
+python web/server.py 8080       # custom port
 ```
 
 Steps 1–3 repeat throughout the night. The dashboard reads fresh data on every model request (60-second cache).
@@ -133,16 +192,14 @@ Two-tab interface toggled by a round switcher:
 
 **Primera Vuelta** — frozen final results, 38 parties, 100% counted. Finalists banner, bar chart, department table.
 
-**Segunda Vuelta** — live results with auto-detected coverage. KPI row, progress bar, bar chart, department table, and two model cards:
-
-| Model Card | Source | Updates |
-|---|---|---|
-| Propagation | `/api/model/propagation` | 60s cache |
-| Migration | `/api/model/migration` | 60s cache |
-
-Both model cards handle three states automatically: loading spinner → active projection with CI → error box. The migration card also handles `waiting` (primera vuelta data still in `processed_results/`) and `insufficient_data` (<4 districts reporting).
+**Segunda Vuelta** — live results with auto-detected coverage. KPI row, progress bar, bar chart, department table, and two model cards with 95% CI. Sub-tabs: Resumen · Por Departamento · Evolución.
 
 **Refresh:** Click **Actualizar** to immediately expire the model cache and re-run both projections.
+
+**Static snapshot:**
+```bash
+python web/generate_static.py       # → dashboard_static.html (no server needed)
+```
 
 ---
 
@@ -153,46 +210,14 @@ Both model cards handle three states automatically: loading spinner → active p
 | `GET /` | Dashboard HTML |
 | `GET /api/round/first` | Primera vuelta aggregates |
 | `GET /api/round/second` | Segunda vuelta aggregates (live) |
-| `GET /api/observed` | Alias for `/api/round/second` |
-| `GET /api/model/propagation` | Stratified projection payload |
-| `GET /api/model/migration` | Migration WLS projection payload |
+| `GET /api/model/propagation` | Stratified projection — national |
+| `GET /api/model/propagation/dept` | Stratified projection — per department |
+| `GET /api/model/migration` | Migration WLS projection — national |
+| `GET /api/model/migration/dept` | Migration WLS projection — per department |
+| `GET /api/history` | Prediction history time series |
+| `POST /api/cache/clear` | Invalidate model cache (requires `X-Admin-Token` header) |
 
 All endpoints return `{ "ok": true, "data": ... }` or `{ "ok": false, "error": "..." }`.
-
----
-
-## Project Layout
-
-```
-.
-├── scraper.py                      # Worker — scrapes one ubigeo chunk
-├── run_cluster.py                  # Orchestrator — spawns 5 workers, TUI
-├── merge_workers.py                # Merges per-worker JSONL into unified file
-├── processData.py                  # Builds aggregation hierarchy
-├── propagation_model.py            # Stratified projection model
-├── migration_model.py              # WLS migration model
-├── app.py                          # Flask server + API
-├── dashboard.html                  # Single-file frontend (Chart.js, inline CSS/JS)
-├── simulate_segunda_vuelta.py      # Test utility — synthetic segunda vuelta data
-│
-├── inputs/
-│   ├── onpe_ubigeo_map.json        # All 2,102 districts with ubigeo codes
-│   ├── ubigeo_votos_habiles.json   # Eligible voter counts per district (static)
-│   └── migration_cluster_map.json  # Precomputed Hellinger clusters (built once)
-│
-├── first_round_agg_results/        # Frozen primera vuelta archive — never modify
-│   ├── agg_ambito.json
-│   ├── agg_departamental.json
-│   ├── agg_distrital.json
-│   ├── agg_provincial.json
-│   └── idx_codigo_nombre_partido.json
-│
-├── processed_results/              # Live segunda vuelta data — updated by pipeline
-│   └── (same schema as above)
-│
-├── log/                            # Per-worker JSONL and system logs
-└── backups/                        # Timestamped auto-backups per scraper run
-```
 
 ---
 
@@ -201,27 +226,37 @@ All endpoints return `{ "ok": true, "data": ... }` or `{ "ok": false, "error": "
 Generate synthetic segunda vuelta data for end-to-end validation:
 
 ```bash
-python simulate_segunda_vuelta.py          # write simulated data (~62% districts)
-python simulate_segunda_vuelta.py --check  # show current state of processed_results/
-python simulate_segunda_vuelta.py --restore  # restore primera vuelta data
+python analysis/simulate.py           # write simulated data (~62% districts)
+python analysis/simulate.py --check   # show current state of data/round2/
+python analysis/simulate.py --restore # restore primera vuelta data
 ```
 
-The simulator encodes politically realistic migration rates by ideology and department (e.g., Renovación Popular → 62% to FUERZA POPULAR; Perú Libre → 68% to JUNTOS POR EL PERÚ) and produces a simulated national outcome near 56/44.
+---
+
+## Analysis Scripts
+
+| Script | Purpose |
+|---|---|
+| `analysis/acid_test.py` | Forces worst-case JPP splits on remaining districts to find the margin of victory threshold |
+| `analysis/exterior_sensitivity.py` | 2D sensitivity table: overseas participation rate × FP share → national margin |
+| `analysis/exterior_comparison.py` | District-level comparison of 2026 exterior results vs 2021 (Keiko vs Castillo) |
+| `analysis/compare_actas_rounds.py` | R2 actas coverage by department vs equivalent R1 coverage level |
 
 ---
 
 ## Key Constraints
 
-- **`first_round_agg_results/` is immutable.** The pipeline always writes to `processed_results/`. Never pass `first_round_agg_results/` as an output target to `processData.py`.
-- **Party IDs `"80"` and `"81"`** (blancos/nulos) are excluded from all charts and model calculations. They are present in `votos_partidos` dicts and included in `votos_validos` but are never treated as candidates.
-- **Finalists are determined dynamically** — by top-2 valid votes in `migration_model.py` and by sorted party totals in the dashboard JS. Party IDs `"8"` and `"10"` are not hardcoded anywhere.
-- **Do not regenerate `inputs/migration_cluster_map.json` during a live count.** Stable cluster definitions are required for consistent regression pools throughout the night.
+- **`data/round1/` is immutable.** The pipeline always writes to `data/round2/`. Never use `data/round1/` as an output target.
+- **Party IDs `"80"` and `"81"`** (blancos/nulos) are excluded from all charts and model calculations.
+- **Finalists are determined dynamically** — top-2 valid votes in `models/migration.py` and sorted party totals in dashboard JS. IDs `"8"` and `"10"` are not hardcoded anywhere.
+- **Do not regenerate `data/inputs/migration_cluster_map.json` during a live count.** Stable cluster definitions are required for consistent regression pools.
 
 ---
 
-## Election Night Runbook
+## Documentation
 
-See [`ELECTION_NIGHT_GUIDE.md`](./ELECTION_NIGHT_GUIDE.md) for the complete step-by-step operations guide covering pre-election setup, live pipeline operation, dashboard interpretation, and post-count archival.
+- [`PIPELINE.md`](./PIPELINE.md) — full pipeline walkthrough, model architecture, API contracts, deployment guide
+- [`CLAUDE.md`](./CLAUDE.md) — codebase instructions for AI-assisted development
 
 ---
 
