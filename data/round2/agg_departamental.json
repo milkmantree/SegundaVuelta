@@ -61,8 +61,8 @@
     "votos_validos": 912859,
     "votos_habiles": 1226525,
     "votos_partidos": {
-      "10": 580551,
       "8": 332308,
+      "10": 580551,
       "81": 56438,
       "80": 3774
     }
@@ -71,17 +71,17 @@
     "ambito": "1",
     "departamento": "AYACUCHO",
     "actas_total": 1900,
-    "actas_contabilizadas": 1884,
-    "pct_actas_contabilizadas": 99.158,
-    "pct_participacion": 65.591,
-    "votos_emitidos": 341231,
-    "votos_validos": 323098,
+    "actas_contabilizadas": 1885,
+    "pct_actas_contabilizadas": 99.211,
+    "pct_participacion": 65.614,
+    "votos_emitidos": 341349,
+    "votos_validos": 323211,
     "votos_habiles": 520238,
     "votos_partidos": {
-      "10": 256263,
-      "8": 66835,
-      "81": 15787,
-      "80": 2346
+      "10": 256362,
+      "8": 66849,
+      "81": 15790,
+      "80": 2348
     }
   },
   {
@@ -95,8 +95,8 @@
     "votos_validos": 734856,
     "votos_habiles": 1198773,
     "votos_partidos": {
-      "10": 490590,
       "8": 244266,
+      "10": 490590,
       "81": 50100,
       "80": 7386
     }
@@ -122,17 +122,17 @@
     "ambito": "1",
     "departamento": "CUSCO",
     "actas_total": 3983,
-    "actas_contabilizadas": 3711,
-    "pct_actas_contabilizadas": 93.171,
-    "pct_participacion": 67.758,
-    "votos_emitidos": 768211,
-    "votos_validos": 718453,
+    "actas_contabilizadas": 3840,
+    "pct_actas_contabilizadas": 96.41,
+    "pct_participacion": 69.795,
+    "votos_emitidos": 791305,
+    "votos_validos": 740547,
     "votos_habiles": 1133754,
     "votos_partidos": {
-      "10": 560300,
-      "8": 158153,
-      "81": 45019,
-      "80": 4739
+      "10": 579978,
+      "8": 162561,
+      "81": 46015,
+      "80": 4859
     }
   },
   {
@@ -231,8 +231,8 @@
     "votos_validos": 740416,
     "votos_habiles": 1051350,
     "votos_partidos": {
-      "10": 304695,
       "8": 435721,
+      "10": 304695,
       "81": 55368,
       "80": 5215
     }
@@ -258,17 +258,17 @@
     "ambito": "1",
     "departamento": "LORETO",
     "actas_total": 2697,
-    "actas_contabilizadas": 2455,
-    "pct_actas_contabilizadas": 91.027,
-    "pct_participacion": 52.283,
-    "votos_emitidos": 405674,
-    "votos_validos": 377559,
+    "actas_contabilizadas": 2501,
+    "pct_actas_contabilizadas": 92.733,
+    "pct_participacion": 53.101,
+    "votos_emitidos": 412019,
+    "votos_validos": 383623,
     "votos_habiles": 775923,
     "votos_partidos": {
-      "10": 173018,
-      "8": 204541,
-      "81": 24902,
-      "80": 3213
+      "10": 177172,
+      "8": 206735,
+      "81": 25147,
+      "80": 3265
     }
   },
   {
@@ -420,8 +420,8 @@
     "votos_partidos": {
       "8": 139606,
       "10": 126082,
-      "81": 16075,
-      "80": 2144
+      "80": 2144,
+      "81": 16075
     }
   },
   {
@@ -445,17 +445,17 @@
     "ambito": "2",
     "departamento": "AMÉRICA",
     "actas_total": 1570,
-    "actas_contabilizadas": 662,
-    "pct_actas_contabilizadas": 42.166,
-    "pct_participacion": 10.189,
-    "votos_emitidos": 77199,
-    "votos_validos": 72873,
+    "actas_contabilizadas": 665,
+    "pct_actas_contabilizadas": 42.357,
+    "pct_participacion": 10.225,
+    "votos_emitidos": 77476,
+    "votos_validos": 73140,
     "votos_habiles": 757697,
     "votos_partidos": {
-      "8": 49821,
-      "10": 23052,
-      "80": 416,
-      "81": 3910
+      "8": 50004,
+      "10": 23136,
+      "81": 3920,
+      "80": 416
     }
   },
   {
@@ -488,8 +488,8 @@
     "votos_partidos": {
       "8": 10141,
       "10": 9193,
-      "80": 118,
-      "81": 1048
+      "81": 1048,
+      "80": 118
     }
   },
   {

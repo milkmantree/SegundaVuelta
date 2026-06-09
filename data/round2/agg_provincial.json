@@ -29,8 +29,8 @@
     "votos_validos": 13854,
     "votos_habiles": 22182,
     "votos_partidos": {
-      "8": 6000,
       "10": 7854,
+      "8": 6000,
       "81": 933,
       "80": 167
     }
@@ -47,10 +47,28 @@
     "votos_validos": 29171,
     "votos_habiles": 45595,
     "votos_partidos": {
-      "8": 13006,
       "10": 16165,
+      "8": 13006,
       "81": 2205,
       "80": 279
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "AMAZONAS",
+    "provincia": "CONDORCANQUI",
+    "actas_total": 174,
+    "actas_contabilizadas": 173,
+    "pct_actas_contabilizadas": 99.425,
+    "pct_participacion": 38.008,
+    "votos_emitidos": 17981,
+    "votos_validos": 17366,
+    "votos_habiles": 47309,
+    "votos_partidos": {
+      "10": 15943,
+      "8": 1423,
+      "81": 518,
+      "80": 97
     }
   },
   {
@@ -65,8 +83,8 @@
     "votos_validos": 23266,
     "votos_habiles": 40053,
     "votos_partidos": {
-      "10": 13296,
       "8": 9970,
+      "10": 13296,
       "81": 1588,
       "80": 251
     }
@@ -83,8 +101,8 @@
     "votos_validos": 14531,
     "votos_habiles": 26069,
     "votos_partidos": {
-      "8": 6664,
       "10": 7867,
+      "8": 6664,
       "81": 984,
       "80": 145
     }
@@ -146,6 +164,24 @@
   {
     "ambito": "1",
     "departamento": "ÁNCASH",
+    "provincia": "ASUNCIÓN",
+    "actas_total": 23,
+    "actas_contabilizadas": 22,
+    "pct_actas_contabilizadas": 95.652,
+    "pct_participacion": 60.768,
+    "votos_emitidos": 3702,
+    "votos_validos": 3276,
+    "votos_habiles": 6092,
+    "votos_partidos": {
+      "10": 2328,
+      "8": 948,
+      "81": 354,
+      "80": 72
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "ÁNCASH",
     "provincia": "BOLOGNESI",
     "actas_total": 85,
     "actas_contabilizadas": 85,
@@ -157,8 +193,8 @@
     "votos_partidos": {
       "10": 7459,
       "8": 4515,
-      "81": 653,
-      "80": 98
+      "80": 98,
+      "81": 653
     }
   },
   {
@@ -191,8 +227,8 @@
     "votos_validos": 29261,
     "votos_habiles": 41116,
     "votos_partidos": {
-      "8": 16863,
       "10": 12398,
+      "8": 16863,
       "81": 2197,
       "80": 320
     }
@@ -281,8 +317,8 @@
     "votos_validos": 30001,
     "votos_habiles": 46990,
     "votos_partidos": {
-      "8": 15935,
       "10": 14066,
+      "8": 15935,
       "81": 2749,
       "80": 463
     }
@@ -389,8 +425,8 @@
     "votos_validos": 257976,
     "votos_habiles": 377362,
     "votos_partidos": {
-      "8": 129482,
       "10": 128494,
+      "8": 129482,
       "81": 22982,
       "80": 1590
     }
@@ -425,8 +461,8 @@
     "votos_validos": 29083,
     "votos_habiles": 46908,
     "votos_partidos": {
-      "8": 10325,
       "10": 18758,
+      "8": 10325,
       "81": 2693,
       "80": 493
     }
@@ -569,8 +605,8 @@
     "votos_validos": 726897,
     "votos_habiles": 951357,
     "votos_partidos": {
-      "10": 446974,
       "8": 279923,
+      "10": 446974,
       "81": 47314,
       "80": 2645
     }
@@ -605,8 +641,8 @@
     "votos_validos": 21320,
     "votos_habiles": 31648,
     "votos_partidos": {
-      "8": 8868,
       "10": 12452,
+      "8": 8868,
       "81": 854,
       "80": 154
     }
@@ -760,17 +796,17 @@
     "departamento": "AYACUCHO",
     "provincia": "HUANTA",
     "actas_total": 281,
-    "actas_contabilizadas": 278,
-    "pct_actas_contabilizadas": 98.932,
-    "pct_participacion": 61.816,
-    "votos_emitidos": 48329,
-    "votos_validos": 45756,
+    "actas_contabilizadas": 279,
+    "pct_actas_contabilizadas": 99.288,
+    "pct_participacion": 61.967,
+    "votos_emitidos": 48447,
+    "votos_validos": 45869,
     "votos_habiles": 78182,
     "votos_partidos": {
-      "10": 35959,
-      "8": 9797,
-      "81": 2203,
-      "80": 370
+      "10": 36058,
+      "8": 9811,
+      "81": 2206,
+      "80": 372
     }
   },
   {
@@ -902,6 +938,24 @@
   {
     "ambito": "1",
     "departamento": "CAJAMARCA",
+    "provincia": "CAJABAMBA",
+    "actas_total": 220,
+    "actas_contabilizadas": 218,
+    "pct_actas_contabilizadas": 99.091,
+    "pct_participacion": 59.703,
+    "votos_emitidos": 37702,
+    "votos_validos": 33933,
+    "votos_habiles": 63149,
+    "votos_partidos": {
+      "8": 14549,
+      "10": 19384,
+      "81": 3282,
+      "80": 487
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "CAJAMARCA",
     "provincia": "CAJAMARCA",
     "actas_total": 1021,
     "actas_contabilizadas": 1008,
@@ -965,8 +1019,8 @@
     "votos_validos": 14005,
     "votos_habiles": 22672,
     "votos_partidos": {
-      "8": 5777,
       "10": 8228,
+      "8": 5777,
       "81": 791,
       "80": 161
     }
@@ -1264,17 +1318,17 @@
     "departamento": "CUSCO",
     "provincia": "LA CONVENCIÓN",
     "actas_total": 632,
-    "actas_contabilizadas": 394,
-    "pct_actas_contabilizadas": 62.342,
-    "pct_participacion": 37.393,
-    "votos_emitidos": 66736,
-    "votos_validos": 63412,
+    "actas_contabilizadas": 523,
+    "pct_actas_contabilizadas": 82.753,
+    "pct_participacion": 50.333,
+    "votos_emitidos": 89830,
+    "votos_validos": 85506,
     "votos_habiles": 178472,
     "votos_partidos": {
-      "10": 50738,
-      "8": 12674,
-      "81": 2936,
-      "80": 388
+      "10": 70416,
+      "8": 17082,
+      "81": 3932,
+      "80": 508
     }
   },
   {
@@ -1514,24 +1568,6 @@
   {
     "ambito": "1",
     "departamento": "HUÁNUCO",
-    "provincia": "HUACAYBAMBA",
-    "actas_total": 55,
-    "actas_contabilizadas": 55,
-    "pct_actas_contabilizadas": 100.0,
-    "pct_participacion": 49.338,
-    "votos_emitidos": 6780,
-    "votos_validos": 6268,
-    "votos_habiles": 13742,
-    "votos_partidos": {
-      "10": 5038,
-      "8": 1230,
-      "81": 415,
-      "80": 97
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "HUÁNUCO",
     "provincia": "HUAMALIES",
     "actas_total": 173,
     "actas_contabilizadas": 173,
@@ -1595,8 +1631,8 @@
     "votos_validos": 71659,
     "votos_habiles": 112261,
     "votos_partidos": {
-      "8": 34051,
       "10": 37608,
+      "8": 34051,
       "81": 4356,
       "80": 596
     }
@@ -1622,24 +1658,6 @@
   {
     "ambito": "1",
     "departamento": "HUÁNUCO",
-    "provincia": "PACHITEA",
-    "actas_total": 166,
-    "actas_contabilizadas": 165,
-    "pct_actas_contabilizadas": 99.398,
-    "pct_participacion": 56.53,
-    "votos_emitidos": 26145,
-    "votos_validos": 24436,
-    "votos_habiles": 46250,
-    "votos_partidos": {
-      "10": 19400,
-      "8": 5036,
-      "81": 1492,
-      "80": 217
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "HUÁNUCO",
     "provincia": "PUERTO INCA",
     "actas_total": 119,
     "actas_contabilizadas": 116,
@@ -1649,8 +1667,8 @@
     "votos_validos": 16973,
     "votos_habiles": 33155,
     "votos_partidos": {
-      "10": 9826,
       "8": 7147,
+      "10": 9826,
       "81": 1320,
       "80": 208
     }
@@ -1703,8 +1721,8 @@
     "votos_validos": 248650,
     "votos_habiles": 327776,
     "votos_partidos": {
-      "10": 118794,
       "8": 129856,
+      "10": 118794,
       "81": 12866,
       "80": 1261
     }
@@ -1721,8 +1739,8 @@
     "votos_validos": 45202,
     "votos_habiles": 63028,
     "votos_partidos": {
-      "8": 20008,
       "10": 25194,
+      "8": 20008,
       "81": 2139,
       "80": 233
     }
@@ -1847,8 +1865,8 @@
     "votos_validos": 50029,
     "votos_habiles": 73635,
     "votos_partidos": {
-      "10": 26150,
       "8": 23879,
+      "10": 26150,
       "81": 3284,
       "80": 354
     }
@@ -1982,19 +2000,19 @@
   {
     "ambito": "1",
     "departamento": "LA LIBERTAD",
-    "provincia": "JULCÁN",
-    "actas_total": 94,
-    "actas_contabilizadas": 94,
-    "pct_actas_contabilizadas": 100.0,
-    "pct_participacion": 61.719,
-    "votos_emitidos": 16334,
-    "votos_validos": 15041,
-    "votos_habiles": 26465,
+    "provincia": "GRAN CHIMÚ",
+    "actas_total": 83,
+    "actas_contabilizadas": 80,
+    "pct_actas_contabilizadas": 96.386,
+    "pct_participacion": 60.864,
+    "votos_emitidos": 14409,
+    "votos_validos": 13203,
+    "votos_habiles": 23674,
     "votos_partidos": {
-      "10": 8392,
-      "8": 6649,
-      "81": 1130,
-      "80": 163
+      "8": 8791,
+      "10": 4412,
+      "81": 1071,
+      "80": 135
     }
   },
   {
@@ -2009,8 +2027,8 @@
     "votos_validos": 43255,
     "votos_habiles": 73980,
     "votos_partidos": {
-      "8": 18997,
       "10": 24258,
+      "8": 18997,
       "81": 3639,
       "80": 515
     }
@@ -2063,8 +2081,8 @@
     "votos_validos": 70385,
     "votos_habiles": 123306,
     "votos_partidos": {
-      "8": 32323,
       "10": 38062,
+      "8": 32323,
       "81": 6572,
       "80": 926
     }
@@ -2107,24 +2125,6 @@
   },
   {
     "ambito": "1",
-    "departamento": "LA LIBERTAD",
-    "provincia": "VIRÚ",
-    "actas_total": 283,
-    "actas_contabilizadas": 281,
-    "pct_actas_contabilizadas": 99.293,
-    "pct_participacion": 76.648,
-    "votos_emitidos": 64290,
-    "votos_validos": 58858,
-    "votos_habiles": 83877,
-    "votos_partidos": {
-      "10": 33630,
-      "8": 25228,
-      "81": 4895,
-      "80": 537
-    }
-  },
-  {
-    "ambito": "1",
     "departamento": "LAMBAYEQUE",
     "provincia": "CHICLAYO",
     "actas_total": 2391,
@@ -2135,8 +2135,8 @@
     "votos_validos": 500051,
     "votos_habiles": 705206,
     "votos_partidos": {
-      "10": 200322,
       "8": 299729,
+      "10": 200322,
       "81": 38345,
       "80": 2697
     }
@@ -2153,8 +2153,8 @@
     "votos_validos": 55288,
     "votos_habiles": 87330,
     "votos_partidos": {
-      "10": 27310,
       "8": 27978,
+      "10": 27310,
       "81": 3933,
       "80": 552
     }
@@ -2171,8 +2171,8 @@
     "votos_validos": 185077,
     "votos_habiles": 258814,
     "votos_partidos": {
-      "8": 108014,
       "10": 77063,
+      "8": 108014,
       "81": 13090,
       "80": 1966
     }
@@ -2380,17 +2380,17 @@
     "departamento": "LORETO",
     "provincia": "DATEM DEL MARAÑÓN",
     "actas_total": 199,
-    "actas_contabilizadas": 35,
-    "pct_actas_contabilizadas": 17.588,
-    "pct_participacion": 7.429,
-    "votos_emitidos": 3875,
-    "votos_validos": 3722,
+    "actas_contabilizadas": 81,
+    "pct_actas_contabilizadas": 40.704,
+    "pct_participacion": 19.593,
+    "votos_emitidos": 10220,
+    "votos_validos": 9786,
     "votos_habiles": 52161,
     "votos_partidos": {
-      "10": 2587,
-      "8": 1135,
-      "81": 127,
-      "80": 26
+      "10": 6741,
+      "8": 3329,
+      "81": 372,
+      "80": 78
     }
   },
   {
@@ -2450,24 +2450,6 @@
   {
     "ambito": "1",
     "departamento": "LORETO",
-    "provincia": "PUTUMAYO",
-    "actas_total": 30,
-    "actas_contabilizadas": 25,
-    "pct_actas_contabilizadas": 83.333,
-    "pct_participacion": 30.148,
-    "votos_emitidos": 2350,
-    "votos_validos": 2247,
-    "votos_habiles": 7795,
-    "votos_partidos": {
-      "8": 1576,
-      "10": 671,
-      "81": 80,
-      "80": 23
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "LORETO",
     "provincia": "REQUENA",
     "actas_total": 191,
     "actas_contabilizadas": 180,
@@ -2504,19 +2486,19 @@
   {
     "ambito": "1",
     "departamento": "MADRE DE DIOS",
-    "provincia": "TAHUAMANÚ",
-    "actas_total": 37,
-    "actas_contabilizadas": 37,
-    "pct_actas_contabilizadas": 100.0,
-    "pct_participacion": 62.415,
-    "votos_emitidos": 6571,
-    "votos_validos": 6006,
-    "votos_habiles": 10528,
+    "provincia": "MANÚ",
+    "actas_total": 68,
+    "actas_contabilizadas": 67,
+    "pct_actas_contabilizadas": 98.529,
+    "pct_participacion": 56.122,
+    "votos_emitidos": 10928,
+    "votos_validos": 10474,
+    "votos_habiles": 19472,
     "votos_partidos": {
-      "10": 3681,
-      "8": 2325,
-      "81": 511,
-      "80": 54
+      "10": 8428,
+      "8": 2046,
+      "81": 386,
+      "80": 68
     }
   },
   {
@@ -2567,8 +2549,8 @@
     "votos_validos": 50720,
     "votos_habiles": 68078,
     "votos_partidos": {
-      "8": 17724,
       "10": 32996,
+      "8": 17724,
       "81": 3002,
       "80": 276
     }
@@ -2639,8 +2621,8 @@
     "votos_validos": 65686,
     "votos_habiles": 107365,
     "votos_partidos": {
-      "8": 20393,
       "10": 45293,
+      "8": 20393,
       "81": 4349,
       "80": 398
     }
@@ -2711,8 +2693,8 @@
     "votos_validos": 72247,
     "votos_habiles": 101755,
     "votos_partidos": {
-      "10": 33095,
       "8": 39152,
+      "10": 33095,
       "81": 6177,
       "80": 720
     }
@@ -2747,8 +2729,8 @@
     "votos_validos": 46242,
     "votos_habiles": 62702,
     "votos_partidos": {
-      "10": 22293,
       "8": 23949,
+      "10": 22293,
       "81": 3029,
       "80": 402
     }
@@ -2765,8 +2747,8 @@
     "votos_validos": 184122,
     "votos_habiles": 262094,
     "votos_partidos": {
-      "8": 126876,
       "10": 57246,
+      "8": 126876,
       "81": 15336,
       "80": 1600
     }
@@ -2913,6 +2895,24 @@
       "8": 4168,
       "81": 1986,
       "80": 151
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "PUNO",
+    "provincia": "MOHO",
+    "actas_total": 86,
+    "actas_contabilizadas": 85,
+    "pct_actas_contabilizadas": 98.837,
+    "pct_participacion": 63.578,
+    "votos_emitidos": 14820,
+    "votos_validos": 14184,
+    "votos_habiles": 23310,
+    "votos_partidos": {
+      "10": 13174,
+      "8": 1010,
+      "81": 572,
+      "80": 64
     }
   },
   {
@@ -3161,8 +3161,8 @@
     "votos_validos": 115821,
     "votos_habiles": 165614,
     "votos_partidos": {
-      "8": 64030,
       "10": 51791,
+      "8": 64030,
       "81": 8193,
       "80": 906
     }
@@ -3296,6 +3296,24 @@
   {
     "ambito": "1",
     "departamento": "UCAYALI",
+    "provincia": "ATALAYA",
+    "actas_total": 170,
+    "actas_contabilizadas": 156,
+    "pct_actas_contabilizadas": 91.765,
+    "pct_participacion": 41.085,
+    "votos_emitidos": 19771,
+    "votos_validos": 17539,
+    "votos_habiles": 48122,
+    "votos_partidos": {
+      "8": 8385,
+      "10": 9154,
+      "80": 325,
+      "81": 1907
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "UCAYALI",
     "provincia": "CORONEL PORTILLO",
     "actas_total": 1162,
     "actas_contabilizadas": 1134,
@@ -3305,8 +3323,8 @@
     "votos_validos": 207438,
     "votos_habiles": 339303,
     "votos_partidos": {
-      "8": 116873,
       "10": 90565,
+      "8": 116873,
       "81": 11845,
       "80": 1479
     }
@@ -3330,37 +3348,37 @@
     }
   },
   {
+    "ambito": "1",
+    "departamento": "UCAYALI",
+    "provincia": "PURÚS",
+    "actas_total": 12,
+    "actas_contabilizadas": 12,
+    "pct_actas_contabilizadas": 100.0,
+    "pct_participacion": 38.139,
+    "votos_emitidos": 1320,
+    "votos_validos": 1253,
+    "votos_habiles": 3461,
+    "votos_partidos": {
+      "8": 813,
+      "10": 440,
+      "81": 58,
+      "80": 9
+    }
+  },
+  {
     "ambito": "2",
     "departamento": "ÁFRICA",
-    "provincia": "ARGELIA",
+    "provincia": "REPÚBLICA ÁRABE DE EGIPTO",
     "actas_total": 1,
     "actas_contabilizadas": 0,
     "pct_actas_contabilizadas": 0.0,
     "pct_participacion": 0.0,
     "votos_emitidos": 0,
     "votos_validos": 0,
-    "votos_habiles": 29,
+    "votos_habiles": 40,
     "votos_partidos": {
       "8": 0,
       "10": 0,
-      "80": 0,
-      "81": 0
-    }
-  },
-  {
-    "ambito": "2",
-    "departamento": "ÁFRICA",
-    "provincia": "SUDÁFRICA",
-    "actas_total": 1,
-    "actas_contabilizadas": 1,
-    "pct_actas_contabilizadas": 100.0,
-    "pct_participacion": 9.053,
-    "votos_emitidos": 22,
-    "votos_validos": 22,
-    "votos_habiles": 243,
-    "votos_partidos": {
-      "8": 19,
-      "10": 3,
       "80": 0,
       "81": 0
     }
@@ -3379,8 +3397,8 @@
     "votos_partidos": {
       "8": 6811,
       "10": 4808,
-      "80": 124,
-      "81": 906
+      "81": 906,
+      "80": 124
     }
   },
   {
@@ -3449,10 +3467,10 @@
     "votos_validos": 8146,
     "votos_habiles": 137987,
     "votos_partidos": {
-      "8": 4160,
       "10": 3986,
-      "80": 58,
-      "81": 647
+      "8": 4160,
+      "81": 647,
+      "80": 58
     }
   },
   {
@@ -3469,8 +3487,26 @@
     "votos_partidos": {
       "8": 1528,
       "10": 566,
-      "81": 104,
-      "80": 18
+      "80": 18,
+      "81": 104
+    }
+  },
+  {
+    "ambito": "2",
+    "departamento": "AMÉRICA",
+    "provincia": "CUBA",
+    "actas_total": 1,
+    "actas_contabilizadas": 1,
+    "pct_actas_contabilizadas": 100.0,
+    "pct_participacion": 12.409,
+    "votos_emitidos": 17,
+    "votos_validos": 16,
+    "votos_habiles": 137,
+    "votos_partidos": {
+      "10": 11,
+      "8": 5,
+      "81": 1,
+      "80": 0
     }
   },
   {
@@ -3494,104 +3530,32 @@
   {
     "ambito": "2",
     "departamento": "AMÉRICA",
-    "provincia": "EL SALVADOR",
-    "actas_total": 1,
-    "actas_contabilizadas": 1,
-    "pct_actas_contabilizadas": 100.0,
-    "pct_participacion": 43.275,
-    "votos_emitidos": 74,
-    "votos_validos": 72,
-    "votos_habiles": 171,
-    "votos_partidos": {
-      "8": 46,
-      "10": 26,
-      "80": 1,
-      "81": 1
-    }
-  },
-  {
-    "ambito": "2",
-    "departamento": "AMÉRICA",
     "provincia": "ESTADOS UNIDOS DE ÁMERICA",
     "actas_total": 749,
-    "actas_contabilizadas": 394,
-    "pct_actas_contabilizadas": 52.603,
-    "pct_participacion": 9.237,
-    "votos_emitidos": 34022,
-    "votos_validos": 32873,
+    "actas_contabilizadas": 397,
+    "pct_actas_contabilizadas": 53.004,
+    "pct_participacion": 9.312,
+    "votos_emitidos": 34299,
+    "votos_validos": 33140,
     "votos_habiles": 368338,
     "votos_partidos": {
-      "8": 25578,
-      "10": 7295,
-      "81": 1062,
+      "8": 25761,
+      "10": 7379,
+      "81": 1072,
       "80": 87
     }
   },
   {
     "ambito": "2",
     "departamento": "AMÉRICA",
-    "provincia": "HONDURAS",
-    "actas_total": 1,
-    "actas_contabilizadas": 1,
-    "pct_actas_contabilizadas": 100.0,
-    "pct_participacion": 21.612,
-    "votos_emitidos": 59,
-    "votos_validos": 57,
-    "votos_habiles": 273,
-    "votos_partidos": {
-      "8": 47,
-      "10": 10,
-      "81": 2,
-      "80": 0
-    }
-  },
-  {
-    "ambito": "2",
-    "departamento": "AMÉRICA",
-    "provincia": "PANAMÁ",
-    "actas_total": 10,
-    "actas_contabilizadas": 10,
-    "pct_actas_contabilizadas": 100.0,
-    "pct_participacion": 38.24,
-    "votos_emitidos": 1369,
-    "votos_validos": 1253,
-    "votos_habiles": 3580,
-    "votos_partidos": {
-      "10": 292,
-      "8": 961,
-      "80": 5,
-      "81": 111
-    }
-  },
-  {
-    "ambito": "2",
-    "departamento": "AMÉRICA",
-    "provincia": "PUERTO RICO",
+    "provincia": "GUAYANA FRANCESA",
     "actas_total": 2,
-    "actas_contabilizadas": 2,
-    "pct_actas_contabilizadas": 100.0,
-    "pct_participacion": 31.785,
-    "votos_emitidos": 260,
-    "votos_validos": 247,
-    "votos_habiles": 818,
-    "votos_partidos": {
-      "8": 181,
-      "10": 66,
-      "81": 11,
-      "80": 2
-    }
-  },
-  {
-    "ambito": "2",
-    "departamento": "AMÉRICA",
-    "provincia": "VENEZUELA",
-    "actas_total": 34,
-    "actas_contabilizadas": 34,
-    "pct_actas_contabilizadas": 100.0,
+    "actas_contabilizadas": 0,
+    "pct_actas_contabilizadas": 0.0,
     "pct_participacion": 0.0,
     "votos_emitidos": 0,
     "votos_validos": 0,
-    "votos_habiles": 16515,
+    "votos_habiles": 642,
     "votos_partidos": {
       "8": 0,
       "10": 0,
@@ -3601,15 +3565,69 @@
   },
   {
     "ambito": "2",
-    "departamento": "ASIA",
-    "provincia": "FILIPINAS",
+    "departamento": "AMÉRICA",
+    "provincia": "NICARAGUA",
     "actas_total": 1,
+    "actas_contabilizadas": 1,
+    "pct_actas_contabilizadas": 100.0,
+    "pct_participacion": 33.514,
+    "votos_emitidos": 62,
+    "votos_validos": 58,
+    "votos_habiles": 185,
+    "votos_partidos": {
+      "8": 44,
+      "10": 14,
+      "80": 2,
+      "81": 2
+    }
+  },
+  {
+    "ambito": "2",
+    "departamento": "AMÉRICA",
+    "provincia": "PARAGUAY",
+    "actas_total": 4,
+    "actas_contabilizadas": 2,
+    "pct_actas_contabilizadas": 50.0,
+    "pct_participacion": 19.534,
+    "votos_emitidos": 352,
+    "votos_validos": 331,
+    "votos_habiles": 1802,
+    "votos_partidos": {
+      "8": 268,
+      "10": 63,
+      "81": 18,
+      "80": 3
+    }
+  },
+  {
+    "ambito": "2",
+    "departamento": "AMÉRICA",
+    "provincia": "URUGUAY",
+    "actas_total": 4,
+    "actas_contabilizadas": 4,
+    "pct_actas_contabilizadas": 100.0,
+    "pct_participacion": 50.359,
+    "votos_emitidos": 983,
+    "votos_validos": 900,
+    "votos_habiles": 1952,
+    "votos_partidos": {
+      "8": 569,
+      "10": 331,
+      "81": 70,
+      "80": 13
+    }
+  },
+  {
+    "ambito": "2",
+    "departamento": "ASIA",
+    "provincia": "EMIRATOS ÁRABES UNIDOS",
+    "actas_total": 2,
     "actas_contabilizadas": 0,
     "pct_actas_contabilizadas": 0.0,
     "pct_participacion": 0.0,
     "votos_emitidos": 0,
     "votos_validos": 0,
-    "votos_habiles": 49,
+    "votos_habiles": 234,
     "votos_partidos": {
       "8": 0,
       "10": 0,
@@ -3656,14 +3674,14 @@
   {
     "ambito": "2",
     "departamento": "ASIA",
-    "provincia": "MALASIA",
+    "provincia": "LÍBANO",
     "actas_total": 1,
-    "actas_contabilizadas": 0,
-    "pct_actas_contabilizadas": 0.0,
+    "actas_contabilizadas": 1,
+    "pct_actas_contabilizadas": 100.0,
     "pct_participacion": 0.0,
     "votos_emitidos": 0,
     "votos_validos": 0,
-    "votos_habiles": 23,
+    "votos_habiles": 28,
     "votos_partidos": {
       "8": 0,
       "10": 0,
@@ -3692,14 +3710,14 @@
   {
     "ambito": "2",
     "departamento": "ASIA",
-    "provincia": "VIETNAM",
-    "actas_total": 1,
+    "provincia": "TURQUÍA",
+    "actas_total": 2,
     "actas_contabilizadas": 0,
     "pct_actas_contabilizadas": 0.0,
     "pct_participacion": 0.0,
     "votos_emitidos": 0,
     "votos_validos": 0,
-    "votos_habiles": 17,
+    "votos_habiles": 91,
     "votos_partidos": {
       "8": 0,
       "10": 0,
@@ -3721,8 +3739,8 @@
     "votos_partidos": {
       "8": 919,
       "10": 893,
-      "80": 6,
-      "81": 62
+      "81": 62,
+      "80": 6
     }
   },
   {
@@ -3782,19 +3800,19 @@
   {
     "ambito": "2",
     "departamento": "EUROPA",
-    "provincia": "HUNGRÍA",
-    "actas_total": 1,
-    "actas_contabilizadas": 1,
-    "pct_actas_contabilizadas": 100.0,
-    "pct_participacion": 29.193,
-    "votos_emitidos": 94,
-    "votos_validos": 91,
-    "votos_habiles": 322,
+    "provincia": "HOLANDA",
+    "actas_total": 6,
+    "actas_contabilizadas": 0,
+    "pct_actas_contabilizadas": 0.0,
+    "pct_participacion": 0.0,
+    "votos_emitidos": 0,
+    "votos_validos": 0,
+    "votos_habiles": 2550,
     "votos_partidos": {
-      "8": 57,
-      "10": 34,
-      "81": 3,
-      "80": 0
+      "8": 0,
+      "10": 0,
+      "80": 0,
+      "81": 0
     }
   },
   {
@@ -3809,8 +3827,8 @@
     "votos_validos": 11024,
     "votos_habiles": 123188,
     "votos_partidos": {
-      "8": 5371,
       "10": 5653,
+      "8": 5371,
       "81": 625,
       "80": 61
     }
@@ -3818,37 +3836,37 @@
   {
     "ambito": "2",
     "departamento": "EUROPA",
-    "provincia": "NORUEGA",
-    "actas_total": 2,
-    "actas_contabilizadas": 2,
-    "pct_actas_contabilizadas": 100.0,
-    "pct_participacion": 22.659,
-    "votos_emitidos": 121,
-    "votos_validos": 116,
-    "votos_habiles": 534,
-    "votos_partidos": {
-      "10": 66,
-      "8": 50,
-      "81": 5,
-      "80": 0
-    }
-  },
-  {
-    "ambito": "2",
-    "departamento": "EUROPA",
-    "provincia": "RUMANÍA",
-    "actas_total": 2,
+    "provincia": "MALTA",
+    "actas_total": 1,
     "actas_contabilizadas": 0,
     "pct_actas_contabilizadas": 0.0,
     "pct_participacion": 0.0,
     "votos_emitidos": 0,
     "votos_validos": 0,
-    "votos_habiles": 145,
+    "votos_habiles": 37,
     "votos_partidos": {
       "8": 0,
       "10": 0,
       "80": 0,
       "81": 0
+    }
+  },
+  {
+    "ambito": "2",
+    "departamento": "EUROPA",
+    "provincia": "REPÚBLICA CHECA",
+    "actas_total": 1,
+    "actas_contabilizadas": 1,
+    "pct_actas_contabilizadas": 100.0,
+    "pct_participacion": 27.24,
+    "votos_emitidos": 76,
+    "votos_validos": 75,
+    "votos_habiles": 279,
+    "votos_partidos": {
+      "8": 41,
+      "10": 34,
+      "81": 1,
+      "80": 0
     }
   },
   {
@@ -3888,6 +3906,24 @@
     }
   },
   {
+    "ambito": "2",
+    "departamento": "OCEANÍA",
+    "provincia": "NUEVA ZELANDA",
+    "actas_total": 3,
+    "actas_contabilizadas": 0,
+    "pct_actas_contabilizadas": 0.0,
+    "pct_participacion": 0.0,
+    "votos_emitidos": 0,
+    "votos_validos": 0,
+    "votos_habiles": 841,
+    "votos_partidos": {
+      "8": 0,
+      "10": 0,
+      "80": 0,
+      "81": 0
+    }
+  },
+  {
     "ambito": "1",
     "departamento": "ÁNCASH",
     "provincia": "CARLOS FERMÍN FITZCARRALD",
@@ -3903,24 +3939,6 @@
       "8": 1681,
       "81": 713,
       "80": 144
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "CAJAMARCA",
-    "provincia": "CAJABAMBA",
-    "actas_total": 220,
-    "actas_contabilizadas": 218,
-    "pct_actas_contabilizadas": 99.091,
-    "pct_participacion": 59.703,
-    "votos_emitidos": 37702,
-    "votos_validos": 33933,
-    "votos_habiles": 63149,
-    "votos_partidos": {
-      "10": 19384,
-      "8": 14549,
-      "81": 3282,
-      "80": 487
     }
   },
   {
@@ -3943,56 +3961,110 @@
   },
   {
     "ambito": "1",
-    "departamento": "LA LIBERTAD",
-    "provincia": "GRAN CHIMÚ",
-    "actas_total": 83,
-    "actas_contabilizadas": 80,
-    "pct_actas_contabilizadas": 96.386,
-    "pct_participacion": 60.864,
-    "votos_emitidos": 14409,
-    "votos_validos": 13203,
-    "votos_habiles": 23674,
+    "departamento": "HUÁNUCO",
+    "provincia": "HUACAYBAMBA",
+    "actas_total": 55,
+    "actas_contabilizadas": 55,
+    "pct_actas_contabilizadas": 100.0,
+    "pct_participacion": 49.338,
+    "votos_emitidos": 6780,
+    "votos_validos": 6268,
+    "votos_habiles": 13742,
     "votos_partidos": {
-      "8": 8791,
-      "10": 4412,
-      "81": 1071,
-      "80": 135
+      "10": 5038,
+      "8": 1230,
+      "81": 415,
+      "80": 97
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "HUÁNUCO",
+    "provincia": "PACHITEA",
+    "actas_total": 166,
+    "actas_contabilizadas": 165,
+    "pct_actas_contabilizadas": 99.398,
+    "pct_participacion": 56.53,
+    "votos_emitidos": 26145,
+    "votos_validos": 24436,
+    "votos_habiles": 46250,
+    "votos_partidos": {
+      "10": 19400,
+      "8": 5036,
+      "81": 1492,
+      "80": 217
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "LA LIBERTAD",
+    "provincia": "JULCÁN",
+    "actas_total": 94,
+    "actas_contabilizadas": 94,
+    "pct_actas_contabilizadas": 100.0,
+    "pct_participacion": 61.719,
+    "votos_emitidos": 16334,
+    "votos_validos": 15041,
+    "votos_habiles": 26465,
+    "votos_partidos": {
+      "8": 6649,
+      "10": 8392,
+      "81": 1130,
+      "80": 163
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "LA LIBERTAD",
+    "provincia": "VIRÚ",
+    "actas_total": 283,
+    "actas_contabilizadas": 281,
+    "pct_actas_contabilizadas": 99.293,
+    "pct_participacion": 76.648,
+    "votos_emitidos": 64290,
+    "votos_validos": 58858,
+    "votos_habiles": 83877,
+    "votos_partidos": {
+      "8": 25228,
+      "10": 33630,
+      "81": 4895,
+      "80": 537
+    }
+  },
+  {
+    "ambito": "1",
+    "departamento": "LORETO",
+    "provincia": "PUTUMAYO",
+    "actas_total": 30,
+    "actas_contabilizadas": 25,
+    "pct_actas_contabilizadas": 83.333,
+    "pct_participacion": 30.148,
+    "votos_emitidos": 2350,
+    "votos_validos": 2247,
+    "votos_habiles": 7795,
+    "votos_partidos": {
+      "8": 1576,
+      "10": 671,
+      "81": 80,
+      "80": 23
     }
   },
   {
     "ambito": "1",
     "departamento": "MADRE DE DIOS",
-    "provincia": "MANÚ",
-    "actas_total": 68,
-    "actas_contabilizadas": 67,
-    "pct_actas_contabilizadas": 98.529,
-    "pct_participacion": 56.122,
-    "votos_emitidos": 10928,
-    "votos_validos": 10474,
-    "votos_habiles": 19472,
+    "provincia": "TAHUAMANÚ",
+    "actas_total": 37,
+    "actas_contabilizadas": 37,
+    "pct_actas_contabilizadas": 100.0,
+    "pct_participacion": 62.415,
+    "votos_emitidos": 6571,
+    "votos_validos": 6006,
+    "votos_habiles": 10528,
     "votos_partidos": {
-      "10": 8428,
-      "8": 2046,
-      "81": 386,
-      "80": 68
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "PUNO",
-    "provincia": "MOHO",
-    "actas_total": 86,
-    "actas_contabilizadas": 85,
-    "pct_actas_contabilizadas": 98.837,
-    "pct_participacion": 63.578,
-    "votos_emitidos": 14820,
-    "votos_validos": 14184,
-    "votos_habiles": 23310,
-    "votos_partidos": {
-      "10": 13174,
-      "8": 1010,
-      "81": 572,
-      "80": 64
+      "8": 2325,
+      "10": 3681,
+      "81": 511,
+      "80": 54
     }
   },
   {
@@ -4011,24 +4083,6 @@
       "8": 1633,
       "81": 360,
       "80": 30
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "UCAYALI",
-    "provincia": "ATALAYA",
-    "actas_total": 170,
-    "actas_contabilizadas": 156,
-    "pct_actas_contabilizadas": 91.765,
-    "pct_participacion": 41.085,
-    "votos_emitidos": 19771,
-    "votos_validos": 17539,
-    "votos_habiles": 48122,
-    "votos_partidos": {
-      "10": 9154,
-      "8": 8385,
-      "81": 1907,
-      "80": 325
     }
   },
   {
@@ -4083,6 +4137,24 @@
       "10": 402,
       "81": 73,
       "80": 3
+    }
+  },
+  {
+    "ambito": "2",
+    "departamento": "AMÉRICA",
+    "provincia": "PANAMÁ",
+    "actas_total": 10,
+    "actas_contabilizadas": 10,
+    "pct_actas_contabilizadas": 100.0,
+    "pct_participacion": 38.24,
+    "votos_emitidos": 1369,
+    "votos_validos": 1253,
+    "votos_habiles": 3580,
+    "votos_partidos": {
+      "8": 961,
+      "10": 292,
+      "81": 111,
+      "80": 5
     }
   },
   {
@@ -4232,6 +4304,24 @@
   {
     "ambito": "2",
     "departamento": "EUROPA",
+    "provincia": "RUMANÍA",
+    "actas_total": 2,
+    "actas_contabilizadas": 0,
+    "pct_actas_contabilizadas": 0.0,
+    "pct_participacion": 0.0,
+    "votos_emitidos": 0,
+    "votos_validos": 0,
+    "votos_habiles": 145,
+    "votos_partidos": {
+      "8": 0,
+      "10": 0,
+      "80": 0,
+      "81": 0
+    }
+  },
+  {
+    "ambito": "2",
+    "departamento": "EUROPA",
     "provincia": "SUIZA",
     "actas_total": 19,
     "actas_contabilizadas": 18,
@@ -4248,73 +4338,37 @@
     }
   },
   {
-    "ambito": "1",
-    "departamento": "AMAZONAS",
-    "provincia": "CONDORCANQUI",
-    "actas_total": 174,
-    "actas_contabilizadas": 173,
-    "pct_actas_contabilizadas": 99.425,
-    "pct_participacion": 38.008,
-    "votos_emitidos": 17981,
-    "votos_validos": 17366,
-    "votos_habiles": 47309,
+    "ambito": "2",
+    "departamento": "ÁFRICA",
+    "provincia": "ARGELIA",
+    "actas_total": 1,
+    "actas_contabilizadas": 0,
+    "pct_actas_contabilizadas": 0.0,
+    "pct_participacion": 0.0,
+    "votos_emitidos": 0,
+    "votos_validos": 0,
+    "votos_habiles": 29,
     "votos_partidos": {
-      "10": 15943,
-      "8": 1423,
-      "81": 518,
-      "80": 97
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "ÁNCASH",
-    "provincia": "ASUNCIÓN",
-    "actas_total": 23,
-    "actas_contabilizadas": 22,
-    "pct_actas_contabilizadas": 95.652,
-    "pct_participacion": 60.768,
-    "votos_emitidos": 3702,
-    "votos_validos": 3276,
-    "votos_habiles": 6092,
-    "votos_partidos": {
-      "10": 2328,
-      "8": 948,
-      "81": 354,
-      "80": 72
-    }
-  },
-  {
-    "ambito": "1",
-    "departamento": "UCAYALI",
-    "provincia": "PURÚS",
-    "actas_total": 12,
-    "actas_contabilizadas": 12,
-    "pct_actas_contabilizadas": 100.0,
-    "pct_participacion": 38.139,
-    "votos_emitidos": 1320,
-    "votos_validos": 1253,
-    "votos_habiles": 3461,
-    "votos_partidos": {
-      "8": 813,
-      "10": 440,
-      "81": 58,
-      "80": 9
+      "8": 0,
+      "10": 0,
+      "80": 0,
+      "81": 0
     }
   },
   {
     "ambito": "2",
     "departamento": "ÁFRICA",
-    "provincia": "REPÚBLICA ÁRABE DE EGIPTO",
+    "provincia": "SUDÁFRICA",
     "actas_total": 1,
-    "actas_contabilizadas": 0,
-    "pct_actas_contabilizadas": 0.0,
-    "pct_participacion": 0.0,
-    "votos_emitidos": 0,
-    "votos_validos": 0,
-    "votos_habiles": 40,
+    "actas_contabilizadas": 1,
+    "pct_actas_contabilizadas": 100.0,
+    "pct_participacion": 9.053,
+    "votos_emitidos": 22,
+    "votos_validos": 22,
+    "votos_habiles": 243,
     "votos_partidos": {
-      "8": 0,
-      "10": 0,
+      "8": 19,
+      "10": 3,
       "80": 0,
       "81": 0
     }
@@ -4322,104 +4376,68 @@
   {
     "ambito": "2",
     "departamento": "AMÉRICA",
-    "provincia": "CUBA",
+    "provincia": "EL SALVADOR",
     "actas_total": 1,
     "actas_contabilizadas": 1,
     "pct_actas_contabilizadas": 100.0,
-    "pct_participacion": 12.409,
-    "votos_emitidos": 17,
-    "votos_validos": 16,
-    "votos_habiles": 137,
+    "pct_participacion": 43.275,
+    "votos_emitidos": 74,
+    "votos_validos": 72,
+    "votos_habiles": 171,
     "votos_partidos": {
-      "10": 11,
-      "8": 5,
-      "81": 1,
+      "8": 46,
+      "10": 26,
+      "80": 1,
+      "81": 1
+    }
+  },
+  {
+    "ambito": "2",
+    "departamento": "AMÉRICA",
+    "provincia": "HONDURAS",
+    "actas_total": 1,
+    "actas_contabilizadas": 1,
+    "pct_actas_contabilizadas": 100.0,
+    "pct_participacion": 21.612,
+    "votos_emitidos": 59,
+    "votos_validos": 57,
+    "votos_habiles": 273,
+    "votos_partidos": {
+      "8": 47,
+      "10": 10,
+      "81": 2,
       "80": 0
     }
   },
   {
     "ambito": "2",
     "departamento": "AMÉRICA",
-    "provincia": "GUAYANA FRANCESA",
+    "provincia": "PUERTO RICO",
     "actas_total": 2,
-    "actas_contabilizadas": 0,
-    "pct_actas_contabilizadas": 0.0,
-    "pct_participacion": 0.0,
-    "votos_emitidos": 0,
-    "votos_validos": 0,
-    "votos_habiles": 642,
-    "votos_partidos": {
-      "8": 0,
-      "10": 0,
-      "80": 0,
-      "81": 0
-    }
-  },
-  {
-    "ambito": "2",
-    "departamento": "AMÉRICA",
-    "provincia": "NICARAGUA",
-    "actas_total": 1,
-    "actas_contabilizadas": 1,
-    "pct_actas_contabilizadas": 100.0,
-    "pct_participacion": 33.514,
-    "votos_emitidos": 62,
-    "votos_validos": 58,
-    "votos_habiles": 185,
-    "votos_partidos": {
-      "8": 44,
-      "10": 14,
-      "80": 2,
-      "81": 2
-    }
-  },
-  {
-    "ambito": "2",
-    "departamento": "AMÉRICA",
-    "provincia": "PARAGUAY",
-    "actas_total": 4,
     "actas_contabilizadas": 2,
-    "pct_actas_contabilizadas": 50.0,
-    "pct_participacion": 19.534,
-    "votos_emitidos": 352,
-    "votos_validos": 331,
-    "votos_habiles": 1802,
+    "pct_actas_contabilizadas": 100.0,
+    "pct_participacion": 31.785,
+    "votos_emitidos": 260,
+    "votos_validos": 247,
+    "votos_habiles": 818,
     "votos_partidos": {
-      "8": 268,
-      "10": 63,
-      "81": 18,
-      "80": 3
+      "8": 181,
+      "10": 66,
+      "81": 11,
+      "80": 2
     }
   },
   {
     "ambito": "2",
     "departamento": "AMÉRICA",
-    "provincia": "URUGUAY",
-    "actas_total": 4,
-    "actas_contabilizadas": 4,
+    "provincia": "VENEZUELA",
+    "actas_total": 34,
+    "actas_contabilizadas": 34,
     "pct_actas_contabilizadas": 100.0,
-    "pct_participacion": 50.359,
-    "votos_emitidos": 983,
-    "votos_validos": 900,
-    "votos_habiles": 1952,
-    "votos_partidos": {
-      "8": 569,
-      "10": 331,
-      "81": 70,
-      "80": 13
-    }
-  },
-  {
-    "ambito": "2",
-    "departamento": "ASIA",
-    "provincia": "EMIRATOS ÁRABES UNIDOS",
-    "actas_total": 2,
-    "actas_contabilizadas": 0,
-    "pct_actas_contabilizadas": 0.0,
     "pct_participacion": 0.0,
     "votos_emitidos": 0,
     "votos_validos": 0,
-    "votos_habiles": 234,
+    "votos_habiles": 16515,
     "votos_partidos": {
       "8": 0,
       "10": 0,
@@ -4430,109 +4448,91 @@
   {
     "ambito": "2",
     "departamento": "ASIA",
-    "provincia": "LÍBANO",
+    "provincia": "FILIPINAS",
+    "actas_total": 1,
+    "actas_contabilizadas": 0,
+    "pct_actas_contabilizadas": 0.0,
+    "pct_participacion": 0.0,
+    "votos_emitidos": 0,
+    "votos_validos": 0,
+    "votos_habiles": 49,
+    "votos_partidos": {
+      "8": 0,
+      "10": 0,
+      "80": 0,
+      "81": 0
+    }
+  },
+  {
+    "ambito": "2",
+    "departamento": "ASIA",
+    "provincia": "MALASIA",
+    "actas_total": 1,
+    "actas_contabilizadas": 0,
+    "pct_actas_contabilizadas": 0.0,
+    "pct_participacion": 0.0,
+    "votos_emitidos": 0,
+    "votos_validos": 0,
+    "votos_habiles": 23,
+    "votos_partidos": {
+      "8": 0,
+      "10": 0,
+      "80": 0,
+      "81": 0
+    }
+  },
+  {
+    "ambito": "2",
+    "departamento": "ASIA",
+    "provincia": "VIETNAM",
+    "actas_total": 1,
+    "actas_contabilizadas": 0,
+    "pct_actas_contabilizadas": 0.0,
+    "pct_participacion": 0.0,
+    "votos_emitidos": 0,
+    "votos_validos": 0,
+    "votos_habiles": 17,
+    "votos_partidos": {
+      "8": 0,
+      "10": 0,
+      "80": 0,
+      "81": 0
+    }
+  },
+  {
+    "ambito": "2",
+    "departamento": "EUROPA",
+    "provincia": "HUNGRÍA",
     "actas_total": 1,
     "actas_contabilizadas": 1,
     "pct_actas_contabilizadas": 100.0,
-    "pct_participacion": 0.0,
-    "votos_emitidos": 0,
-    "votos_validos": 0,
-    "votos_habiles": 28,
+    "pct_participacion": 29.193,
+    "votos_emitidos": 94,
+    "votos_validos": 91,
+    "votos_habiles": 322,
     "votos_partidos": {
-      "8": 0,
-      "10": 0,
-      "80": 0,
-      "81": 0
-    }
-  },
-  {
-    "ambito": "2",
-    "departamento": "ASIA",
-    "provincia": "TURQUÍA",
-    "actas_total": 2,
-    "actas_contabilizadas": 0,
-    "pct_actas_contabilizadas": 0.0,
-    "pct_participacion": 0.0,
-    "votos_emitidos": 0,
-    "votos_validos": 0,
-    "votos_habiles": 91,
-    "votos_partidos": {
-      "8": 0,
-      "10": 0,
-      "80": 0,
-      "81": 0
-    }
-  },
-  {
-    "ambito": "2",
-    "departamento": "EUROPA",
-    "provincia": "HOLANDA",
-    "actas_total": 6,
-    "actas_contabilizadas": 0,
-    "pct_actas_contabilizadas": 0.0,
-    "pct_participacion": 0.0,
-    "votos_emitidos": 0,
-    "votos_validos": 0,
-    "votos_habiles": 2550,
-    "votos_partidos": {
-      "8": 0,
-      "10": 0,
-      "80": 0,
-      "81": 0
-    }
-  },
-  {
-    "ambito": "2",
-    "departamento": "EUROPA",
-    "provincia": "MALTA",
-    "actas_total": 1,
-    "actas_contabilizadas": 0,
-    "pct_actas_contabilizadas": 0.0,
-    "pct_participacion": 0.0,
-    "votos_emitidos": 0,
-    "votos_validos": 0,
-    "votos_habiles": 37,
-    "votos_partidos": {
-      "8": 0,
-      "10": 0,
-      "80": 0,
-      "81": 0
-    }
-  },
-  {
-    "ambito": "2",
-    "departamento": "EUROPA",
-    "provincia": "REPÚBLICA CHECA",
-    "actas_total": 1,
-    "actas_contabilizadas": 1,
-    "pct_actas_contabilizadas": 100.0,
-    "pct_participacion": 27.24,
-    "votos_emitidos": 76,
-    "votos_validos": 75,
-    "votos_habiles": 279,
-    "votos_partidos": {
-      "8": 41,
+      "8": 57,
       "10": 34,
-      "81": 1,
+      "81": 3,
       "80": 0
     }
   },
   {
     "ambito": "2",
-    "departamento": "OCEANÍA",
-    "provincia": "NUEVA ZELANDA",
-    "actas_total": 3,
-    "actas_contabilizadas": 0,
-    "pct_actas_contabilizadas": 0.0,
-    "pct_participacion": 0.0,
-    "votos_emitidos": 0,
-    "votos_validos": 0,
-    "votos_habiles": 841,
+    "departamento": "EUROPA",
+    "provincia": "NORUEGA",
+    "actas_total": 2,
+    "actas_contabilizadas": 2,
+    "pct_actas_contabilizadas": 100.0,
+    "pct_participacion": 22.659,
+    "votos_emitidos": 121,
+    "votos_validos": 116,
+    "votos_habiles": 534,
     "votos_partidos": {
-      "8": 0,
-      "10": 0,
-      "80": 0,
-      "81": 0
+      "10": 66,
+      "8": 50,
+      "81": 5,
+      "80": 0
     }
   },
   {
