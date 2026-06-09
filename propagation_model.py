@@ -5,6 +5,31 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.io as pio
 
+# Fallback participation rate applied to exterior districts when no R1 data
+# can be inferred. Exterior turnout is ~25–34% vs ~73% domestic, so without
+# this correction the model fabricates ~3–4× too many pending overseas votes.
+_EXT_PART_FALLBACK = 0.32
+_R1_DEPT_PATH = os.path.join(
+    os.path.dirname(__file__), "first_round_agg_results", "agg_departamental.json"
+)
+
+
+def _load_r1_ext_part_rates():
+    """Return dict: exterior dept name → R1 participation rate (emit/hab)."""
+    try:
+        rows = json.load(open(_R1_DEPT_PATH, encoding="utf-8"))
+        rates = {}
+        for r in rows:
+            if str(r.get("ambito", "1")) != "2":
+                continue
+            hab  = r.get("votos_habiles",  0)
+            emit = r.get("votos_emitidos", 0)
+            if hab > 0:
+                rates[r.get("departamento", "")] = emit / hab
+        return rates
+    except Exception:
+        return {}
+
 
 def preprocess_electoral_data(json_filepath, party_mapping_filepath):
     """Loads raw aggregated distrital JSON data, flattens the nested party votes,
@@ -89,6 +114,24 @@ def run_dynamic_stratified_projection(
     df["f_h"] = df["actas_contabilizadas"] / df["actas_total"]
     df["FPC"] = 1 - df["f_h"]
     df["E_pending_h"] = df["votos_habiles"] * (1 - df["f_h"])
+
+    # Exterior participation rate correction.
+    # E_pending_h represents registered voters in pending precincts. For
+    # domestic districts the downstream r_valid = valid/emitted implicitly
+    # captures participation because emitted ≈ hab × part_rate. For exterior,
+    # ONPE does not report votos_emitidos proportionally (only ~7–8% of
+    # habilitados have voted so far), so r_valid ≈ 0.94 (valid/emitted) and
+    # does NOT include the participation rate. Without correction the model
+    # overcounts exterior pending votes by ~1/part_rate ≈ 3–4×.
+    # Fix: scale E_pending_h by the expected exterior participation rate.
+    # Source: R1 per-department rates from first_round_agg_results/; fall back
+    # to _EXT_PART_FALLBACK (32%) for any exterior dept not in that file.
+    if "ambito" in df.columns:
+        r1_ext_rates = _load_r1_ext_part_rates()
+        is_ext  = df["ambito"].astype(str) == "2"
+        mapped  = df["departamento"].map(r1_ext_rates)
+        factor  = np.where(is_ext, mapped.fillna(_EXT_PART_FALLBACK), 1.0)
+        df["E_pending_h"] = df["E_pending_h"] * factor
 
     # -----------------------------------------------------------------
     # 3. Dynamic Mathematical Modeling Loop

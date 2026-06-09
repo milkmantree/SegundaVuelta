@@ -62,28 +62,81 @@ def load_observed_exterior():
 
 # ── Step 2: R1 exterior participation baseline ────────────────────────────────
 
-def load_r1_exterior_baseline():
+REGION_ORDER = ["AMÉRICA", "EUROPA", "ASIA", "OCEANÍA", "ÁFRICA"]
+_NORM = str.maketrans("ÉÁÓÍÚ", "EAOIU")
+
+def _norm(s):
+    return s.upper().strip().translate(_NORM)
+
+
+def load_r1_exterior_by_region():
     """
-    Returns (habiles, valid_rate) from first-round exterior departments.
-    valid_rate = votos_validos / votos_emitidos  (used to convert emitidos → validos)
+    Returns a dict region_name → {hab, emit, valid, part_rate, valid_rate}
+    using display names from REGION_ORDER (with accents).
     """
     if not R1_DEPARTAMENTAL.exists():
-        return 0, 0.75
+        return {}
     rows = json.loads(R1_DEPARTAMENTAL.read_text(encoding="utf-8"))
-    hab = emit = valid = 0
+    regions = {}
     for r in rows:
         if str(r.get("ambito", "1")) != "2":
             continue
-        dept = r.get("departamento", "").upper().strip()
-        # normalise accented chars
-        dept = dept.replace("É", "E").replace("Á", "A").replace("Ó", "O")
-        if dept not in EXTERIOR_DEPTS and not any(d in dept for d in EXTERIOR_DEPTS):
+        raw = r.get("departamento", "")
+        key = _norm(raw)
+        if key not in EXTERIOR_DEPTS:
             continue
-        hab   += r.get("votos_habiles",  0)
-        emit  += r.get("votos_emitidos", 0)
-        valid += r.get("votos_validos",  0)
+        # find display name
+        display = next((d for d in REGION_ORDER if _norm(d) == key), raw.upper())
+        hab   = r.get("votos_habiles",  0)
+        emit  = r.get("votos_emitidos", 0)
+        valid = r.get("votos_validos",  0)
+        regions[display] = {
+            "hab":        hab,
+            "emit":       emit,
+            "valid":      valid,
+            "part_rate":  emit / hab  if hab  else 0.0,
+            "valid_rate": valid / emit if emit else 0.749,
+        }
+    return regions
+
+
+def load_r1_exterior_baseline():
+    """Aggregate totals across all exterior regions."""
+    regions = load_r1_exterior_by_region()
+    hab = emit = valid = 0
+    for v in regions.values():
+        hab   += v["hab"]
+        emit  += v["emit"]
+        valid += v["valid"]
     valid_rate = valid / emit if emit else 0.749
     return hab, valid_rate, emit, valid
+
+
+def load_observed_exterior_by_region():
+    """
+    Returns a dict region_name → {fp, jpp, valid} from processed_results/ agg_departamental.json.
+    Falls back to zeros if file absent.
+    """
+    dept_file = ROOT / "processed_results" / "agg_departamental.json"
+    if not dept_file.exists():
+        return {}
+    rows = json.loads(dept_file.read_text(encoding="utf-8"))
+    obs = {}
+    for r in rows:
+        if str(r.get("ambito", "1")) != "2":
+            continue
+        raw = r.get("departamento", "")
+        key = _norm(raw)
+        if key not in EXTERIOR_DEPTS:
+            continue
+        display = next((d for d in REGION_ORDER if _norm(d) == key), raw.upper())
+        vp = r.get("votos_partidos", {})
+        obs[display] = {
+            "fp":    int(vp.get(FP_ID,  0)),
+            "jpp":   int(vp.get(JPP_ID, 0)),
+            "valid": r.get("votos_validos", 0),
+        }
+    return obs
 
 
 # ── Step 3: domestic projection ───────────────────────────────────────────────
@@ -174,25 +227,26 @@ def main():
     fp_pcts = [0.55, 0.60, 0.65, 0.67, 0.70, 0.75]
 
     print()
-    print(f"  Tabla de sensibilidad: margen final FP − JPP (miles de votos)")
+    print(f"  Tabla de sensibilidad: votos NETOS para FP del exterior restante (FP − JPP)")
     print(f"  Filas = tasa de participación exterior supuesta")
     print(f"  Columnas = % de votos válidos restantes del exterior que obtiene FP")
+    print(f"  Brecha a cubrir: {_sign(fixed_gap)} votos  ({_winner(fixed_fp, fixed_jpp)} lidera el punto de partida)")
     print()
 
     # Header
     col_w = 10
-    hdr_cols = "  ".join(f"FP={int(p*100)}%" .center(col_w) for p in fp_pcts)
+    hdr_cols = "  ".join(f"FP={int(p*100)}%".center(col_w) for p in fp_pcts)
     bk_w = 11
     print(f"  {'Part%':>6}  {'V.resto':>9}  {'Breakeven':>{bk_w}}  {hdr_cols}")
     print("  " + "─" * (6 + 2 + 9 + 2 + bk_w + 2 + len(hdr_cols) + 2))
 
     for pt in part_rates:
-        is_r1      = abs(pt - r1_part_rate) < 0.0001
-        label      = f"{pt*100:.0f}%{'*' if is_r1 else ' '}"
-        v_total    = r1_hab * pt * r1_valid_rate
-        v_remain   = max(0.0, v_total - ext_valid_obs)
+        is_r1    = abs(pt - r1_part_rate) < 0.0001
+        label    = f"{pt*100:.0f}%{'*' if is_r1 else ' '}"
+        v_total  = r1_hab * pt * r1_valid_rate
+        v_remain = max(0.0, v_total - ext_valid_obs)
 
-        # Breakeven: FP% of remaining votes to make fixed_fp + p*v_remain == fixed_jpp + (1-p)*v_remain
+        # Breakeven: FP% of remaining votes such that net_ext cancels the gap
         if v_remain > 0:
             bk = 0.5 + (fixed_jpp - fixed_fp) / (2.0 * v_remain)
             if bk <= 0:
@@ -206,23 +260,55 @@ def main():
 
         cells = []
         for fp_p in fp_pcts:
-            fp_add  = fp_p * v_remain
-            jpp_add = (1 - fp_p) * v_remain
-            margin  = (fixed_fp + fp_add) - (fixed_jpp + jpp_add)
-            # colour with unicode: ↑ FP wins, ↓ JPP wins
-            sym = "▲" if margin > 0 else ("▼" if margin < 0 else "=")
-            cell = f"{sym}{abs(margin)/1000:>5.1f}k".center(col_w)
+            # Net votes FP gains from remaining exterior = fp_add - jpp_add
+            net_ext = (2 * fp_p - 1) * v_remain
+            # Final national margin = fixed_gap + net_ext
+            final   = fixed_gap + net_ext
+            sym = "▲" if final > 0 else ("▼" if final < 0 else "=")
+            cell = f"{sym}{net_ext/1000:>+5.1f}k".center(col_w)
             cells.append(cell)
 
         tag = " ← R1" if is_r1 else ""
         print(f"  {label:>6}  {v_remain:>9,.0f}  {bk_s:>{bk_w}}  {'  '.join(cells)}{tag}")
 
     print()
-    print(f"  ▲ = FP gana   ▼ = JPP gana   k = miles de votos")
+    print(f"  Valores = votos netos FP del exterior restante (FP − JPP de esas papeletas)")
+    print(f"  ▲ = margen final FP positivo (FP gana nacional)   ▼ = JPP gana nacional")
     print(f"  * participación R1 exterior ({r1_part_rate*100:.1f}%)")
     print(f"  V.resto = votos válidos exteriores restantes estimados (total proyectado − ya contabilizados)")
     print()
     print(f"  Nota: 'votos válidos' incluye blancos — el % de FP es sobre válidos, no h2h.")
+
+    # ── Net exterior votes for FP (standalone, no domestic gap) ─────────────
+    print()
+    print(f"  Votos netos del exterior para FP (FP − JPP, miles de votos)")
+    print(f"  Filas = tasa de participación exterior supuesta")
+    print(f"  Columnas = % de votos válidos restantes del exterior que obtiene FP")
+    print()
+
+    col_w2 = 10
+    fp_hdr2 = "  ".join(f"FP={int(p*100)}%".center(col_w2) for p in fp_pcts)
+    print(f"  {'Part%':>6}  {'V.resto':>9}  {fp_hdr2}")
+    print("  " + "─" * (6 + 2 + 9 + 2 + len(fp_hdr2) + 2))
+
+    for pt in part_rates:
+        is_r1    = abs(pt - r1_part_rate) < 0.0001
+        label    = f"{pt*100:.0f}%{'*' if is_r1 else ' '}"
+        v_total  = r1_hab * pt * r1_valid_rate
+        v_remain = max(0.0, v_total - ext_valid_obs)
+
+        cells = []
+        for fp_p in fp_pcts:
+            net = (2 * fp_p - 1) * v_remain
+            cells.append(f"{net/1000:>+.1f}k".center(col_w2))
+
+        tag = " ← R1" if is_r1 else ""
+        print(f"  {label:>6}  {v_remain:>9,.0f}  {'  '.join(cells)}{tag}")
+
+    print()
+    print(f"  * participación R1 exterior ({r1_part_rate*100:.1f}%)")
+    print(f"  V.resto = votos válidos exteriores restantes (total proyectado − ya contabilizados)")
+    print(f"  Neto positivo = FP gana el exterior   Neto negativo = JPP gana el exterior")
     print("  " + "═" * W)
     print()
 
