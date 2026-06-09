@@ -180,8 +180,8 @@
     "votos_validos": 538859,
     "votos_habiles": 713997,
     "votos_partidos": {
-      "8": 279728,
       "10": 259131,
+      "8": 279728,
       "81": 28799,
       "80": 3332
     }
@@ -197,8 +197,8 @@
     "votos_validos": 712633,
     "votos_habiles": 1062500,
     "votos_partidos": {
-      "8": 321180,
       "10": 391453,
+      "8": 321180,
       "81": 44841,
       "80": 4673
     }
@@ -231,8 +231,8 @@
     "votos_validos": 740416,
     "votos_habiles": 1051350,
     "votos_partidos": {
-      "10": 304695,
       "8": 435721,
+      "10": 304695,
       "81": 55368,
       "80": 5215
     }
@@ -248,8 +248,8 @@
     "votos_validos": 6211917,
     "votos_habiles": 8651028,
     "votos_partidos": {
-      "8": 3944506,
       "10": 2267411,
+      "8": 3944506,
       "81": 373411,
       "80": 32057
     }
@@ -266,8 +266,8 @@
     "votos_habiles": 775923,
     "votos_partidos": {
       "10": 171408,
-      "8": 203543,
       "81": 24795,
+      "8": 203543,
       "80": 3189
     }
   },
@@ -445,17 +445,17 @@
     "ambito": "2",
     "departamento": "AMÉRICA",
     "actas_total": 1570,
-    "actas_contabilizadas": 526,
-    "pct_actas_contabilizadas": 33.503,
-    "pct_participacion": 8.527,
-    "votos_emitidos": 64611,
-    "votos_validos": 60828,
+    "actas_contabilizadas": 631,
+    "pct_actas_contabilizadas": 40.191,
+    "pct_participacion": 9.65,
+    "votos_emitidos": 73114,
+    "votos_validos": 69014,
     "votos_habiles": 757697,
     "votos_partidos": {
-      "8": 41887,
-      "10": 18941,
-      "80": 362,
-      "81": 3421
+      "8": 47715,
+      "10": 21359,
+      "80": 384,
+      "81": 3718
     }
   },
   {
@@ -479,17 +479,17 @@
     "ambito": "2",
     "departamento": "EUROPA",
     "actas_total": 839,
-    "actas_contabilizadas": 100,
-    "pct_actas_contabilizadas": 11.919,
-    "pct_participacion": 4.01,
-    "votos_emitidos": 16177,
-    "votos_validos": 15267,
+    "actas_contabilizadas": 133,
+    "pct_actas_contabilizadas": 15.852,
+    "pct_participacion": 5.082,
+    "votos_emitidos": 20500,
+    "votos_validos": 19334,
     "votos_habiles": 403388,
     "votos_partidos": {
-      "8": 8318,
-      "10": 7702,
-      "80": 93,
-      "81": 853
+      "8": 10141,
+      "10": 9193,
+      "80": 118,
+      "81": 1048
     }
   },
   {

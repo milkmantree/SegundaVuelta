@@ -18,17 +18,17 @@
   {
     "ambito": "2",
     "actas_total": 2543,
-    "actas_contabilizadas": 630,
-    "pct_actas_contabilizadas": 24.774,
-    "pct_participacion": 6.674,
-    "votos_emitidos": 80810,
-    "votos_validos": 76117,
+    "actas_contabilizadas": 768,
+    "pct_actas_contabilizadas": 30.201,
+    "pct_participacion": 7.733,
+    "votos_emitidos": 93636,
+    "votos_validos": 88370,
     "votos_habiles": 1210813,
     "votos_partidos": {
-      "8": 50224,
-      "10": 26646,
-      "80": 455,
-      "81": 4274
+      "8": 57875,
+      "10": 30555,
+      "80": 502,
+      "81": 4766
     }
   }
 ]
