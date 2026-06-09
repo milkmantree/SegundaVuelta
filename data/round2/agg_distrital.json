@@ -16086,17 +16086,17 @@
     "provincia": "BRASIL",
     "distrito": "SAO PAULO",
     "actas_total": 21,
-    "actas_contabilizadas": 0,
-    "pct_actas_contabilizadas": 0.0,
-    "pct_participacion": 0.0,
-    "votos_emitidos": 0,
-    "votos_validos": 0,
+    "actas_contabilizadas": 20,
+    "pct_actas_contabilizadas": 95.238,
+    "pct_participacion": 29.608,
+    "votos_emitidos": 3010,
+    "votos_validos": 2831,
     "votos_habiles": 10166,
     "votos_partidos": {
-      "8": 0,
-      "10": 0,
-      "80": 0,
-      "81": 0
+      "8": 1439,
+      "10": 1392,
+      "81": 151,
+      "80": 28
     }
   },
   {
@@ -31206,17 +31206,17 @@
     "provincia": "PUTUMAYO",
     "distrito": "TENIENTE MANUEL CLAVERO",
     "actas_total": 10,
-    "actas_contabilizadas": 0,
-    "pct_actas_contabilizadas": 0.0,
-    "pct_participacion": 0.0,
-    "votos_emitidos": 0,
-    "votos_validos": 0,
+    "actas_contabilizadas": 10,
+    "pct_actas_contabilizadas": 100.0,
+    "pct_participacion": 28.732,
+    "votos_emitidos": 768,
+    "votos_validos": 733,
     "votos_habiles": 2673,
     "votos_partidos": {
-      "8": 0,
-      "10": 0,
-      "80": 0,
-      "81": 0
+      "8": 515,
+      "10": 218,
+      "81": 27,
+      "80": 8
     }
   },
   {
@@ -32886,17 +32886,17 @@
     "provincia": "BRASIL",
     "distrito": "PORTO ALEGRE",
     "actas_total": 2,
-    "actas_contabilizadas": 0,
-    "pct_actas_contabilizadas": 0.0,
-    "pct_participacion": 0.0,
-    "votos_emitidos": 0,
-    "votos_validos": 0,
+    "actas_contabilizadas": 2,
+    "pct_actas_contabilizadas": 100.0,
+    "pct_participacion": 12.802,
+    "votos_emitidos": 127,
+    "votos_validos": 123,
     "votos_habiles": 992,
     "votos_partidos": {
-      "8": 0,
-      "10": 0,
-      "80": 0,
-      "81": 0
+      "10": 66,
+      "8": 57,
+      "81": 3,
+      "80": 1
     }
   },
   {
@@ -39526,17 +39526,17 @@
     "provincia": "DATEM DEL MARAÑÓN",
     "distrito": "PASTAZA",
     "actas_total": 32,
-    "actas_contabilizadas": 20,
-    "pct_actas_contabilizadas": 62.5,
-    "pct_participacion": 25.586,
-    "votos_emitidos": 2020,
-    "votos_validos": 1943,
+    "actas_contabilizadas": 25,
+    "pct_actas_contabilizadas": 78.125,
+    "pct_participacion": 33.515,
+    "votos_emitidos": 2646,
+    "votos_validos": 2540,
     "votos_habiles": 7895,
     "votos_partidos": {
-      "10": 1068,
-      "8": 875,
-      "81": 67,
-      "80": 10
+      "10": 1451,
+      "8": 1089,
+      "81": 93,
+      "80": 13
     }
   },
   {
@@ -39706,16 +39706,16 @@
     "provincia": "MANÚ",
     "distrito": "MADRE DE DIOS",
     "actas_total": 29,
-    "actas_contabilizadas": 25,
-    "pct_actas_contabilizadas": 86.207,
-    "pct_participacion": 46.363,
-    "votos_emitidos": 3831,
-    "votos_validos": 3709,
+    "actas_contabilizadas": 28,
+    "pct_actas_contabilizadas": 96.552,
+    "pct_participacion": 51.652,
+    "votos_emitidos": 4268,
+    "votos_validos": 4136,
     "votos_habiles": 8263,
     "votos_partidos": {
-      "10": 3055,
-      "8": 654,
-      "81": 107,
+      "10": 3406,
+      "8": 730,
+      "81": 117,
       "80": 15
     }
   },
@@ -41286,17 +41286,17 @@
     "provincia": "BRASIL",
     "distrito": "CURITIBA",
     "actas_total": 2,
-    "actas_contabilizadas": 0,
-    "pct_actas_contabilizadas": 0.0,
-    "pct_participacion": 0.0,
-    "votos_emitidos": 0,
-    "votos_validos": 0,
+    "actas_contabilizadas": 2,
+    "pct_actas_contabilizadas": 100.0,
+    "pct_participacion": 27.985,
+    "votos_emitidos": 218,
+    "votos_validos": 208,
     "votos_habiles": 779,
     "votos_partidos": {
-      "8": 0,
-      "10": 0,
-      "80": 0,
-      "81": 0
+      "8": 130,
+      "10": 78,
+      "81": 10,
+      "80": 0
     }
   },
   {

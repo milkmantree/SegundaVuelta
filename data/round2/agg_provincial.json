@@ -2380,17 +2380,17 @@
     "departamento": "LORETO",
     "provincia": "DATEM DEL MARAÑÓN",
     "actas_total": 199,
-    "actas_contabilizadas": 30,
-    "pct_actas_contabilizadas": 15.075,
-    "pct_participacion": 6.229,
-    "votos_emitidos": 3249,
-    "votos_validos": 3125,
+    "actas_contabilizadas": 35,
+    "pct_actas_contabilizadas": 17.588,
+    "pct_participacion": 7.429,
+    "votos_emitidos": 3875,
+    "votos_validos": 3722,
     "votos_habiles": 52161,
     "votos_partidos": {
-      "10": 2204,
-      "8": 921,
-      "81": 101,
-      "80": 23
+      "10": 2587,
+      "8": 1135,
+      "81": 127,
+      "80": 26
     }
   },
   {
@@ -2452,17 +2452,17 @@
     "departamento": "LORETO",
     "provincia": "PUTUMAYO",
     "actas_total": 30,
-    "actas_contabilizadas": 15,
-    "pct_actas_contabilizadas": 50.0,
-    "pct_participacion": 20.295,
-    "votos_emitidos": 1582,
-    "votos_validos": 1514,
+    "actas_contabilizadas": 25,
+    "pct_actas_contabilizadas": 83.333,
+    "pct_participacion": 30.148,
+    "votos_emitidos": 2350,
+    "votos_validos": 2247,
     "votos_habiles": 7795,
     "votos_partidos": {
-      "8": 1061,
-      "10": 453,
-      "81": 53,
-      "80": 15
+      "8": 1576,
+      "10": 671,
+      "81": 80,
+      "80": 23
     }
   },
   {
@@ -3406,17 +3406,17 @@
     "departamento": "AMÉRICA",
     "provincia": "BRASIL",
     "actas_total": 44,
-    "actas_contabilizadas": 10,
-    "pct_actas_contabilizadas": 22.727,
-    "pct_participacion": 5.156,
-    "votos_emitidos": 1007,
-    "votos_validos": 943,
+    "actas_contabilizadas": 34,
+    "pct_actas_contabilizadas": 77.273,
+    "pct_participacion": 22.333,
+    "votos_emitidos": 4362,
+    "votos_validos": 4105,
     "votos_habiles": 19532,
     "votos_partidos": {
-      "8": 644,
-      "10": 299,
-      "80": 10,
-      "81": 54
+      "8": 2270,
+      "10": 1835,
+      "80": 39,
+      "81": 218
     }
   },
   {
@@ -3964,16 +3964,16 @@
     "departamento": "MADRE DE DIOS",
     "provincia": "MANÚ",
     "actas_total": 68,
-    "actas_contabilizadas": 64,
-    "pct_actas_contabilizadas": 94.118,
-    "pct_participacion": 53.877,
-    "votos_emitidos": 10491,
-    "votos_validos": 10047,
+    "actas_contabilizadas": 67,
+    "pct_actas_contabilizadas": 98.529,
+    "pct_participacion": 56.122,
+    "votos_emitidos": 10928,
+    "votos_validos": 10474,
     "votos_habiles": 19472,
     "votos_partidos": {
-      "10": 8077,
-      "8": 1970,
-      "81": 376,
+      "10": 8428,
+      "8": 2046,
+      "81": 386,
       "80": 68
     }
   },

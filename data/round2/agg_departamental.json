@@ -258,33 +258,33 @@
     "ambito": "1",
     "departamento": "LORETO",
     "actas_total": 2697,
-    "actas_contabilizadas": 2440,
-    "pct_actas_contabilizadas": 90.471,
-    "pct_participacion": 52.103,
-    "votos_emitidos": 404280,
-    "votos_validos": 376229,
+    "actas_contabilizadas": 2455,
+    "pct_actas_contabilizadas": 91.027,
+    "pct_participacion": 52.283,
+    "votos_emitidos": 405674,
+    "votos_validos": 377559,
     "votos_habiles": 775923,
     "votos_partidos": {
-      "10": 172417,
-      "8": 203812,
-      "81": 24849,
-      "80": 3202
+      "10": 173018,
+      "8": 204541,
+      "81": 24902,
+      "80": 3213
     }
   },
   {
     "ambito": "1",
     "departamento": "MADRE DE DIOS",
     "actas_total": 507,
-    "actas_contabilizadas": 499,
-    "pct_actas_contabilizadas": 98.422,
-    "pct_participacion": 67.252,
-    "votos_emitidos": 99249,
-    "votos_validos": 94120,
+    "actas_contabilizadas": 502,
+    "pct_actas_contabilizadas": 99.014,
+    "pct_participacion": 67.548,
+    "votos_emitidos": 99686,
+    "votos_validos": 94547,
     "votos_habiles": 147577,
     "votos_partidos": {
-      "10": 65081,
-      "8": 29039,
-      "81": 4536,
+      "10": 65432,
+      "8": 29115,
+      "81": 4546,
       "80": 593
     }
   },
@@ -445,17 +445,17 @@
     "ambito": "2",
     "departamento": "AMÉRICA",
     "actas_total": 1570,
-    "actas_contabilizadas": 638,
-    "pct_actas_contabilizadas": 40.637,
-    "pct_participacion": 9.746,
-    "votos_emitidos": 73844,
-    "votos_validos": 69711,
+    "actas_contabilizadas": 662,
+    "pct_actas_contabilizadas": 42.166,
+    "pct_participacion": 10.189,
+    "votos_emitidos": 77199,
+    "votos_validos": 72873,
     "votos_habiles": 757697,
     "votos_partidos": {
-      "8": 48195,
-      "10": 21516,
-      "80": 387,
-      "81": 3746
+      "8": 49821,
+      "10": 23052,
+      "80": 416,
+      "81": 3910
     }
   },
   {
