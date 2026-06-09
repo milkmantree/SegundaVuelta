@@ -4,7 +4,7 @@ import os
 import sys
 import time
 
-from flask import Flask, jsonify, send_file
+from flask import Flask, jsonify, render_template
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from paths import ROUND1, ROUND2, PREDICTION_HISTORY
@@ -111,7 +111,7 @@ def _read(path: str):
 
 @app.route("/")
 def index():
-    return send_file("dashboard.html")
+    return render_template("dashboard.html")
 
 
 def _round_payload(base_dir, is_final: bool):
